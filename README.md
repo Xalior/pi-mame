@@ -67,8 +67,10 @@ configuration: don't remove it. 🌡️
 ## 🧰 Prerequisites
 
 - [Arm GNU toolchain](https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads)
-  **aarch64-none-elf**, release 15.2.Rel1, on your `PATH`
-- GNU make, `wget` (firmware download)
+  release 15.2.Rel1, target **aarch64-none-elf** — pick the archive whose
+  *host* matches the machine you're building on (x86_64 Linux, macOS,
+  AArch64 Linux, …), untar it anywhere, and put its `bin/` on your `PATH`
+- `git`, GNU make, `wget` (firmware download)
 - On macOS: `brew install bash gnu-getopt`, and put both ahead of the
   system versions when building —
 
@@ -78,7 +80,8 @@ configuration: don't remove it. 🌡️
 
   The stock bash 3.2 and BSD getopt silently break circle-stdlib's
   `configure` (the symptom is `Error: Invalid toolchain prefix`) 🍎🪤
-- ~15 GB of disk and some patience: MAME is a large build ☕
+- ~15 GB of disk and real patience: the MAME step is hours, not
+  minutes ☕☕☕
 
 ## 🏗️ Building
 
@@ -92,25 +95,45 @@ make mame      # the MAME archives — the long one; log: build/mame-build.log
                #  archives are the product and the kernel links itself)
 make kernels   # kernel8-spectrum.img, kernel8-tbblue.img, kernel8-picker.img
 
-make sd MACHINE=spectrum ASSETS=~/my-assets
+make sd MACHINE=spectrum ASSETS=~/my-assets   # see "Assets you must supply"
 ```
 
-`make sd` assembles a complete copy-to-FAT-card tree in `build/sd/`:
+`make sd` assembles a complete copy-to-card tree in `build/sd/`:
 Raspberry Pi firmware (fetched at the revision Circle pins), Circle's
 `config64.txt` boot configuration, the PAL canvas `cmdline.txt`, and the
-chosen kernel. Copy its contents to an SD card's FAT partition and power
-the Pi on. 🔌
+chosen kernel. `ASSETS` points at a directory you provide (layout below);
+leave it off and `make sd` still builds the tree — you'll just add
+`roms/` (and `next/`) to the card yourself.
+
+Then, concretely: 💾
+
+1. Format an SD card with a single **FAT32** partition (any size card; the
+   Pi 4 boots from FAT).
+2. Copy everything *inside* `build/sd/` onto it — files at the card's top
+   level, not in a subfolder.
+3. Put the card in the Pi, plug the display into **HDMI0 — the micro-HDMI
+   port next to the USB-C power connector** — and power on. 🔌
 
 ## 🕹️ Assets you must supply
 
-This repository contains no ROMs and no disk images. Your assets directory
-provides:
+This repository contains no ROMs and no disk images. The `ASSETS`
+directory you hand to `make sd` looks like this:
 
-- `roms/` — MAME-format ROM zips for the machines you build
-  (e.g. `spectrum.zip`; `tbblue.zip` for the Next)
-- `next/next.img` — a ZX Spectrum Next SD-card image, required by the
-  `tbblue` machine (distributed by the
-  [Spectrum Next project](https://www.specnext.com/latestdistro/))
+```
+my-assets/
+├── roms/
+│   ├── spectrum.zip   # MAME-format ROM zip for the 48K
+│   └── tbblue.zip     # …and for the Next
+└── next/
+    └── next.img       # ZX Spectrum Next SD-card image (tbblue only)
+```
+
+- ROM zips are standard MAME romsets, named for their machine.
+- `next.img` is distributed by the
+  [Spectrum Next project](https://www.specnext.com/latestdistro/); the
+  `tbblue` machine boots NextZXOS from it.
+- Only supplying some assets is fine: machines without their ROMs simply
+  won't run.
 
 ## ⌨️ At the keyboard
 
