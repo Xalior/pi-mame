@@ -42,8 +42,15 @@ configuration: don't remove it.
 - [Arm GNU toolchain](https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads)
   **aarch64-none-elf**, release 15.2.Rel1, on your `PATH`
 - GNU make, `wget` (firmware download)
-- On macOS: Homebrew `bash` (5.x) and `gnu-getopt` on `PATH` ahead of the
-  system versions — circle-stdlib's `configure` needs them
+- On macOS: `brew install bash gnu-getopt`, and put both ahead of the
+  system versions when building —
+
+  ```sh
+  export PATH="/opt/homebrew/opt/gnu-getopt/bin:/opt/homebrew/bin:$PATH"
+  ```
+
+  The stock bash 3.2 and BSD getopt silently break circle-stdlib's
+  `configure` (the symptom is `Error: Invalid toolchain prefix`)
 - ~15 GB of disk and some patience: MAME is a large build
 
 ## Building

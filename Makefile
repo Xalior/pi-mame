@@ -13,8 +13,10 @@ MACHINE ?= spectrum
 
 .PHONY: deps mame kernel kernels sd
 
+# `bash ./configure` (not ./configure): the shebang would pin macOS's
+# bash 3.2; PATH resolution finds a modern bash when one is installed.
 deps:
-	cd circle-stdlib && ./configure -r 4 -p aarch64-none-elf- --libcxx \
+	cd circle-stdlib && bash ./configure -r 4 -p aarch64-none-elf- --libcxx \
 		--kernel-max-size 64 -o ARM_ALLOW_MULTI_CORE && $(MAKE)
 	$(MAKE) -C circle-libsdl2
 
