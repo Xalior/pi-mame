@@ -19,9 +19,18 @@ The family compiled into every image is currently the Sinclair range
 (SUBTARGET=spectrum): the 48K ZX Spectrum, the ZX Spectrum Next (`tbblue`,
 with its SD card image attached), and three dozen relatives.
 
-## The three images
+## The default images
 
-| `make` | Image | Boots into |
+Everything on this page describes **this repository's build system and its
+defaults** — the family it compiles, the machines it bakes, the canvas it
+ships. All of it is yours to change: add a `MACHINE_DEFS_<name>` line in
+`host/Makefile` to bake a different machine, change `SOURCES` in
+`scripts/build-mame.sh` to compile a different family, write your own
+canvas. A custom image is the same build with your choices in it.
+
+Out of the box, three images:
+
+| `make` | Image | Powers on into |
 |---|---|---|
 | `MACHINE=spectrum` | `kernel8-spectrum.img` | 48K ZX Spectrum BASIC |
 | `MACHINE=tbblue` | `kernel8-tbblue.img` | ZX Spectrum Next / NextZXOS (needs `next/next.img` on the card) |
