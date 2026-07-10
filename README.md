@@ -6,17 +6,18 @@ because that's what it is.
 
 pi-mame embeds MAME's emulation core on the [Circle](https://github.com/rsta2/circle)
 bare-metal framework through a purpose-built
-[SDL2 shim](https://github.com/Xalior/circle-libsdl2). MAME's desktop
-surface — command line, config files, snapshots, debugger — never ships:
-an image's configuration is compiled in, never read at runtime. A machine
-image *is* its machine; the picker image bakes in no machine at all — it boots
-into MAME's system list, and the compiled-in family is the menu. Picking
-isn't configuration: nothing is written, nothing persists, and power-off
-forgets the choice.
+[SDL2 shim](https://github.com/Xalior/circle-libsdl2). Every image contains
+the same compiled-in family of machines. What differs is what happens at
+power-on, and that is decided when the image is **built** — never by config
+files or a command line, because there are none. A machine image powers on
+as its one machine, instantly, every time. The picker image powers on into
+MAME's system list instead: pick any machine in the family with the
+keyboard and it starts. Nothing you pick is remembered — power off, and the
+next power-on asks again.
 
-The current family is the Sinclair range (SUBTARGET=spectrum): the 48K
-ZX Spectrum, the ZX Spectrum Next (`tbblue`, with its SD card image
-attached), and three dozen relatives.
+The family compiled into every image is currently the Sinclair range
+(SUBTARGET=spectrum): the 48K ZX Spectrum, the ZX Spectrum Next (`tbblue`,
+with its SD card image attached), and three dozen relatives.
 
 ## The three images
 
