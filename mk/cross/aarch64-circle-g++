@@ -1,0 +1,39 @@
+#!/bin/sh
+# Cross C++ compiler for MAME-on-Circle: aarch64-none-elf-g++ against
+# circle-stdlib's newlib + libc++ sysroot. Flags appended AFTER the caller's
+# arguments deliberately: gcc honours the last -std/-mcpu, so genie's
+# defaults are overridden without patching MAME's build scripts.
+#
+# Requires the Arm GNU aarch64-none-elf toolchain on PATH.
+
+ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+REAL="$(command -v aarch64-none-elf-g++)" || {
+    echo "aarch64-circle-g++: aarch64-none-elf-g++ not on PATH" >&2; exit 1; }
+TC="$(cd "$(dirname "$REAL")/.." && pwd)"
+STDLIB=$ROOT/circle-stdlib
+INSTALL=$STDLIB/install/aarch64-none-circle
+TCINC="$(echo "$TC"/lib/gcc/aarch64-none-elf/*/include)"
+
+exec "$REAL" "$@" \
+    -mcpu=cortex-a72 -mlittle-endian \
+    -std=gnu++23 -Wno-volatile \
+    -Wno-alloc-size-larger-than \
+    -nostdinc \
+    -isystem "$INSTALL-libc++/include" \
+    -isystem "$INSTALL-libc++/include/c++/v1" \
+    -isystem "$INSTALL-libc++-threading/include" \
+    -isystem "$ROOT/mk/cross/compat" \
+    -isystem "$INSTALL/include" \
+    -isystem "$STDLIB/include" \
+    -isystem "$STDLIB/libs/circle/include" \
+    -isystem "$STDLIB/libs/circle/addon" \
+    -isystem "$TCINC" \
+    -D__circle__ -DAARCH=64 -DRASPPI=4 \
+    -D__LINUX_ERRNO_EXTENSIONS__ \
+    -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L \
+    -D_POSIX_TIMERS=1 -D_POSIX_MONOTONIC_CLOCK=200112L \
+    -D_POSIX_PRIORITY_SCHEDULING=1 \
+    -DBX_CRT_NEWLIB=1 \
+    -DBX_CONFIG_SUPPORTS_THREADING=0 \
+    -DBGFX_CONFIG_MULTITHREADED=0 \
+    -Wno-free-nonheap-object

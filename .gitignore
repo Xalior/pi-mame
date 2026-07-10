@@ -1,0 +1,10 @@
+build/
+host/*.o
+host/*.d
+host/*.elf
+host/*.img
+host/*.lst
+host/*.map
+host/libosd_sdl-nomain.a
+assets/
+.DS_Store

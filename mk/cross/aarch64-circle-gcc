@@ -1,0 +1,29 @@
+#!/bin/sh
+# Cross C compiler for MAME-on-Circle 3rdparty C code (zlib, expat, ...):
+# aarch64-none-elf-gcc against circle-stdlib's newlib. Flags appended AFTER
+# the caller's arguments so they win gcc's last-flag rule.
+#
+# Requires the Arm GNU aarch64-none-elf toolchain on PATH.
+
+ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+REAL="$(command -v aarch64-none-elf-gcc)" || {
+    echo "aarch64-circle-gcc: aarch64-none-elf-gcc not on PATH" >&2; exit 1; }
+TC="$(cd "$(dirname "$REAL")/.." && pwd)"
+STDLIB=$ROOT/circle-stdlib
+INSTALL=$STDLIB/install/aarch64-none-circle
+TCINC="$(echo "$TC"/lib/gcc/aarch64-none-elf/*/include)"
+
+exec "$REAL" "$@" \
+    -mcpu=cortex-a72 -mlittle-endian \
+    -nostdinc \
+    -isystem "$ROOT/mk/cross/compat" \
+    -isystem "$INSTALL/include" \
+    -isystem "$STDLIB/include" \
+    -isystem "$STDLIB/libs/circle/include" \
+    -isystem "$STDLIB/libs/circle/addon" \
+    -isystem "$TCINC" \
+    -D__circle__ -DAARCH=64 -DRASPPI=4 \
+    -D__LINUX_ERRNO_EXTENSIONS__ \
+    -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L \
+    -D_POSIX_TIMERS=1 -D_POSIX_MONOTONIC_CLOCK=200112L \
+    -D_POSIX_PRIORITY_SCHEDULING=1

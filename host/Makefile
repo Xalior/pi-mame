@@ -1,0 +1,144 @@
+#
+# MAME payload kernel: links MAME's archives + circle-libsdl2 + circle-stdlib
+# into one image per personality — the machine and its fixed facts are baked.
+#
+#   make MACHINE=spectrum -> kernel8-spectrum.img (boots straight into a 48K)
+#   make MACHINE=tbblue   -> kernel8-tbblue.img (ZX Spectrum Next,
+#                            /next/next.img attached as its SD card)
+#   make MACHINE=picker   -> kernel8-picker.img (nothing baked: MAME boots
+#                            into its system list; the family is the menu)
+#
+# Framebuffer geometry is NOT in here: it is Circle boot config (width=/
+# height= in the SD card's FAT-root cmdline.txt), set PER REGION, not per
+# machine — cmdline-pal.txt is the PAL canvas (720x576) every PAL machine
+# fills, the way a CRT was filled.
+#
+# Prerequisite: scripts/build-mame.sh has produced mame/build/rapi-circle/.
+#
+
+include ../circle-stdlib/Config.mk
+
+ROOT = ..
+MAMEBUILD = $(ROOT)/mame/build/rapi-circle
+
+MACHINE ?= spectrum
+
+# Per-personality fixed facts, compiled into the kernel (kernel.cpp).
+MACHINE_DEFS_spectrum = -DMAME_MACHINE='"spectrum"'
+MACHINE_DEFS_tbblue   = -DMAME_MACHINE='"tbblue"' -DMAME_HARDDISK='"/next/next.img"'
+MACHINE_DEFS_picker   = -DMAME_PICKER
+
+KERNEL_DEFS = $(MACHINE_DEFS_$(MACHINE))
+ifeq ($(strip $(KERNEL_DEFS)),)
+$(error unknown MACHINE '$(MACHINE)' — spectrum, tbblue, or picker)
+endif
+
+TARGET = kernel8-$(MACHINE)
+
+OBJS = main.o kernel-$(MACHINE).o mamemain.o circle_stubs.o
+
+STANDARD = -std=gnu++23 -Wno-volatile
+
+# The three objects genie links directly into the final binary.
+MAME_OBJS = \
+	$(MAMEBUILD)/obj/Release/src/mame/mame.o \
+	$(MAMEBUILD)/obj/Release/generated/mame/spectrum/drivlist.o \
+	$(MAMEBUILD)/obj/Release/generated/version.o
+
+# libosd_sdl.a ships sdlmain.o (MAME's own main() + sdl_entered_debugger,
+# which mamemain.cpp provides instead). Link a local copy with that member
+# deleted; the mame tree stays untouched.
+LIBOSD_NOMAIN = libosd_sdl-nomain.a
+
+# libprecompile.a is excluded (PCH carrier, nothing to link). libqtdbg_sdl.a
+# stays in: built with USE_QTDEBUG=0 it holds only the not-supported debugger
+# module (DEBUG_QT), which osdobj_common.cpp registers unconditionally.
+MAME_ARCHIVES = \
+	$(wildcard $(MAMEBUILD)/bin/mame_spectrum/*.a) \
+	$(filter-out %/libosd_sdl.a %/libprecompile.a, \
+		$(wildcard $(MAMEBUILD)/bin/*.a))
+
+# Rules.mk's link recipe already wraps $(LIBS) in --start-group/--end-group,
+# which covers MAME's mutually referential archives. LIBS is also part of
+# the .img rule's prerequisite list: file paths only, defined before Rules.mk.
+LIBS = $(MAME_OBJS) \
+	$(LIBOSD_NOMAIN) \
+	$(MAME_ARCHIVES) \
+	$(ROOT)/circle-libsdl2/libSDL2.a \
+	$(CIRCLEHOME)/lib/sound/libsound.a \
+	$(CIRCLE_STDLIB_LIBS)
+
+include $(CIRCLEHOME)/Rules.mk
+
+# MAME is multicore by design: this kernel must link a multicore-configured
+# circle-stdlib world (configure with -o ARM_ALLOW_MULTI_CORE).
+ifeq ($(findstring ARM_ALLOW_MULTI_CORE,$(DEFINE)),)
+$(error the payload requires a multicore circle-stdlib world — reconfigure circle-stdlib with -o ARM_ALLOW_MULTI_CORE)
+endif
+
+INCLUDE := -I $(ROOT)/circle-libsdl2/include $(CIRCLE_STDLIB_INCLUDES) $(INCLUDE)
+
+# The kernel object is per-personality: the baked facts live in it, and
+# distinct object names keep the personalities from inheriting each
+# other's bake.
+kernel-$(MACHINE).o: kernel.cpp
+	@echo "  CPP   $@ ($(KERNEL_DEFS))"
+	@$(CPP) $(CPPFLAGS) $(KERNEL_DEFS) -c -o $@ $<
+
+kernel-$(MACHINE).d: kernel.cpp
+	@$(CPP) $(CPPFLAGS) $(KERNEL_DEFS) -M -MG -MT kernel-$(MACHINE).o -MT $@ -MF $@ $<
+
+$(LIBOSD_NOMAIN): $(MAMEBUILD)/bin/libosd_sdl.a
+	@echo "  AR    $@ (libosd_sdl.a minus sdlmain.o)"
+	@cp $< $@
+	@chmod u+w $@
+	@$(AR) d $@ sdlmain.o
+
+# mamemain.cpp compiles the way genie compiled sdlmain.cpp: same cross
+# wrapper, and the `release` config's DEFINES/INCLUDES from
+# mame/build/projects/sdl/mamespectrum/gmake-rapi-circle/osd_sdl.make.
+MAME_CXX = $(ROOT)/mk/cross/aarch64-circle-g++
+
+MAME_DEFINES = -DNDEBUG -DCRLF=2 -DLSB_FIRST -DFLAC__NO_DLL \
+	-DPUGIXML_HEADER_ONLY -DMAME_NOASM -DNATIVE_DRC=drcbe_c \
+	-DASIO_HAS_THREAD_KEYWORD_EXTENSION -DSDLMAME_NO_X11 -DUSE_XINPUT=0 \
+	-DUSE_XINPUT_WII_LIGHTGUN_HACK=0 -DSDLMAME_SDL2=1 -DOSD_SDL \
+	-DSDLMAME_UNIX -DUSE_OPENGL=1 -D__STDC_LIMIT_MACROS \
+	-D__STDC_FORMAT_MACROS -D__STDC_CONSTANT_MACROS -DBX_CONFIG_DEBUG=0 \
+	-DNO_USE_PORTAUDIO -DNO_USE_PULSEAUDIO -DNO_USE_PIPEWIRE \
+	-DNO_USE_MIDI -DUSE_QTDEBUG=0
+
+MAME_INCLUDES = \
+	-I $(ROOT)/mame/src/osd \
+	-I $(ROOT)/mame/3rdparty/asio/include \
+	-I $(ROOT)/mame/3rdparty/bgfx/examples/common \
+	-I $(ROOT)/mame/3rdparty/bgfx/include \
+	-I $(ROOT)/mame/3rdparty/bgfx/3rdparty \
+	-I $(ROOT)/mame/3rdparty/bgfx/3rdparty/khronos \
+	-I $(ROOT)/mame/3rdparty/bx/include \
+	-I $(ROOT)/mame/3rdparty/rapidjson/include \
+	-I $(ROOT)/mame/src/emu \
+	-I $(ROOT)/mame/src/devices \
+	-I $(ROOT)/mame/src/lib \
+	-I $(ROOT)/mame/src/lib/util \
+	-I $(ROOT)/mame/src/osd/modules/file \
+	-I $(ROOT)/mame/src/osd/modules/render \
+	-I $(ROOT)/mame/3rdparty \
+	-I $(ROOT)/mame/src/osd/sdl \
+	-I $(ROOT)/circle-libsdl2/include
+
+mamemain.o: mamemain.cpp
+	@echo "  CPP   $@ (MAME env)"
+	@$(MAME_CXX) $(MAME_DEFINES) $(MAME_INCLUDES) \
+		-O3 -fno-strict-aliasing -Wall -Wno-unknown-pragmas \
+		-c -o $@ $<
+
+# Overrides Rules.mk's %.d rule, whose Circle flags can't see MAME headers.
+mamemain.d: mamemain.cpp
+	@$(MAME_CXX) $(MAME_DEFINES) $(MAME_INCLUDES) \
+		-M -MT mamemain.o -MT $@ -MF $@ $<
+
+-include $(DEPS)
+
+# pi-mame link rule: pristine Circle tree, TLS-adjacent linker script
+include ../mk/ld/circle-app.mk

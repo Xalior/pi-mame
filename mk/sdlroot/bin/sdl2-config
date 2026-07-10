@@ -1,0 +1,12 @@
+#!/bin/sh
+# sdl2-config for circle-libsdl2 — answers MAME's build-time SDL discovery.
+# Lives outside the mame tree; genie finds it via SDL_INSTALL_ROOT.
+
+PREFIX="$(cd "$(dirname "$0")/../../.." && pwd)/circle-libsdl2"
+
+case "$1" in
+  --version) echo 2.32.4 ;;
+  --cflags)  echo "-I$PREFIX/include" ;;
+  --libs|--static-libs) echo "-L$PREFIX -lSDL2" ;;
+  *)         exit 1 ;;
+esac
