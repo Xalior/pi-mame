@@ -9,8 +9,7 @@ bare-metal framework through a purpose-built
 [SDL2 shim](https://github.com/Xalior/circle-libsdl2). MAME's desktop
 surface — command line, config files, snapshots, debugger — never ships:
 an image's configuration is compiled in, never read at runtime. A machine
-image *is* its machine (switching machines means booting a different
-kernel); the picker image bakes in no machine at all — it boots
+image *is* its machine; the picker image bakes in no machine at all — it boots
 into MAME's system list, and the compiled-in family is the menu. Picking
 isn't configuration: nothing is written, nothing persists, and power-off
 forgets the choice.
