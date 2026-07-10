@@ -6,21 +6,22 @@ because that's what it is.
 
 pi-mame embeds MAME's emulation core on the [Circle](https://github.com/rsta2/circle)
 bare-metal framework through a purpose-built
-[SDL2 shim](https://github.com/Xalior/circle-libsdl2). Every image contains
-the same compiled-in family of machines. What differs is what happens at
-power-on, and that is decided when the image is **built** — never by config
-files or a command line, because there are none. A machine image powers on
-as its one machine, instantly, every time. The picker image powers on into
-MAME's system list instead: pick any machine in the family with the
-keyboard and it starts. Nothing you pick is remembered — power off, and the
-next power-on asks again.
+[SDL2 shim](https://github.com/Xalior/circle-libsdl2). Every image is the
+same emulator; what differs is what happens at power-on, and that is
+decided when the image is **built** — never by config files or a command
+line, because there are none. A machine image powers on as its one
+machine, instantly, every time. The picker image powers on into MAME's
+system list instead: pick a machine with the keyboard and — if its ROMs
+are on the card — it starts. Nothing you pick is remembered — power off,
+and the next power-on asks again.
 
-The family compiled into every image is exactly what the build's `SOURCES`
-names: `spectrum.cpp` and `specnext.cpp` — the 48K ZX Spectrum with its
-direct clones, and the ZX Spectrum Next (`tbblue`, with its SD card image
-attached). The wider Sinclair range (128K, +2/+3, Timex, Pentagon, …) lives
-in other driver files and is not built by default; adding it is a
-`SOURCES` change in `scripts/build-mame.sh`.
+Out of the box, the images run **two machines**: the 48K ZX Spectrum and
+the ZX Spectrum Next (`tbblue`, with its SD card image attached). The
+picker's list shows everything in MAME's database, but a listed machine
+only runs if you've supplied its ROMs — with the default assets, that's
+those two. Building more of MAME in is a `SOURCES` change in
+`scripts/build-mame.sh`; running more is a matter of what you put in
+`roms/`.
 
 ## The default images
 
@@ -37,7 +38,7 @@ Out of the box, three images:
 |---|---|---|
 | `MACHINE=spectrum` | `kernel8-spectrum.img` | 48K ZX Spectrum BASIC |
 | `MACHINE=tbblue` | `kernel8-tbblue.img` | ZX Spectrum Next / NextZXOS (needs `next/next.img` on the card) |
-| `MACHINE=picker` | `kernel8-picker.img` | MAME's system list — the whole compiled family as a menu |
+| `MACHINE=picker` | `kernel8-picker.img` | MAME's system list — a menu; machines with ROMs on the card run |
 
 The SD card is identical in every case — only the kernel differs. "Which
 machine" is not configuration; it's which binary you boot.
