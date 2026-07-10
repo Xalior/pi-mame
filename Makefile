@@ -15,9 +15,11 @@ MACHINE ?= spectrum
 
 # `bash ./configure` (not ./configure): the shebang would pin macOS's
 # bash 3.2; PATH resolution finds a modern bash when one is installed.
+# MAKEINFO=true: newlib insists on building its manuals otherwise, which
+# fails on any system without texinfo — the manuals aren't the product.
 deps:
 	cd circle-stdlib && bash ./configure -r 4 -p aarch64-none-elf- --libcxx \
-		--kernel-max-size 64 -o ARM_ALLOW_MULTI_CORE && $(MAKE)
+		--kernel-max-size 64 -o ARM_ALLOW_MULTI_CORE && $(MAKE) MAKEINFO=true
 	$(MAKE) -C circle-libsdl2
 
 mame:
