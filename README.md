@@ -15,9 +15,12 @@ MAME's system list instead: pick any machine in the family with the
 keyboard and it starts. Nothing you pick is remembered — power off, and the
 next power-on asks again.
 
-The family compiled into every image is currently the Sinclair range
-(SUBTARGET=spectrum): the 48K ZX Spectrum, the ZX Spectrum Next (`tbblue`,
-with its SD card image attached), and three dozen relatives.
+The family compiled into every image is exactly what the build's `SOURCES`
+names: `spectrum.cpp` and `specnext.cpp` — the 48K ZX Spectrum with its
+direct clones, and the ZX Spectrum Next (`tbblue`, with its SD card image
+attached). The wider Sinclair range (128K, +2/+3, Timex, Pentagon, …) lives
+in other driver files and is not built by default; adding it is a
+`SOURCES` change in `scripts/build-mame.sh`.
 
 ## The default images
 
