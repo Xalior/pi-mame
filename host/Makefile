@@ -3,6 +3,7 @@
 # into one image per personality — the machine and its fixed facts are baked.
 #
 #   make MACHINE=spectrum -> kernel8-spectrum.img (boots straight into a 48K)
+#   make MACHINE=spec128  -> kernel8-spec128.img (boots into a ZX Spectrum 128)
 #   make MACHINE=tbblue   -> kernel8-tbblue.img (ZX Spectrum Next,
 #                            /next/next.img attached as its SD card)
 #   make MACHINE=picker   -> kernel8-picker.img (nothing baked: MAME boots
@@ -25,12 +26,13 @@ MACHINE ?= spectrum
 
 # Per-personality fixed facts, compiled into the kernel (kernel.cpp).
 MACHINE_DEFS_spectrum = -DMAME_MACHINE='"spectrum"'
+MACHINE_DEFS_spec128  = -DMAME_MACHINE='"spec128"'
 MACHINE_DEFS_tbblue   = -DMAME_MACHINE='"tbblue"' -DMAME_HARDDISK='"/next/next.img"'
 MACHINE_DEFS_picker   = -DMAME_PICKER
 
 KERNEL_DEFS = $(MACHINE_DEFS_$(MACHINE))
 ifeq ($(strip $(KERNEL_DEFS)),)
-$(error unknown MACHINE '$(MACHINE)' — spectrum, tbblue, or picker)
+$(error unknown MACHINE '$(MACHINE)' — spectrum, spec128, tbblue, or picker)
 endif
 
 TARGET = kernel8-$(MACHINE)
