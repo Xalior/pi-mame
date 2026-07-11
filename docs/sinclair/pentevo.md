@@ -1,5 +1,7 @@
 # ZX Evolution: BASECONF
 
+![ZX Evolution: BASECONF at power-on](images/pentevo.jpg)
+
 - **`make MACHINE=pentevo`** — Sinclair
 - **Year**: 2009
 - **Manufacturer**: NedoPC

@@ -1,5 +1,7 @@
 # Elwro 800-3 Junior
 
+![Elwro 800-3 Junior at power-on](images/elwro800.jpg)
+
 - **`make MACHINE=elwro800`** — Sinclair
 - **Year**: 1986
 - **Manufacturer**: Elwro

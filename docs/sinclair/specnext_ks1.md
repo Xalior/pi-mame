@@ -1,5 +1,7 @@
 # ZX Spectrum Next, KS1 board (2020 Kickstarter)
 
+![ZX Spectrum Next, KS1 board (2020 Kickstarter) at power-on](images/specnext_ks1.jpg)
+
 - **`make MACHINE=specnext_ks1`** — Sinclair
 - **Year**: 2020
 - **Manufacturer**: SpecNext Ltd., Victor Trucco, Fabio Belavenuto

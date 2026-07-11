@@ -1,5 +1,7 @@
 # ZX Spectrum Next
 
+![ZX Spectrum Next at power-on](images/tbblue.jpg)
+
 - **`make MACHINE=tbblue`** — Sinclair
 - **Year**: 2017
 - **Manufacturer**: SpecNext Ltd., Victor Trucco, Fabio Belavenuto

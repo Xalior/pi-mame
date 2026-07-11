@@ -1,5 +1,7 @@
 # ZX Spectrum Next, KS3 board (2025 Kickstarter)
 
+![ZX Spectrum Next, KS3 board (2025 Kickstarter) at power-on](images/specnext_ks3.jpg)
+
 - **`make MACHINE=specnext_ks3`** — Sinclair
 - **Year**: 2025
 - **Manufacturer**: SpecNext Ltd., Victor Trucco, Fabio Belavenuto

@@ -1,5 +1,7 @@
 # KC Compact
 
+![KC Compact at power-on](images/kccomp.jpg)
+
 - **`make MACHINE=kccomp`** — Amstrad
 - **Year**: 1989
 - **Manufacturer**: VEB Mikroelektronik "Wilhelm Pieck" Mühlhausen

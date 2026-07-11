@@ -1,5 +1,7 @@
 # Pentagon 128K
 
+![Pentagon 128K at power-on](images/pentagon.jpg)
+
 - **`make MACHINE=pentagon`** — Sinclair
 - **Year**: 1991
 - **Manufacturer**: Vladimir Drozdov

@@ -1,5 +1,7 @@
 # PEVM Byte
 
+![PEVM Byte at power-on](images/byte.jpg)
+
 - **`make MACHINE=byte`** — Sinclair
 - **Year**: 1990
 - **Manufacturer**: BEMZ

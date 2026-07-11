@@ -59,7 +59,9 @@ Every other machine belongs to one of two platforms:
 Each platform page carries its own machine table (`make MACHINE=` target,
 system, year, romset, TV region) and a details page per machine covering
 exactly what appears on the glass at power-on and exactly which assets it
-needs.
+needs. Every screenshot in those pages is an HDMI capture from a real
+Raspberry Pi 4 running that machine's image — not an emulator window, not
+a mockup. 📸
 
 ## 📺 Display: the regional canvas
 

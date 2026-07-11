@@ -1,5 +1,7 @@
 # Peters Plus Sprinter
 
+![Peters Plus Sprinter at power-on](images/sprinter.jpg)
+
 - **`make MACHINE=sprinter`** — Sinclair
 - **Year**: 2000
 - **Manufacturer**: Peters Plus, Ivan Mak

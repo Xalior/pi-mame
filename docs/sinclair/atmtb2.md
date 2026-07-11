@@ -1,5 +1,7 @@
 # MicroART ATM-Turbo 2
 
+![MicroART ATM-Turbo 2 at power-on](images/atmtb2.jpg)
+
 - **`make MACHINE=atmtb2`** — Sinclair
 - **Year**: 1992
 - **Manufacturer**: MicroART

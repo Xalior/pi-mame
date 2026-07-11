@@ -1,5 +1,7 @@
 # 48K ZX Spectrum
 
+![48K ZX Spectrum at power-on](images/spectrum.jpg)
+
 - **`make MACHINE=spectrum`** — Sinclair
 - **Year**: 1982
 - **Manufacturer**: Sinclair Research Ltd
