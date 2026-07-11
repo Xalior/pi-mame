@@ -12,13 +12,16 @@
 #   make MACHINE=zx80     -> kernel8-zx80.img (boots into a Sinclair ZX-80)
 #   make MACHINE=zx81     -> kernel8-zx81.img (boots into a Sinclair ZX-81)
 #   make MACHINE=tc2048   -> kernel8-tc2048.img (boots into a Timex TC-2048)
+#   make MACHINE=ts2068   -> kernel8-ts2068.img (boots into a Timex Sinclair
+#                            TS-2068, the American 60Hz machine)
 #   make MACHINE=picker   -> kernel8-picker.img (nothing baked: MAME boots
 #                            into its system list; the family is the menu)
 #
 # Framebuffer geometry is NOT in here: it is Circle boot config (width=/
 # height= in the SD card's FAT-root cmdline.txt), set PER REGION, not per
 # machine — cmdline-pal.txt is the PAL canvas (720x576) every PAL machine
-# fills, the way a CRT was filled.
+# fills, cmdline-ntsc.txt the NTSC canvas (720x480) the American 60Hz
+# machines fill, the way a CRT was filled.
 #
 # Prerequisite: scripts/build-mame.sh has produced mame/build/rapi-circle/.
 #
@@ -40,11 +43,12 @@ MACHINE_DEFS_tbblue   = -DMAME_MACHINE='"tbblue"' -DMAME_HARDDISK='"/next/next.i
 MACHINE_DEFS_zx80     = -DMAME_MACHINE='"zx80"'
 MACHINE_DEFS_zx81     = -DMAME_MACHINE='"zx81"'
 MACHINE_DEFS_tc2048   = -DMAME_MACHINE='"tc2048"'
+MACHINE_DEFS_ts2068   = -DMAME_MACHINE='"ts2068"'
 MACHINE_DEFS_picker   = -DMAME_PICKER
 
 KERNEL_DEFS = $(MACHINE_DEFS_$(MACHINE))
 ifeq ($(strip $(KERNEL_DEFS)),)
-$(error unknown MACHINE '$(MACHINE)' — spectrum, spec128, specpls2, specpl2a, specpls3, tbblue, zx80, zx81, tc2048, or picker)
+$(error unknown MACHINE '$(MACHINE)' — spectrum, spec128, specpls2, specpl2a, specpls3, tbblue, zx80, zx81, tc2048, ts2068, or picker)
 endif
 
 TARGET = kernel8-$(MACHINE)

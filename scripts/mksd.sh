@@ -5,8 +5,8 @@
 #
 # The tree is a complete FAT-root layout: Raspberry Pi firmware (fetched at
 # the revision pinned by circle/boot/Makefile, using Circle's own download
-# mechanism), Circle's config64.txt as config.txt, the PAL canvas as
-# cmdline.txt, the chosen kernel image, and — if an assets directory is
+# mechanism), Circle's config64.txt as config.txt, the machine's regional
+# canvas as cmdline.txt, the chosen kernel image, and — if an assets directory is
 # given — roms/ and next/ copied from it. ROMs and disk images are yours
 # to provide; they are not part of this repository.
 
@@ -35,8 +35,14 @@ done
 cp "$ROOT/circle/boot/config64.txt" "$SD/config.txt"
 cp "$IMG" "$SD/kernel8-rpi4.img"
 
-# The regional canvas: every PAL machine fills the same PAL tube.
-cp "$ROOT/host/cmdline-pal.txt" "$SD/cmdline.txt"
+# The regional canvas: a machine's region picks its television. The American
+# 60Hz machines fill the NTSC tube (720x480); everything else fills PAL
+# (720x576).
+case "$MACHINE" in
+    ts2068|ts1000|ts1500) CANVAS=cmdline-ntsc.txt ;;
+    *)                    CANVAS=cmdline-pal.txt ;;
+esac
+cp "$ROOT/host/$CANVAS" "$SD/cmdline.txt"
 
 if [ -n "$ASSETS" ]; then
     [ -d "$ASSETS/roms" ] && cp -R "$ASSETS/roms" "$SD/roms" \
