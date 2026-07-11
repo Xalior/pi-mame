@@ -19,7 +19,7 @@ and the next power-on asks again. 🔁
 
 Delightfully small. Let's be precise about what this actually is:
 
-- **Twenty-eight machines run.** 🕹️ The 48K ZX Spectrum, the ZX Spectrum 128, the
+- **Twenty-nine machines run.** 🕹️ The 48K ZX Spectrum, the ZX Spectrum 128, the
   ZX Spectrum +2 (`specpls2`, Amstrad's grey 128), the ZX Spectrum +2a
   (`specpl2a`, Amstrad's +3 firmware in the +2's cassette case), the ZX
   Spectrum +3 (`specpls3`, the same firmware with the built-in 3" floppy
@@ -98,10 +98,17 @@ Delightfully small. Let's be precise about what this actually is:
   prompt `Set the time...` / `Press ↑↓ to adjust the hour` / `Press ↵ when
   finished` / `Press Stop to exit`, and a live `MONDAY 1 JAN` / `London`
   calendar-clock widget ticking away, in the LCD's blue-on-tan, stretched
-  to fill the PAL canvas). That's it. That's the list.
+  to fill the PAL canvas), and the Peters Plus Sprinter (`sprinter`,
+  the 2000 Russian Spectrum-compatible from Peters Plus Ltd, a Z84C015
+  with an FPGA beside it — whose Sprinter BIOS v3.04.253 powers on to
+  its BIOS report: model name, board ID, 4096K memory, the CMOS clock,
+  and — finding none of the CF/IDE media we don't ship — `Detecting IDE
+  Primary Master ... None`, `Start from Hard disk...fail` /
+  `Alternative Start from Diskette...fail`, and `PRESS <ENTER> TO
+  REBOOT`, on the PAL canvas). That's it. That's the list.
 - **Two driver families are compiled** — Sinclair and Amstrad. The build's
   `SOURCES` names exactly
-  fifteen MAME driver files: `sinclair/spectrum.cpp`, `sinclair/spec128.cpp`
+  sixteen MAME driver files: `sinclair/spectrum.cpp`, `sinclair/spec128.cpp`
   (the 128 and the
   +2 both), `sinclair/next/specnext.cpp`, `sinclair/specpls3.cpp` (the +2a and the +3),
   `sinclair/zx.cpp` (the ZX-80, the ZX-81, the TS-1000, and the TS-1500),
@@ -110,13 +117,14 @@ Delightfully small. Let's be precise about what this actually is:
   (the MicroART ATM-Turbo 2), `sinclair/evo/pentevo.cpp` (the ZX Evolution
   BASECONF), `sinclair/evo/tsconf.cpp` (the ZX Evolution TS-Configuration),
   `sinclair/elwro800.cpp` (the Elwro 800-3 Junior), `sinclair/byte.cpp`
-  (the PEVM Byte), `amstrad/amstrad.cpp` (the Amstrad CPC464, the
+  (the PEVM Byte), `sinclair/sprinter.cpp` (the Peters Plus Sprinter),
+  `amstrad/amstrad.cpp` (the Amstrad CPC464, the
   Amstrad CPC664, the Amstrad CPC6128, and the KC Compact), and
   `amstrad/nc.cpp` (the Amstrad NC100 and NC200 notepads).
   The picker's
   list shows everything those files define, but a listed machine only runs
   if you've supplied its ROMs — with the default assets, that's the
-  twenty-eight above.
+  twenty-nine above.
 - **One board.** 🥧 Proven on a Raspberry Pi 4 Model B (4GB). Nothing else
   has ever booted it. (The firmware files for the Pi 400 and CM4 ride
   along because Circle ships them — consider those a rumor, not a
@@ -133,7 +141,7 @@ wild. A custom image is the same build with your choices in it. 🧪
 
 ## 📦 The default images
 
-Out of the box, twenty-nine images:
+Out of the box, thirty images:
 
 | `make` | Image | Powers on into |
 |---|---|---|
@@ -165,6 +173,7 @@ Out of the box, twenty-nine images:
 | `MACHINE=kccomp` | `kernel8-kccomp.img` | KC Compact (1989) — VEB Mikroelektronik "Wilhelm Pieck" Mühlhausen's East German CPC clone, a cpc464 clone, boots to Locomotive BASIC 1.1 under its own maker's firmware: the yellow-on-blue `KC compact` / `Version 1.3` sign-on over `BASIC 1.1` / `Ready`, on the PAL canvas |
 | `MACHINE=nc100` | `kernel8-nc100.img` | Amstrad NC100 (1992) — Amstrad's Z80-based A4 notepad computer, powers on to its `Set time and date` screen (a `London` / `Mon 1 Jan 1990` status bar, a `00:00` time box and a `1 Jan 1990` date box, and the prompt to set the time with ↑↓ and press J when finished), the 480×64 LCD's blue-on-tan stretched to fill the PAL canvas |
 | `MACHINE=nc200` | `kernel8-nc200.img` | Amstrad NC200 (1993) — the NC100's successor, a Z80 A4 notepad with a taller 480×128 LCD and a built-in 3½″ floppy drive, powers on to its `Set time and date` screen (the `Set time and date` title bar, a `00:00` time box and a `1 Jan 1990` date box, the prompt to set the time with ↑↓ and press ↵ when finished, and a live `MONDAY 1 JAN` / `London` calendar-clock), the 480×128 LCD's blue-on-tan stretched to fill the PAL canvas |
+| `MACHINE=sprinter` | `kernel8-sprinter.img` | Peters Plus Sprinter (2000) — the Russian Z84C015-plus-FPGA Spectrum-compatible, its Sprinter BIOS v3.04.253 powers on to a BIOS report (model name, board ID, 4096K memory, CMOS clock) and, with no CF/IDE media shipped, `Detecting IDE Primary Master ... None` and `Start from Hard disk...fail` / `Alternative Start from Diskette...fail`, on the PAL canvas — the largest image in the set (~84MB) |
 | `MACHINE=picker` | `kernel8-picker.img` | MAME's system list — a menu; machines with ROMs on the card run |
 
 The SD card is identical in every case — only the kernel differs. "Which
@@ -225,7 +234,7 @@ make kernels   # kernel8-spectrum.img, kernel8-spec128.img, kernel8-specpls2.img
                #   kernel8-cpc464.img, kernel8-cpc664.img,
                #   kernel8-cpc6128.img, kernel8-kccomp.img,
                #   kernel8-nc100.img, kernel8-nc200.img,
-               #   kernel8-picker.img
+               #   kernel8-sprinter.img, kernel8-picker.img
 
 make sd MACHINE=spectrum ASSETS=~/my-assets   # see "Assets you must supply"
 ```
@@ -279,7 +288,9 @@ my-assets/
 │   ├── kccomp.zip     # …and for the KC Compact (a cpc464 clone, but self-contained: its own 32K OS + Locomotive BASIC 1.1 ROM and the `farben.rom` colour PROM)
 │   ├── nc100.zip      # …and for the Amstrad NC100 notepad (self-contained: its own 256K organiser firmware ROM)
 │   ├── nc200.zip      # …and for the Amstrad NC200 notepad (self-contained: its own 512K organiser firmware ROM — ships both BIOS revisions, v2.02 default)
-│   └── betadisk.zip   # Beta Disk / TR-DOS interface ROMs (the disk device shared by the pentagon, the scorpio, the atmtb2, and the pentevo)
+│   ├── sprinter.zip   # …and for the Peters Plus Sprinter (self-contained: seven BIOS revisions v2.13–v3.06, v3.04 default)
+│   ├── betadisk.zip   # Beta Disk / TR-DOS interface ROMs (the disk device shared by the pentagon, the scorpio, the atmtb2, and the pentevo)
+│   └── kb_ms_natural.zip # Microsoft Natural keyboard ROM (the PS/2 keyboard device the sprinter needs)
 └── next/
     └── next.img       # ZX Spectrum Next SD-card image (tbblue, specnext_ks1, specnext_ks2, specnext_ks3)
 ```
@@ -291,6 +302,9 @@ my-assets/
   shared 128 ROMs from `spec128.zip` — so both the clone zip and
   `spec128.zip` must be present. Each machine's Beta Disk interface pulls
   the TR-DOS ROMs from `betadisk.zip` (MAME's `betadisk` device set).
+- The `sprinter` is self-contained for its BIOS (`sprinter.zip`), but its
+  PS/2 keyboard is MAME's `kb_ms_natural` device, whose `natural.bin` ROM
+  comes from `kb_ms_natural.zip` — both zips must be present.
 - `next.img` is distributed by the
   [Spectrum Next project](https://www.specnext.com/latestdistro/); the
   `tbblue`, `specnext_ks1`, `specnext_ks2`, and `specnext_ks3` machines
