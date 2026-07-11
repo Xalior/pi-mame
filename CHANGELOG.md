@@ -4,7 +4,7 @@ pi-mame doesn't version by semver yet — each cycle is a named proof-of-concept
 (PoC). This log starts with PoC1, the first released cycle, then rolls
 straight into PoC2, the cycle in progress.
 
-## PoC1
+## PoC1 — vStranger · 2026-07-11
 
 The first release. If you're new here, this is the orientation.
 
