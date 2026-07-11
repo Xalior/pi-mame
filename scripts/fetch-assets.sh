@@ -7,7 +7,7 @@
 # Tiers (see scripts/assets.manifest for the doctrine and every source):
 #   free    content whose redistribution is properly blessed, from a proper
 #           upstream (Fuse / proteanthread under Amstrad's permission; the
-#           SpecNext official distro).
+#           hosted ready-to-boot Next SD image).
 #   public  publicly-available-but-grey MAME-set mirrors (archive.org).
 #   all     both.
 #
@@ -197,44 +197,45 @@ do_file() {
     fi
 }
 
-# next.img: checksum-exempt. Scrape the distro page for the current download,
-# fetch it, and install a plausible .img if the distro carries one.
+# next.img: checksum-exempt (the hosted image may be refreshed upstream, so
+# it is not byte-pinned). Fetch the hosted zip, extract the .img the
+# manifest's raw field names, sanity-check the size (2147483648 bytes
+# expected today; drift is noted, never fatal), install renamed to the dest.
 do_image() {
     _name="$1"; _dest="$2"
     _out="$ASSETS_DIR/$_dest"
-    if [ -f "$_out" ] && [ "$(wc -c < "$_out")" -gt 268435456 ]; then
+    if [ -f "$_out" ] && [ "$(wc -c < "$_out")" -ge 1073741824 ]; then
         log "ALREADY-PRESENT  $_dest"; return
     fi
-    _page=$(asset_srcs "$_name" | grep '|page|' | head -1 | cut -d'|' -f4)
-    [ -n "$_page" ] || { log "FAILED           $_dest  (no page source)"; return; }
-    if ! download "$_page" "$WORK/distro.html"; then
-        log "FAILED           $_dest  (distro page unreachable: $_page)"; return
+    _url=$(asset_srcs "$_name" | head -1 | cut -d'|' -f4)
+    _raw=$(asset_mems "$_name" | head -1 | cut -d'|' -f6)
+    [ -n "$_url" ] || { log "FAILED           $_dest  (no source in manifest)"; return; }
+    note "next.img: fetching $_url"
+    if ! download "$_url" "$WORK/img.zip"; then
+        log "FAILED           $_dest  (download failed: $_url)"; return
     fi
-    # newest-looking distro archive link on the page
-    _link=$(grep -oiE 'href="[^"]*\.(zip|7z|img)"' "$WORK/distro.html" \
-            | sed 's/^href="//I;s/"$//' | grep -iE 'complete|distro|sd|next|sn-' \
-            | head -1)
-    case "$_link" in
-        /*)  _link="https://www.specnext.com$_link" ;;
-        http*) ;;
-        "" ) log "FAILED           $_dest  (no download link on $_page — page shape changed?)"; return ;;
-        *)   _link="https://www.specnext.com/$_link" ;;
-    esac
-    note "next.img: official distro at $_link"
-    if ! download "$_link" "$WORK/distro.dl"; then
-        log "FAILED           $_dest  (distro download failed: $_link)"; return
+    rm -rf "$WORK/imgx"; mkdir -p "$WORK/imgx"
+    if ! unzip -qo "$WORK/img.zip" -d "$WORK/imgx" 2>/dev/null; then
+        rm -f "$WORK/img.zip"
+        log "FAILED           $_dest  (fetched file is not a zip: $_url)"; return
     fi
-    _img=""
-    if unzip -qo "$WORK/distro.dl" -d "$WORK/distro" 2>/dev/null; then
-        _img=$(find "$WORK/distro" -type f -iname '*.img' -size +262144k 2>/dev/null | head -1)
+    rm -f "$WORK/img.zip"
+    _img="$WORK/imgx/$_raw"
+    [ -f "$_img" ] || _img=$(find "$WORK/imgx" -type f -iname '*.img' 2>/dev/null | head -1)
+    if [ -z "$_img" ] || [ ! -f "$_img" ]; then
+        log "FAILED           $_dest  (no .img inside the fetched zip — upstream shape changed?)"; return
     fi
-    if [ -n "$_img" ]; then
-        mkdir -p "$(dirname "$_out")"
-        mv "$_img" "$_out"
-        log "FETCHED          $_dest  (checksum-exempt; $(wc -c < "$_out") bytes)"
-    else
-        log "FAILED           $_dest  (official distro ships a file tree, no raw SD .img — build next.img yourself; see README)"
+    _sz=$(wc -c < "$_img" | tr -d ' ')
+    if [ "$_sz" -lt 1073741824 ]; then
+        rm -rf "$WORK/imgx"
+        log "FAILED           $_dest  (extracted image implausibly small: $_sz bytes)"; return
     fi
+    [ "$_sz" -ne 2147483648 ] && \
+        note "next.img: size $_sz differs from the expected 2147483648 (image refreshed upstream?) — installing anyway"
+    mkdir -p "$(dirname "$_out")"
+    mv "$_img" "$_out"
+    rm -rf "$WORK/imgx"
+    log "FETCHED          $_dest  (checksum-exempt; $_sz bytes)"
 }
 
 # --- main loop ----------------------------------------------------------------

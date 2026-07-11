@@ -7,15 +7,16 @@
 #   src|<name>|<type>|<url>        sources, tried in listed order
 #       type = raw  -> url is a base dir; member's <raw> field is the filename
 #              zip  -> url is a set-zip; members located by CRC32 (rename/repack)
-#              page -> url is scraped for the current download link (next.img)
 #   mem|<name>|<target>|<crc32>|<sha1>|<raw>
 #       target = filename inside the produced zip (or the dest file itself)
-#       raw    = source filename for a 'raw' source, or a+b to concatenate;
+#       raw    = source filename for a 'raw' source, inside a 'zip' source
+#                for the checksum-exempt image, or a+b to concatenate;
 #                '-' when only 'zip' sources apply (located by CRC32)
+#       crc32/sha1 = '-' only on the checksum-exempt image asset
 #
 # TIER DOCTRINE ("free soda"): free = redistribution properly blessed, fetched
 # from a proper upstream (Amstrad's permission for the Sinclair/Amstrad 8-bit
-# ROMs, shipped by Fuse/proteanthread; SpecNext's official distro). public =
+# ROMs, shipped by Fuse/proteanthread; the hosted Next SD image). public =
 # publicly-available-but-grey MAME-set mirrors on archive.org. Checksums are
 # each machine's ROM_START in the MAME tree; every member is CRC32+SHA1 verified
 # before install. next.img is the sole checksum-exempt asset (a live SD image
@@ -318,15 +319,16 @@ mem|tsconf|cram-init.bin|8b96ffb7|4dbd22f4312251e922911a01526cbfba77a122fc|-
 mem|tsconf|ts-bios.240728.rom|19f8ad7b|9cee82d4a6212686358a50b0fd5a2981b3323ab6|-
 mem|tsconf|ts-bios.rom|b060b0d9|820d3539de115141daff220a3cb733fc880d1bab|-
 
-# nc200's golden members live in the 0.288 item's v0.283-0.284 update path.
+# nc200: both ROM_START members live in the 0.288 item's v0.283-0.284
+# update path (the base-dir nc200.zip carries an older single-member set).
 asset|nc200|public|zip|roms/nc200.zip
 src|nc200|zip|https://archive.org/download/mame-roms-split_/MAME%20ROMs%20%28split%29%20%28v0.283%20to%20v0.284%29%20-%20Update/nc200.zip
 mem|nc200|amstrad_42112_v201.rom|bb8180e7|fb5c93b0a3e199202c6a12548d2617f7a09bae47|-
 mem|nc200|amstrad_nc200_v202.rom|0919efba|d849fb808a84b6f73a7d5d2676d35c3629809764|-
 
-# tbblue: four members per ROM_START(tbblue) (specnext.cpp); the golden
-# zip's distro extras (README.md, GPL3-LICENSE, rc-named dupes) are not
-# ROM_START members. All four CRC32s are present in the golden zip.
+# tbblue: exactly the four members ROM_START(tbblue) (specnext.cpp) loads;
+# SpecNext-distro extras (README.md, GPL3-LICENSE, rc builds) are not
+# ROM_START members and are deliberately not packed.
 asset|tbblue|public|zip|roms/tbblue.zip
 src|tbblue|zip|https://archive.org/download/mame-roms-split_/MAME%20ROMs%20%28split%29%20%28v0.285%20to%20v0.287%29%20-%20Update/tbblue.zip
 mem|tbblue|boot-30100.bin|ccbd55ba|8b3c2a301f486904d1c74929b94845a7731bf230|-
@@ -340,9 +342,12 @@ asset|sysukpd|public|file|carts/sysukpd.bin
 src|sysukpd|zip|https://archive.org/download/MAME_0.193_Software_List_ROMs_split/MAME_0.193_Software_List_ROMs_split.zip/MAME%200.193%20Software%20List%20ROMs%20%28split%29/gx4000/sysukpd.zip
 mem|sysukpd|sysukpd.bin|e9c5e30e|596bf4d4dedafca71fadffb6e5fa8634c3cd843f|engpados.bin
 
-# next.img (SpecNext, official) — CHECKSUM-EXEMPT, version advances.
-# The 'page' source is scraped for the current distro download; the handler
-# installs a .img from it if present and size-plausible. NB: the official
-# distro currently ships a ~35MB file tree, not a raw SD image — see README.
+# next.img — hosted ready-to-boot 2GB Next SD image. CHECKSUM-EXEMPT: the
+# hosted image may be refreshed, so it is not byte-pinned; the zip fetch,
+# the .img extraction, and size sanity are verified (exactly 2147483648
+# bytes expected today — future size drift is noted, never fatal).
+# (SpecNext's own distro, https://www.specnext.com/latestdistro/, ships a
+# file tree rather than a raw SD image; the hosted image is the source.)
 asset|next|free|image|next/next.img
-src|next|page|https://www.specnext.com/latestdistro/
+src|next|zip|https://zxnext.uk/hosted/index_files/hdfimages/cspect-next-2gb.zip
+mem|next|next.img|-|-|cspect-next-2gb.img

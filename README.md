@@ -1,6 +1,6 @@
 # pi-mame 👾
 
-[![build](https://github.com/Xalior/pi-mame/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/Xalior/pi-mame/actions/workflows/build.yml)
+[![build](https://github.com/Xalior/pi-mame/actions/workflows/build.yml/badge.svg)](https://github.com/Xalior/pi-mame/actions/workflows/build.yml)
 
 Bare-metal MAME for the Raspberry Pi 4. No Linux, no OS, no desktop — the
 Pi boots in seconds straight into an emulated machine, like an appliance,
@@ -133,10 +133,10 @@ Then, concretely: 💾
 
 ## 🤖 Continuous integration
 
-Every push to `main` and every version tag (`v*`) is built from scratch on
-a clean Ubuntu runner — the permanent stranger test: if these published
-sources can't build pi-mame with nothing but the toolchain, CI goes red. 🚦
-Tagged builds also cut a GitHub Release whose assets are the ready-made
+Every version tag (`v*`) on `main` is built from scratch on a clean Ubuntu
+runner — a stranger test at every release cut: if these published sources
+can't build pi-mame with nothing but the toolchain, the tag goes red. 🚦
+Each tag's build cuts a GitHub Release whose assets are the ready-made
 `kernel8-<machine>.img` files, so you can grab an image and skip the
 toolchain entirely. ⬇️ CI proves the build **compiles**; what has actually
 run on real hardware lives in the platform tables — every screenshot there
@@ -164,8 +164,7 @@ tiers, because provenance differs:
 - **free** — content whose redistribution is properly blessed, fetched from
   a proper upstream: the Sinclair/Amstrad 8-bit ROMs under Amstrad's
   standing permission (shipped by the Fuse emulator and the proteanthread
-  ZX-81 project), and the ZX Spectrum Next system image from SpecNext's own
-  official distro.
+  ZX-81 project), and a hosted ready-to-boot ZX Spectrum Next SD image.
 - **public** — publicly-available-but-grey MAME romset mirrors on
   archive.org. Widely used, not formally blessed; your call whether to
   drink.
@@ -183,12 +182,10 @@ prints a per-asset ledger (`FETCHED` / `ALREADY-PRESENT` / `FAILED` /
 that's moved fails only its own asset. Point `make sd`'s `ASSETS` at the
 same directory.
 
-**`next.img` is special.** The ZX Spectrum Next's 2 GB SD image is
-checksum-exempt (its version advances) and is *not* a single official
-download: SpecNext ships a file tree, not a raw card image. `fetch-assets.sh`
-will fetch the current official distro and install an `.img` only if one is
-present; otherwise it reports `FAILED` and you build `next/next.img`
-yourself (format a card from the distro, then image it) — see
+**`next.img` is checksum-exempt.** The ZX Spectrum Next's 2 GB SD image is
+a live filesystem whose contents advance, so it isn't byte-pinned like the
+ROMs: the fetcher downloads a hosted ready-to-boot image, extracts it,
+sanity-checks the size, and installs it as `next/next.img` — see
 [docs/sinclair/tbblue.md](docs/sinclair/tbblue.md).
 
 ## ⌨️ At the keyboard
