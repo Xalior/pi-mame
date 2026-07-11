@@ -1,5 +1,7 @@
 # ZX Evolution: TS-Configuration
 
+![ZX Evolution: TS-Configuration at power-on](images/tsconf.jpg)
+
 - **`make MACHINE=tsconf`** — Sinclair
 - **Year**: 2011
 - **Manufacturer**: NedoPC, TS-Labs

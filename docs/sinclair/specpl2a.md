@@ -1,5 +1,7 @@
 # ZX Spectrum +2a
 
+![ZX Spectrum +2a at power-on](images/specpl2a.jpg)
+
 - **`make MACHINE=specpl2a`** — Sinclair
 - **Year**: 1987
 - **Manufacturer**: Amstrad plc

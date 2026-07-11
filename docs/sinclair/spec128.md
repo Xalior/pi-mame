@@ -1,5 +1,7 @@
 # ZX Spectrum 128
 
+![ZX Spectrum 128 at power-on](images/spec128.jpg)
+
 - **`make MACHINE=spec128`** — Sinclair
 - **Year**: 1986
 - **Manufacturer**: Sinclair Research Ltd
