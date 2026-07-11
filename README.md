@@ -135,7 +135,7 @@ load-bearing thermal configuration: don't remove it. 🌡️
 
 Most people want a [ready-made image](#-download-a-ready-made-image)
 instead. This is for building the kernels yourself: a toolchain download,
-a MAME compile that takes the better part of an hour, and full control
+a MAME compile measured in hours on most machines, and full control
 over which machines get baked in.
 
 ```sh
