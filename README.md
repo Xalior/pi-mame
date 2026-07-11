@@ -19,7 +19,7 @@ and the next power-on asks again. 🔁
 
 Delightfully small. Let's be precise about what this actually is:
 
-- **Fourteen machines run.** 🕹️ The 48K ZX Spectrum, the ZX Spectrum 128, the
+- **Fifteen machines run.** 🕹️ The 48K ZX Spectrum, the ZX Spectrum 128, the
   ZX Spectrum +2 (`specpls2`, Amstrad's grey 128), the ZX Spectrum +2a
   (`specpl2a`, Amstrad's +3 firmware in the +2's cassette case), the ZX
   Spectrum +3 (`specpls3`, the same firmware with the built-in 3" floppy
@@ -28,6 +28,9 @@ Delightfully small. Let's be precise about what this actually is:
   Kickstarter board revision, sharing the Next's ROMs and SD image), the
   ZX Spectrum Next KS2 (`specnext_ks2`, the 2023 Kickstarter board
   revision, likewise sharing the Next's ROMs and SD image), the
+  ZX Spectrum Next KS3 (`specnext_ks3`, the 2025 Kickstarter board
+  revision, whose trimmed BIOS list draws the same Next ROMs from
+  `tbblue.zip` and boots the same SD image), the
   Sinclair ZX-80 (`zx80`, the 1980 original), the
   Sinclair ZX-81 (`zx81`, 1981), the Timex TC-2048 (`tc2048`, Timex
   of Portugal's 1984 Spectrum clone), the Timex Sinclair TS-2068
@@ -41,7 +44,7 @@ Delightfully small. Let's be precise about what this actually is:
   `zx.cpp` (the ZX-80, the ZX-81, the TS-1000, and the TS-1500), and
   `timex.cpp` (the TC-2048 and the TS-2068). The picker's list shows
   everything those files define, but a listed machine only runs if you've
-  supplied its ROMs — with the default assets, that's the fourteen above.
+  supplied its ROMs — with the default assets, that's the fifteen above.
 - **One board.** 🥧 Proven on a Raspberry Pi 4 Model B (4GB). Nothing else
   has ever booted it. (The firmware files for the Pi 400 and CM4 ride
   along because Circle ships them — consider those a rumor, not a
@@ -58,7 +61,7 @@ wild. A custom image is the same build with your choices in it. 🧪
 
 ## 📦 The default images
 
-Out of the box, fifteen images:
+Out of the box, sixteen images:
 
 | `make` | Image | Powers on into |
 |---|---|---|
@@ -70,6 +73,7 @@ Out of the box, fifteen images:
 | `MACHINE=tbblue` | `kernel8-tbblue.img` | ZX Spectrum Next / NextZXOS (needs `next/next.img` on the card) |
 | `MACHINE=specnext_ks1` | `kernel8-specnext_ks1.img` | ZX Spectrum Next, KS1 board (2020 Kickstarter) / NextZXOS (needs `next/next.img`, shares `tbblue.zip`) |
 | `MACHINE=specnext_ks2` | `kernel8-specnext_ks2.img` | ZX Spectrum Next, KS2 board (2023 Kickstarter) / NextZXOS (needs `next/next.img`, shares `tbblue.zip`) |
+| `MACHINE=specnext_ks3` | `kernel8-specnext_ks3.img` | ZX Spectrum Next, KS3 board (2025 Kickstarter) / NextZXOS (needs `next/next.img`, shares `tbblue.zip`) |
 | `MACHINE=zx80` | `kernel8-zx80.img` | Sinclair ZX-80 (1980) BASIC — the inverse-video `K` cursor |
 | `MACHINE=zx81` | `kernel8-zx81.img` | Sinclair ZX-81 (1981) BASIC — the same `K` cursor, one year on |
 | `MACHINE=tc2048` | `kernel8-tc2048.img` | Timex TC-2048 (1984) — a 48K-compatible Spectrum, boots to `© 1982 Sinclair Research Ltd` |
@@ -126,6 +130,7 @@ make mame      # the MAME archives — the long one; log: build/mame-build.log
 make kernels   # kernel8-spectrum.img, kernel8-spec128.img, kernel8-specpls2.img,
                #   kernel8-specpl2a.img, kernel8-specpls3.img, kernel8-tbblue.img,
                #   kernel8-specnext_ks1.img, kernel8-specnext_ks2.img,
+               #   kernel8-specnext_ks3.img,
                #   kernel8-zx80.img, kernel8-zx81.img,
                #   kernel8-tc2048.img, kernel8-ts2068.img, kernel8-ts1000.img,
                #   kernel8-ts1500.img, kernel8-picker.img
@@ -170,15 +175,17 @@ my-assets/
 │   ├── ts1000.zip     # …and for the Timex Sinclair TS-1000
 │   └── ts1500.zip     # …and for the Timex Sinclair TS-1500
 └── next/
-    └── next.img       # ZX Spectrum Next SD-card image (tbblue, specnext_ks1, specnext_ks2)
+    └── next.img       # ZX Spectrum Next SD-card image (tbblue, specnext_ks1, specnext_ks2, specnext_ks3)
 ```
 
 - ROM zips are standard MAME romsets, named for their machine.
 - `next.img` is distributed by the
   [Spectrum Next project](https://www.specnext.com/latestdistro/); the
-  `tbblue`, `specnext_ks1`, and `specnext_ks2` machines boot NextZXOS from
-  it. `specnext_ks1` and `specnext_ks2` are ROM-compatible clones of
-  `tbblue`, so they read `tbblue.zip` — no separate romset.
+  `tbblue`, `specnext_ks1`, `specnext_ks2`, and `specnext_ks3` machines
+  boot NextZXOS from it. `specnext_ks1`, `specnext_ks2`, and `specnext_ks3`
+  are ROM-compatible clones of `tbblue` (KS3's trimmed BIOS list names only
+  files `tbblue.zip` already carries), so they read `tbblue.zip` — no
+  separate romset.
 - Only supplying some assets is fine: machines without their ROMs simply
   won't run.
 
