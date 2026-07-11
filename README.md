@@ -19,128 +19,11 @@ and the next power-on asks again. 🔁
 
 Delightfully small. Let's be precise about what this actually is:
 
-- **Thirty-two machines run.** 🕹️ The 48K ZX Spectrum, the ZX Spectrum 128, the
-  ZX Spectrum +2 (`specpls2`, Amstrad's grey 128), the ZX Spectrum +2a
-  (`specpl2a`, Amstrad's +3 firmware in the +2's cassette case), the ZX
-  Spectrum +3 (`specpls3`, the same firmware with the built-in 3" floppy
-  drive), the ZX Spectrum Next (`tbblue`, with its SD card image
-  attached), the ZX Spectrum Next KS1 (`specnext_ks1`, the 2020
-  Kickstarter board revision, sharing the Next's ROMs and SD image), the
-  ZX Spectrum Next KS2 (`specnext_ks2`, the 2023 Kickstarter board
-  revision, likewise sharing the Next's ROMs and SD image), the
-  ZX Spectrum Next KS3 (`specnext_ks3`, the 2025 Kickstarter board
-  revision, whose trimmed BIOS list draws the same Next ROMs from
-  `tbblue.zip` and boots the same SD image), the
-  Sinclair ZX-80 (`zx80`, the 1980 original), the
-  Sinclair ZX-81 (`zx81`, 1981), the Timex TC-2048 (`tc2048`, Timex
-  of Portugal's 1984 Spectrum clone), the Timex Sinclair TS-2068
-  (`ts2068`, Timex's 1983 American Spectrum on a 60Hz television), and the
-  Timex Sinclair TS-1000 (`ts1000`, Timex's 1982 American ZX-81), and the
-  Timex Sinclair TS-1500 (`ts1500`, Timex's 1983 ZX-81 in a TS-1000 case
-  with 16K on board), the Pentagon 128K (`pentagon`, Vladimir
-  Drozdov's 1991 Russian Spectrum clone, whose startup menu carries a
-  TR-DOS entry for its built-in Beta Disk interface), and the
-  Scorpion ZS-256 (`scorpio`, the 1992 Russian "Yellow PCB" clone, whose
-  V.2.94 firmware boots to a menu of 128 TR-DOS, 128 BASIC, Calculator,
-  48 BASIC, and 48 TR-DOS on its own Beta Disk interface), and the
-  MicroART ATM-Turbo 2 (`atmtb2`, MicroART's 1992 Russian turbo Spectrum
-  clone, whose firmware boots to a MicroART menu of CP/M, TR-DOS 48,
-  Spectrum 128, Spectrum 48, and Turbo On over a red MicroART logo on the
-  PAL canvas), and the NedoPC ZX Evolution: BASECONF (`pentevo`, NedoPC's
-  2009 open-hardware Spectrum clone, whose EVO Reset Service v0.60.02
-  firmware boots to a BASECONF main menu — TR-DOS boot, File browse, Tape
-  load, SD-card boot, 48K and 128K BASIC, and more — beside a settings panel,
-  on the PAL canvas), and the NedoPC ZX Evolution: TS-Configuration
-  (`tsconf`, TS-Labs' 2011 FPGA-based Spectrum clone with the TS-Configuration
-  video/DMA extensions, whose TS-BIOS boots on the PAL canvas), and the
-  Elwro 800-3 Junior (`elwro800`, Elwro's 1986 Polish Spectrum clone built
-  for schools, whose firmware boots to an `ELWRO 800-3 Junior` banner —
-  `64kB RAM 24kB ROM   wersja dyskowa` beside the yellow `elwro` logo, with
-  the Spectrum `K` cursor — on the PAL canvas), and the PEVM Byte
-  (`byte`, BEMZ's 1990 Soviet Spectrum clone from the Brest
-  Electromechanical Plant, whose Prusak firmware boots to a Cyrillic
-  maker's credit — `Брестское ПО` / `средств вычислительной техники`
-  (the Brest production association for computing equipment) — at the foot
-  of the grey canvas, on the PAL canvas), and the Amstrad CPC464
-  (`cpc464`, Amstrad's 1984 all-in-one home computer — the first
-  non-Sinclair machine on this list — whose Locomotive BASIC firmware
-  powers on to the yellow-on-blue `Amstrad 64K Microcomputer (v1)` /
-  `©1984 Amstrad Consumer Electronics plc and Locomotive Software Ltd.`
-  sign-on above `BASIC 1.0` and `Ready`, on the PAL canvas), and the
-  Amstrad CPC664 (`cpc664`, Amstrad's short-lived 1985 disk-based CPC — a
-  cpc464 clone with a built-in 3" floppy drive and its AMSDOS ROM — whose
-  updated firmware powers on to the yellow-on-blue
-  `Amstrad 64K Microcomputer (v2)` /
-  `©1984 Amstrad Consumer Electronics plc and Locomotive Software Ltd.`
-  sign-on above `BASIC 1.1` and `Ready`, on the PAL canvas), and the
-  Amstrad CPC6128 (`cpc6128`, Amstrad's 1985 128K disk-based CPC — a
-  cpc464 clone with 128K of RAM, a built-in 3" floppy drive, and its
-  AMSDOS ROM — whose firmware powers on to the yellow-on-blue
-  `Amstrad 128K Microcomputer (v3)` /
-  `©1985 Amstrad Consumer Electronics plc and Locomotive Software Ltd.`
-  sign-on above `BASIC 1.1` and `Ready`, on the PAL canvas), the
-  Amstrad CPC464+ (`cpc464p`, Amstrad's 1990 Plus-range CPC, whose
-  hardware boots from a cartridge — the image bakes the game-free
-  Locomotive BASIC + ParaDOS cart, which signs on yellow-on-blue as
-  `Amstrad Microcomputer (v4)` / `©1985 Amstrad plc and Locomotive
-  Software Ltd.` / `PARADOS V1.1. ©1997 QUANTUM Solutions.` above
-  `BASIC 1.1` and `Ready`, on the PAL canvas), and the
-  KC Compact (`kccomp`, the 1989 East German CPC clone from VEB
-  Mikroelektronik "Wilhelm Pieck" Mühlhausen — a cpc464 clone whose
-  reworked firmware carries its own maker's sign-on, the yellow-on-blue
-  `KC compact` / `Version 1.3` above `BASIC 1.1` and `Ready`, on the PAL
-  canvas), the Amstrad NC100 (`nc100`, Amstrad's 1992 Z80-based A4
-  notepad computer — not a CPC but the same maker's later portable, with
-  its own 480×64 monochrome LCD and built-in organiser firmware — which
-  powers on to its `Set time and date` screen: a `London` / `Mon 1 Jan
-  1990` status bar above a time box (`00:00`) and a date box (`1 Jan
-  1990`), with the prompt `Set the time...` / `Press ↑↓ to adjust the
-  hour` / `Press J when finished` / `Press Stop to exit`, in the LCD's
-  blue-on-tan, stretched to fill the PAL canvas), and the Amstrad NC200
-  (`nc200`, Amstrad's 1993 successor — the NC100's Z80 notepad grown a
-  taller 480×128 LCD and a built-in 3½″ floppy drive — which powers on to
-  the same `Set time and date` first-run screen: the `Set time and date`
-  title bar, a time box (`00:00`) and a date box (`1 Jan 1990`), the
-  prompt `Set the time...` / `Press ↑↓ to adjust the hour` / `Press ↵ when
-  finished` / `Press Stop to exit`, and a live `MONDAY 1 JAN` / `London`
-  calendar-clock widget ticking away, in the LCD's blue-on-tan, stretched
-  to fill the PAL canvas), and the Peters Plus Sprinter (`sprinter`,
-  the 2000 Russian Spectrum-compatible from Peters Plus Ltd, a Z84C015
-  with an FPGA beside it — whose Sprinter BIOS v3.04.253 powers on to
-  its BIOS report: model name, board ID, 4096K memory, the CMOS clock,
-  and — finding none of the CF/IDE media we don't ship — `Detecting IDE
-  Primary Master ... None`, `Start from Hard disk...fail` /
-  `Alternative Start from Diskette...fail`, and `PRESS <ENTER> TO
-  REBOOT`, on the PAL canvas), and the Amstrad PC1512 SD (`pc1512`,
-  Amstrad's 1986 IBM PC-compatible — the first x86 machine on this list, an
-  8086 that sold the PC into British homes — whose ROM BIOS powers on
-  through its self-test to the `AMSTRAD PC 512k (V1)` /
-  `(c)1986 AMSTRAD Consumer Electronics plc` sign-on and then, finding none
-  of the floppy or hard media we don't ship, `Please set time and date` /
-  `Please set user options (if required)` above `Insert a SYSTEM disk into
-  drive A` / `Then press any key`, on the PAL canvas). That's it. That's the
-  list.
-- **Two driver families are compiled** — Sinclair and Amstrad. The build's
-  `SOURCES` names exactly
-  seventeen MAME driver files: `sinclair/spectrum.cpp`, `sinclair/spec128.cpp`
-  (the 128 and the
-  +2 both), `sinclair/next/specnext.cpp`, `sinclair/specpls3.cpp` (the +2a and the +3),
-  `sinclair/zx.cpp` (the ZX-80, the ZX-81, the TS-1000, and the TS-1500),
-  `sinclair/timex.cpp` (the TC-2048 and the TS-2068), `sinclair/pentagon.cpp` (the
-  Pentagon 128K), `sinclair/scorpion.cpp` (the Scorpion ZS-256), `sinclair/atm.cpp`
-  (the MicroART ATM-Turbo 2), `sinclair/evo/pentevo.cpp` (the ZX Evolution
-  BASECONF), `sinclair/evo/tsconf.cpp` (the ZX Evolution TS-Configuration),
-  `sinclair/elwro800.cpp` (the Elwro 800-3 Junior), `sinclair/byte.cpp`
-  (the PEVM Byte), `sinclair/sprinter.cpp` (the Peters Plus Sprinter),
-  `amstrad/amstrad.cpp` (the Amstrad CPC464, the
-  Amstrad CPC664, the Amstrad CPC6128, the Amstrad CPC464+, and the
-  KC Compact),
-  `amstrad/nc.cpp` (the Amstrad NC100 and NC200 notepads), and
-  `amstrad/pc1512.cpp` (the Amstrad PC1512 SD).
-  The picker's
-  list shows everything those files define, but a listed machine only runs
-  if you've supplied its ROMs — with the default assets, that's the
-  thirty-three above.
+- **Two platforms are proven** — Sinclair and Amstrad. Each is a family of
+  machines built on related hardware, sharing a MAME driver lineage and,
+  often, ROMs: see [docs/sinclair/](docs/sinclair/README.md) and
+  [docs/amstrad/](docs/amstrad/README.md) for exactly which machines and
+  what each needs.
 - **One board.** 🥧 Proven on a Raspberry Pi 4 Model B (4GB). Nothing else
   has ever booted it. (The firmware files for the Pi 400 and CM4 ride
   along because Circle ships them — consider those a rumor, not a
@@ -157,47 +40,26 @@ wild. A custom image is the same build with your choices in it. 🧪
 
 ## 📦 The default images
 
-Out of the box, thirty-four images:
+Every image bakes one machine (or the picker) into `host/kernel.cpp` as
+compiled-in constants — no CLI, no config files of ours. "Which machine"
+is not configuration; it's which binary you boot, and the SD card is
+identical in every case: only the kernel differs. 💾
 
 | `make` | Image | Powers on into |
 |---|---|---|
-| `MACHINE=spectrum` | `kernel8-spectrum.img` | 48K ZX Spectrum BASIC |
-| `MACHINE=spec128` | `kernel8-spec128.img` | ZX Spectrum 128 startup menu (128 BASIC, Tape Loader, …) |
-| `MACHINE=specpls2` | `kernel8-specpls2.img` | ZX Spectrum +2 startup menu (Amstrad's grey 128) |
-| `MACHINE=specpl2a` | `kernel8-specpl2a.img` | ZX Spectrum +2a startup menu (Loader, +3 BASIC, Calculator, 48 BASIC) |
-| `MACHINE=specpls3` | `kernel8-specpls3.img` | ZX Spectrum +3 startup menu (Loader, +3 BASIC, Calculator, 48 BASIC; drives A: and M:) |
-| `MACHINE=tbblue` | `kernel8-tbblue.img` | ZX Spectrum Next / NextZXOS (needs `next/next.img` on the card) |
-| `MACHINE=specnext_ks1` | `kernel8-specnext_ks1.img` | ZX Spectrum Next, KS1 board (2020 Kickstarter) / NextZXOS (needs `next/next.img`, shares `tbblue.zip`) |
-| `MACHINE=specnext_ks2` | `kernel8-specnext_ks2.img` | ZX Spectrum Next, KS2 board (2023 Kickstarter) / NextZXOS (needs `next/next.img`, shares `tbblue.zip`) |
-| `MACHINE=specnext_ks3` | `kernel8-specnext_ks3.img` | ZX Spectrum Next, KS3 board (2025 Kickstarter) / NextZXOS (needs `next/next.img`, shares `tbblue.zip`) |
-| `MACHINE=zx80` | `kernel8-zx80.img` | Sinclair ZX-80 (1980) BASIC — the inverse-video `K` cursor |
-| `MACHINE=zx81` | `kernel8-zx81.img` | Sinclair ZX-81 (1981) BASIC — the same `K` cursor, one year on |
-| `MACHINE=tc2048` | `kernel8-tc2048.img` | Timex TC-2048 (1984) — a 48K-compatible Spectrum, boots to `© 1982 Sinclair Research Ltd` |
-| `MACHINE=ts2068` | `kernel8-ts2068.img` | Timex Sinclair TS-2068 (1983) — the American 60Hz machine, boots to `© 1982 Sinclair Research Ltd` / `© 1983 Timex Computer Corp` on the NTSC canvas |
-| `MACHINE=ts1000` | `kernel8-ts1000.img` | Timex Sinclair TS-1000 (1982) — the American ZX-81, the inverse-video `K` cursor on the NTSC canvas |
-| `MACHINE=ts1500` | `kernel8-ts1500.img` | Timex Sinclair TS-1500 (1983) — the ZX-81 with 16K on board in a TS-1000 case, the inverse-video `K` cursor on the NTSC canvas |
-| `MACHINE=pentagon` | `kernel8-pentagon.img` | Pentagon 128K (1991) — Vladimir Drozdov's Russian Spectrum clone, boots to a 128-style startup menu (Tape Loader, 128 BASIC, Calculator, 48 BASIC, TR-DOS) on the PAL canvas |
-| `MACHINE=scorpio` | `kernel8-scorpio.img` | Scorpion ZS-256 (1992) — the Russian "Yellow PCB" clone, V.2.94 firmware boots to a menu (128 TR-DOS, 128 BASIC, Calculator, 48 BASIC, 48 TR-DOS) on the PAL canvas |
-| `MACHINE=atmtb2` | `kernel8-atmtb2.img` | MicroART ATM-Turbo 2 (1992) — MicroART's Russian turbo Spectrum clone, boots to a MicroART firmware menu (CP/M, TR-DOS 48, Spectrum 128, Spectrum 48, Turbo On) over a red MicroART logo on the PAL canvas |
-| `MACHINE=pentevo` | `kernel8-pentevo.img` | ZX Evolution: BASECONF (2009) — NedoPC's open-hardware Spectrum clone, boots to the EVO Reset Service v0.60.02 firmware, a BASECONF menu (TR-DOS boot, File browse, Tape load, SD-card boot, 48K/128K BASIC, …) beside a settings panel, on the PAL canvas |
-| `MACHINE=tsconf` | `kernel8-tsconf.img` | ZX Evolution: TS-Configuration (2011) — TS-Labs' FPGA Spectrum clone with the TS-Configuration extensions, boots its TS-BIOS on the PAL canvas |
-| `MACHINE=elwro800` | `kernel8-elwro800.img` | Elwro 800-3 Junior (1986) — Elwro's Polish Spectrum clone for schools, boots to an `ELWRO 800-3 Junior` banner (`64kB RAM 24kB ROM   wersja dyskowa`, the yellow `elwro` logo, the Spectrum `K` cursor) on the PAL canvas |
-| `MACHINE=byte` | `kernel8-byte.img` | PEVM Byte (1990) — BEMZ's Soviet Spectrum clone from the Brest Electromechanical Plant, its Prusak firmware boots to a Cyrillic maker's credit (`Брестское ПО` / `средств вычислительной техники`) at the foot of the grey PAL canvas |
-| `MACHINE=cpc464` | `kernel8-cpc464.img` | Amstrad CPC464 (1984) — Amstrad's all-in-one home computer, boots to Locomotive BASIC 1.0: the yellow-on-blue `Amstrad 64K Microcomputer (v1)` / `©1984 Amstrad Consumer Electronics plc and Locomotive Software Ltd.` sign-on over `BASIC 1.0` / `Ready`, on the PAL canvas |
-| `MACHINE=cpc664` | `kernel8-cpc664.img` | Amstrad CPC664 (1985) — the short-lived disk-based CPC, a cpc464 clone with a built-in 3" floppy drive, boots to Locomotive BASIC 1.1: the yellow-on-blue `Amstrad 64K Microcomputer (v2)` / `©1984 Amstrad Consumer Electronics plc and Locomotive Software Ltd.` sign-on over `BASIC 1.1` / `Ready`, on the PAL canvas |
-| `MACHINE=cpc6128` | `kernel8-cpc6128.img` | Amstrad CPC6128 (1985) — the 128K disk-based CPC, a cpc464 clone with 128K of RAM and a built-in 3" floppy drive, boots to Locomotive BASIC 1.1: the yellow-on-blue `Amstrad 128K Microcomputer (v3)` / `©1985 Amstrad Consumer Electronics plc and Locomotive Software Ltd.` sign-on over `BASIC 1.1` / `Ready`, on the PAL canvas |
-| `MACHINE=cpc464p` | `kernel8-cpc464p.img` | Amstrad CPC464+ (1990) — the Plus-range CPC, whose hardware boots from a cartridge: the image bakes `-cart /carts/sysukpd.bin` (the game-free Locomotive BASIC + ParaDOS homebrew cart), which signs on yellow-on-blue as `Amstrad Microcomputer (v4)` / `©1985 Amstrad plc and Locomotive Software Ltd.` / `PARADOS V1.1. ©1997 QUANTUM Solutions.` over `BASIC 1.1` / `Ready`, on the PAL canvas |
-| `MACHINE=cpc6128p` | `kernel8-cpc6128p.img` | Amstrad CPC6128+ (1990) — the 128K Plus-range CPC, whose hardware boots from a cartridge: the image bakes `-cart /carts/sysukpd.bin` (the game-free Locomotive BASIC + ParaDOS homebrew cart), which signs on yellow-on-blue as `Amstrad Microcomputer (v4)` / `©1985 Amstrad plc and Locomotive Software Ltd.` / `PARADOS V1.1. ©1997 QUANTUM Solutions.` over `BASIC 1.1` / `Ready`, on the PAL canvas |
-| `MACHINE=gx4000` | `kernel8-gx4000.img` | Amstrad GX4000 (1990) — the keyboard-less games console of the Plus range, whose hardware boots from a cartridge: the image bakes `-cart /carts/sysukpd.bin` (the game-free Locomotive BASIC + ParaDOS homebrew cart), which signs on yellow-on-blue as `Amstrad Microcomputer (v4)` / `©1985 Amstrad plc and Locomotive Software Ltd.` and, with no keyboard to drop through to a BASIC prompt, halts at that sign-on awaiting a game cart, on the PAL canvas |
-| `MACHINE=kccomp` | `kernel8-kccomp.img` | KC Compact (1989) — VEB Mikroelektronik "Wilhelm Pieck" Mühlhausen's East German CPC clone, a cpc464 clone, boots to Locomotive BASIC 1.1 under its own maker's firmware: the yellow-on-blue `KC compact` / `Version 1.3` sign-on over `BASIC 1.1` / `Ready`, on the PAL canvas |
-| `MACHINE=nc100` | `kernel8-nc100.img` | Amstrad NC100 (1992) — Amstrad's Z80-based A4 notepad computer, powers on to its `Set time and date` screen (a `London` / `Mon 1 Jan 1990` status bar, a `00:00` time box and a `1 Jan 1990` date box, and the prompt to set the time with ↑↓ and press J when finished), the 480×64 LCD's blue-on-tan stretched to fill the PAL canvas |
-| `MACHINE=nc200` | `kernel8-nc200.img` | Amstrad NC200 (1993) — the NC100's successor, a Z80 A4 notepad with a taller 480×128 LCD and a built-in 3½″ floppy drive, powers on to its `Set time and date` screen (the `Set time and date` title bar, a `00:00` time box and a `1 Jan 1990` date box, the prompt to set the time with ↑↓ and press ↵ when finished, and a live `MONDAY 1 JAN` / `London` calendar-clock), the 480×128 LCD's blue-on-tan stretched to fill the PAL canvas |
-| `MACHINE=sprinter` | `kernel8-sprinter.img` | Peters Plus Sprinter (2000) — the Russian Z84C015-plus-FPGA Spectrum-compatible, its Sprinter BIOS v3.04.253 powers on to a BIOS report (model name, board ID, 4096K memory, CMOS clock) and, with no CF/IDE media shipped, `Detecting IDE Primary Master ... None` and `Start from Hard disk...fail` / `Alternative Start from Diskette...fail`, on the PAL canvas — among the largest images in the set (~84MB) |
-| `MACHINE=pc1512` | `kernel8-pc1512.img` | Amstrad PC1512 SD (1986) — Amstrad's 8086 IBM PC-compatible, the first x86 machine in the set, powers on through its ROM BIOS self-test to the `AMSTRAD PC 512k (V1)` / `(c)1986 AMSTRAD Consumer Electronics plc` sign-on and, with no floppy or hard media shipped, `Please set time and date` above `Insert a SYSTEM disk into drive A` / `Then press any key`, on the PAL canvas — the largest image in the set (~84MB) |
 | `MACHINE=picker` | `kernel8-picker.img` | MAME's system list — a menu; machines with ROMs on the card run |
 
-The SD card is identical in every case — only the kernel differs. "Which
-machine" is not configuration; it's which binary you boot. 💾
+Every other machine belongs to one of two platforms:
+
+| Platform | Details | Machines |
+|---|---|---|
+| Sinclair — the ZX Spectrum family and its clones | [docs/sinclair/README.md](docs/sinclair/README.md) | [`docs/sinclair/`](docs/sinclair/) |
+| Amstrad — the CPC family, the NC notepads, and the PC1512 | [docs/amstrad/README.md](docs/amstrad/README.md) | [`docs/amstrad/`](docs/amstrad/) |
+
+Each platform page carries its own machine table (`make MACHINE=` target,
+system, year, romset, TV region) and a details page per machine covering
+exactly what appears on the glass at power-on and exactly which assets it
+needs.
 
 ## 📺 Display: the regional canvas
 
@@ -207,7 +69,7 @@ The framebuffer geometry is Raspberry Pi boot configuration
 with the family television. 📼 Two canvases ship: `cmdline-pal.txt` is the
 720×576 PAL canvas that every PAL machine stretches to fill, and
 `cmdline-ntsc.txt` is the 720×480 NTSC canvas for the American 60Hz
-machines (the TS-2068 and the TS-1000). `make sd` copies the right one for the machine you
+machines. `make sd` copies the right one for the machine you
 name. The GPU outputs that geometry as the video signal; your display's own
 controller stretches it to the glass. `socmaxtemp=70` in the same file is
 load-bearing thermal configuration: don't remove it. 🌡️
@@ -241,32 +103,20 @@ make deps      # circle-stdlib (multicore) + the SDL2 shim
 make mame      # the MAME archives — the long one; log: build/mame-build.log
                # (genie's final host-style link fails by design; the
                #  archives are the product and the kernel links itself)
-make kernels   # kernel8-spectrum.img, kernel8-spec128.img, kernel8-specpls2.img,
-               #   kernel8-specpl2a.img, kernel8-specpls3.img, kernel8-tbblue.img,
-               #   kernel8-specnext_ks1.img, kernel8-specnext_ks2.img,
-               #   kernel8-specnext_ks3.img,
-               #   kernel8-zx80.img, kernel8-zx81.img,
-               #   kernel8-tc2048.img, kernel8-ts2068.img, kernel8-ts1000.img,
-               #   kernel8-ts1500.img, kernel8-pentagon.img,
-               #   kernel8-scorpio.img, kernel8-atmtb2.img,
-               #   kernel8-pentevo.img, kernel8-tsconf.img,
-               #   kernel8-elwro800.img, kernel8-byte.img,
-               #   kernel8-cpc464.img, kernel8-cpc664.img,
-               #   kernel8-cpc6128.img, kernel8-cpc464p.img,
-               #   kernel8-kccomp.img,
-               #   kernel8-nc100.img, kernel8-nc200.img,
-               #   kernel8-sprinter.img, kernel8-pc1512.img,
-               #   kernel8-picker.img
+make kernels   # every machine's kernel8-<machine>.img, plus kernel8-picker.img
+               #   — see docs/sinclair/ and docs/amstrad/ for the full list,
+               #   or `make kernel MACHINE=<name>` for just one
 
 make sd MACHINE=spectrum ASSETS=~/my-assets   # see "Assets you must supply"
 ```
 
 `make sd` assembles a complete copy-to-card tree in `build/sd/`:
 Raspberry Pi firmware (fetched at the revision Circle pins), Circle's
-`config64.txt` boot configuration, the PAL canvas `cmdline.txt`, and the
-chosen kernel. `ASSETS` points at a directory you provide (layout below);
-leave it off and `make sd` still builds the tree — you'll just add
-`roms/` (and `next/`, `carts/`) to the card yourself.
+`config64.txt` boot configuration, the machine's regional canvas
+`cmdline.txt`, and the chosen kernel. `ASSETS` points at a directory you
+provide (layout on the platform pages); leave it off and `make sd` still
+builds the tree — you'll just add `roms/` (and any platform extras)
+to the card yourself.
 
 Then, concretely: 💾
 
@@ -279,76 +129,13 @@ Then, concretely: 💾
 
 ## 🕹️ Assets you must supply
 
-This repository contains no ROMs and no disk images. The `ASSETS`
-directory you hand to `make sd` looks like this:
-
-```
-my-assets/
-├── roms/
-│   ├── spectrum.zip   # MAME-format ROM zip for the 48K
-│   ├── spec128.zip    # …and for the 128
-│   ├── specpls2.zip   # …and for the +2
-│   ├── specpl2a.zip   # …and for the +2a
-│   ├── specpls3.zip   # …and for the +3
-│   ├── tbblue.zip     # …and for the Next (also feeds the KS1 and KS2 clones)
-│   ├── zx80.zip       # …and for the ZX-80
-│   ├── zx81.zip       # …and for the ZX-81
-│   ├── tc2048.zip     # …and for the Timex TC-2048
-│   ├── ts2068.zip     # …and for the Timex Sinclair TS-2068
-│   ├── ts1000.zip     # …and for the Timex Sinclair TS-1000
-│   ├── ts1500.zip     # …and for the Timex Sinclair TS-1500
-│   ├── pentagon.zip   # …and for the Pentagon 128K (a spec128 clone; parent ROMs come from spec128.zip)
-│   ├── scorpio.zip    # …and for the Scorpion ZS-256 (a spec128 clone; parent ROMs come from spec128.zip)
-│   ├── atmtb2.zip     # …and for the MicroART ATM-Turbo 2 (a spec128 clone; parent ROMs come from spec128.zip)
-│   ├── pentevo.zip    # …and for the ZX Evolution BASECONF (a spec128 clone; parent ROMs come from spec128.zip)
-│   ├── tsconf.zip     # …and for the ZX Evolution TS-Configuration (self-contained: TS-BIOS + CRAM init)
-│   ├── elwro800.zip   # …and for the Elwro 800-3 Junior (self-contained: BASIC/boot EPROMs + I/O, memory, and TV PROMs)
-│   ├── byte.zip       # …and for the PEVM Byte (self-contained: Prusak boot ROMs + the DD66/DD71 and TBD PROMs)
-│   ├── cpc464.zip     # …and for the Amstrad CPC464 (self-contained: the 32K OS + Locomotive BASIC ROM)
-│   ├── cpc664.zip     # …and for the Amstrad CPC664 (a cpc464 clone, but self-contained: its own 32K OS + Locomotive BASIC 1.1 ROM and the 16K AMSDOS disk ROM)
-│   ├── cpc6128.zip    # …and for the Amstrad CPC6128 (a 128K cpc464 clone, but self-contained: its own 32K OS + Locomotive BASIC 1.1 ROM and the 16K AMSDOS disk ROM)
-│   ├── kccomp.zip     # …and for the KC Compact (a cpc464 clone, but self-contained: its own 32K OS + Locomotive BASIC 1.1 ROM and the `farben.rom` colour PROM)
-│   ├── nc100.zip      # …and for the Amstrad NC100 notepad (self-contained: its own 256K organiser firmware ROM)
-│   ├── nc200.zip      # …and for the Amstrad NC200 notepad (self-contained: its own 512K organiser firmware ROM — ships both BIOS revisions, v2.02 default)
-│   ├── sprinter.zip   # …and for the Peters Plus Sprinter (self-contained: seven BIOS revisions v2.13–v3.06, v3.04 default)
-│   ├── pc1512.zip     # …and for the Amstrad PC1512 SD (self-contained for its BIOS: three revisions, v1 default)
-│   ├── pc1512kb.zip   # keyboard-controller ROM (the pc1512kb device the PC1512 needs — a separate MAME device set)
-│   ├── betadisk.zip   # Beta Disk / TR-DOS interface ROMs (the disk device shared by the pentagon, the scorpio, the atmtb2, and the pentevo)
-│   └── kb_ms_natural.zip # Microsoft Natural keyboard ROM (the PS/2 keyboard device the sprinter needs)
-├── next/
-│   └── next.img       # ZX Spectrum Next SD-card image (tbblue, specnext_ks1, specnext_ks2, specnext_ks3)
-└── carts/
-    └── sysukpd.bin    # the CPC+ default cartridge (cpc464p) — Locomotive BASIC + ParaDOS
-```
-
-- ROM zips are standard MAME romsets, named for their machine.
-- `pentagon`, `scorpio`, `atmtb2`, and `pentevo` are MAME clones of
-  `spec128`: each zip (`pentagon.zip`, `scorpio.zip`, `atmtb2.zip`,
-  `pentevo.zip`) carries only the clone's own ROMs, and MAME resolves the
-  shared 128 ROMs from `spec128.zip` — so both the clone zip and
-  `spec128.zip` must be present. Each machine's Beta Disk interface pulls
-  the TR-DOS ROMs from `betadisk.zip` (MAME's `betadisk` device set).
-- The `sprinter` is self-contained for its BIOS (`sprinter.zip`), but its
-  PS/2 keyboard is MAME's `kb_ms_natural` device, whose `natural.bin` ROM
-  comes from `kb_ms_natural.zip` — both zips must be present.
-- The `pc1512` is self-contained for its BIOS (`pc1512.zip`), but its
-  keyboard controller is MAME's `pc1512kb` device, whose `40042.ic801` ROM
-  comes from `pc1512kb.zip` — both zips must be present.
-- `next.img` is distributed by the
-  [Spectrum Next project](https://www.specnext.com/latestdistro/); the
-  `tbblue`, `specnext_ks1`, `specnext_ks2`, and `specnext_ks3` machines
-  boot NextZXOS from it. `specnext_ks1`, `specnext_ks2`, and `specnext_ks3`
-  are ROM-compatible clones of `tbblue` (KS3's trimmed BIOS list names only
-  files `tbblue.zip` already carries), so they read `tbblue.zip` — no
-  separate romset.
-- The CPC+ machines boot from a cartridge — the `cpc464p` romset is empty
-  (no `cpc464p.zip`), because the Plus firmware lives on the cart itself.
-  🎮 The baked default is the game-free Locomotive BASIC + ParaDOS
-  homebrew cart (MAME softlist entry `sysukpd`: `engpados.bin`, renamed
-  `sysukpd.bin`), which you supply like every other asset. Other carts
-  load through MAME's UI at runtime (Scroll Lock → Tab → file manager).
-- Only supplying some assets is fine: machines without their ROMs simply
-  won't run.
+This repository contains no ROMs and no disk images. `make sd`'s `ASSETS`
+directory always has a `roms/` folder; some platforms add their own
+subfolder alongside it (the Sinclair platform's Next SD-card image lives
+in `next/`, for instance). Each platform page has the exact tree:
+[docs/sinclair/README.md](docs/sinclair/README.md#assets) and
+[docs/amstrad/README.md](docs/amstrad/README.md#assets). Only supplying
+some assets is fine: machines without their ROMs simply won't run.
 
 ## ⌨️ At the keyboard
 
