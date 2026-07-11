@@ -109,7 +109,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
-            build-essential make wget python3
+            build-essential make wget python3 zip unzip
 
       # Cache the built circle-stdlib world (multicore newlib + libc++)
       # and the SDL2 shim archive. A hit skips the ~40min newlib build.
@@ -189,6 +189,34 @@ jobs:
           done
           [ "$fail" = 0 ] || { echo "kernel image verification failed"; exit 1; }
 
+      # A copy-to-card zip per machine (plus the picker): firmware, boot
+      # config, the machine's kernel, and the FREE-tier assets — only the
+      # properly-redistributable ones ever ship in a release. Machines
+      # whose ROMs are public-tier (see scripts/assets.manifest) get a
+      # bundle that boots but wants its ROMs added. The 2GB Next SD image
+      # rides only where the kernel actually mounts it (MAME_HARDDISK) —
+      # and in the picker's bundle, which can run those machines too.
+      # Each zip root is the FAT root: extract onto a blank card and boot.
+      - name: Assemble per-machine SD card zips
+        run: |
+          make assets-free ASSETS=./free-assets
+          mkdir -p free-assets-lite dist
+          for d in roms carts; do
+            if [ -d "free-assets/$d" ]; then cp -R "free-assets/$d" free-assets-lite/; fi
+          done
+          for img in host/kernel8-*.img; do
+            m=${img#host/kernel8-}; m=${m%.img}
+            if [ "$m" = picker ] || \
+               grep -Eq "^MACHINE_DEFS_$m[[:space:]]*=.*MAME_HARDDISK" host/Makefile; then
+              assets=./free-assets
+            else
+              assets=./free-assets-lite
+            fi
+            make sd MACHINE="$m" ASSETS="$assets"
+            (cd build/sd && zip -qr "../../dist/pi-mame-${GITHUB_REF_NAME}-$m.zip" .)
+          done
+          ls -lh dist/
+
       # Every run: the images as individual artifacts (~85MB each). Not
       # zipped into one blob — a user wants the one image for their machine.
       - name: Upload kernel images
@@ -199,15 +227,17 @@ jobs:
           if-no-files-found: error
 
       # Cut a GitHub Release carrying every kernel image as a separate
-      # downloadable asset, so users can skip the toolchain entirely. The
-      # body is deliberately honest about what CI does and does not prove.
-      # (Every run is a tag run by design; the `if` is belt and braces
-      # should the triggers ever widen.)
+      # downloadable asset, plus the copy-to-card zips, so users can skip
+      # the toolchain entirely. The body is deliberately honest about what
+      # CI does and does not prove. (Every run is a tag run by design; the
+      # `if` is belt and braces should the triggers ever widen.)
       - name: Create release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: host/kernel8-*.img
+          files: |
+            host/kernel8-*.img
+            dist/pi-mame-*.zip
           fail_on_unmatched_files: true
           generate_release_notes: false
           body: |
@@ -224,3 +254,12 @@ jobs:
 
             Each `kernel8-<machine>.img` bakes one machine. Flash a FAT32 SD
             card as the README describes, drop the image on it, and boot.
+
+            The `pi-mame-<tag>-<machine>.zip` assets are complete
+            copy-to-card bundles: firmware, boot config, the machine's
+            kernel, and the **free-tier** assets — only the
+            properly-redistributable ones ever ship here. Machines whose
+            ROMs are public-tier (see `scripts/assets.manifest`) boot from
+            their bundle but need those ROMs added to the card's `roms/`
+            (and `carts/` for the CPC+ range) yourself. Extract a bundle
+            onto a blank FAT32 card and boot.
