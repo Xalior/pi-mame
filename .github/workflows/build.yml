@@ -5,11 +5,12 @@
 # stranger cannot build pi-mame from the published sources alone, this
 # job goes red before anyone ships.
 #
-# Triggers are deliberately narrow — the goal is "prevent total idiocy",
-# not per-branch/per-PR builds:
-#   - every push to main         (the moving demo tip)
-#   - every version tag  v*      (vPoC1, v1, … — a release cut)
-# Nothing else builds. No PR builds, no feature-branch builds.
+# The trigger is deliberately narrow — the goal is "prevent total idiocy":
+#   - a version tag (v*) pushed on main — vPoC1, v1, … a release cut.
+# Nothing else builds: no per-push builds, no PR builds, no branch builds.
+# Tag pushes aren't branch-scoped in git, so a guard step enforces the
+# "on main" half: the tagged commit must be an ancestor of origin/main,
+# or the job stops with a clear message and builds nothing.
 #
 # Scope: ONE Ubuntu x86_64 job. macOS host builds are out of scope for v1.
 # Supply-chain restraint: first-party actions only (checkout / cache /
@@ -19,17 +20,14 @@ name: build
 
 on:
   push:
-    branches: [main]
     tags: ['v*']
 
-# A newer push to main cancels an older still-running main build. Tag
-# builds live in their own per-tag group and are never cancelled: a
-# release cut always runs to completion.
+# Tag builds are never cancelled: a release cut always runs to completion.
 concurrency:
   group: build-${{ github.ref }}
-  cancel-in-progress: ${{ github.ref == 'refs/heads/main' }}
+  cancel-in-progress: false
 
-# The tag job cuts a GitHub Release; main only uploads run artifacts.
+# The job cuts a GitHub Release for the tag.
 permissions:
   contents: write
 
@@ -52,6 +50,23 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 1
+
+      # The "on main" half of the trigger. A git tag isn't branch-scoped:
+      # a v-tag on any commit fires `push: tags`. Only tags pointing at
+      # main's history build — the tagged commit must be an ancestor of
+      # origin/main, or this job stops right here and builds nothing.
+      # (The top repo is tiny; unshallowing it costs nothing. Submodules
+      # stay shallow.)
+      - name: Require the tagged commit to be on main
+        run: |
+          git fetch --unshallow origin +refs/heads/main:refs/remotes/origin/main \
+            || git fetch origin +refs/heads/main:refs/remotes/origin/main
+          if git merge-base --is-ancestor "$GITHUB_SHA" refs/remotes/origin/main; then
+            echo "tag $GITHUB_REF_NAME points at a commit on main — building"
+          else
+            echo "tag $GITHUB_REF_NAME is NOT on main — side-branch tags build nothing"
+            exit 1
+          fi
 
       # Resolve the pinned submodule SHAs into cache-key material. The
       # deps world only changes when the configure line or one of the
@@ -183,11 +198,12 @@ jobs:
           path: host/kernel8-*.img
           if-no-files-found: error
 
-      # Tag builds only: cut a GitHub Release carrying every kernel image
-      # as a separate downloadable asset, so users can skip the toolchain
-      # entirely. The body is deliberately honest about what CI does and
-      # does not prove.
-      - name: Create release (tags only)
+      # Cut a GitHub Release carrying every kernel image as a separate
+      # downloadable asset, so users can skip the toolchain entirely. The
+      # body is deliberately honest about what CI does and does not prove.
+      # (Every run is a tag run by design; the `if` is belt and braces
+      # should the triggers ever widen.)
+      - name: Create release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
