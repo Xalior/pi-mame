@@ -19,7 +19,7 @@ and the next power-on asks again. 🔁
 
 Delightfully small. Let's be precise about what this actually is:
 
-- **Twenty-three machines run.** 🕹️ The 48K ZX Spectrum, the ZX Spectrum 128, the
+- **Twenty-four machines run.** 🕹️ The 48K ZX Spectrum, the ZX Spectrum 128, the
   ZX Spectrum +2 (`specpls2`, Amstrad's grey 128), the ZX Spectrum +2a
   (`specpl2a`, Amstrad's +3 firmware in the +2's cassette case), the ZX
   Spectrum +3 (`specpls3`, the same firmware with the built-in 3" floppy
@@ -66,7 +66,13 @@ Delightfully small. Let's be precise about what this actually is:
   non-Sinclair machine on this list — whose Locomotive BASIC firmware
   powers on to the yellow-on-blue `Amstrad 64K Microcomputer (v1)` /
   `©1984 Amstrad Consumer Electronics plc and Locomotive Software Ltd.`
-  sign-on above `BASIC 1.0` and `Ready`, on the PAL canvas). That's it.
+  sign-on above `BASIC 1.0` and `Ready`, on the PAL canvas), and the
+  Amstrad CPC664 (`cpc664`, Amstrad's short-lived 1985 disk-based CPC — a
+  cpc464 clone with a built-in 3" floppy drive and its AMSDOS ROM — whose
+  updated firmware powers on to the yellow-on-blue
+  `Amstrad 64K Microcomputer (v2)` /
+  `©1984 Amstrad Consumer Electronics plc and Locomotive Software Ltd.`
+  sign-on above `BASIC 1.1` and `Ready`, on the PAL canvas). That's it.
   That's the list.
 - **Two driver families are compiled** — Sinclair and Amstrad. The build's
   `SOURCES` names exactly
@@ -79,11 +85,12 @@ Delightfully small. Let's be precise about what this actually is:
   (the MicroART ATM-Turbo 2), `sinclair/evo/pentevo.cpp` (the ZX Evolution
   BASECONF), `sinclair/evo/tsconf.cpp` (the ZX Evolution TS-Configuration),
   `sinclair/elwro800.cpp` (the Elwro 800-3 Junior), `sinclair/byte.cpp`
-  (the PEVM Byte), and `amstrad/amstrad.cpp` (the Amstrad CPC464).
+  (the PEVM Byte), and `amstrad/amstrad.cpp` (the Amstrad CPC464 and the
+  Amstrad CPC664).
   The picker's
   list shows everything those files define, but a listed machine only runs
   if you've supplied its ROMs — with the default assets, that's the
-  twenty-three above.
+  twenty-four above.
 - **One board.** 🥧 Proven on a Raspberry Pi 4 Model B (4GB). Nothing else
   has ever booted it. (The firmware files for the Pi 400 and CM4 ride
   along because Circle ships them — consider those a rumor, not a
@@ -100,7 +107,7 @@ wild. A custom image is the same build with your choices in it. 🧪
 
 ## 📦 The default images
 
-Out of the box, twenty-four images:
+Out of the box, twenty-five images:
 
 | `make` | Image | Powers on into |
 |---|---|---|
@@ -127,6 +134,7 @@ Out of the box, twenty-four images:
 | `MACHINE=elwro800` | `kernel8-elwro800.img` | Elwro 800-3 Junior (1986) — Elwro's Polish Spectrum clone for schools, boots to an `ELWRO 800-3 Junior` banner (`64kB RAM 24kB ROM   wersja dyskowa`, the yellow `elwro` logo, the Spectrum `K` cursor) on the PAL canvas |
 | `MACHINE=byte` | `kernel8-byte.img` | PEVM Byte (1990) — BEMZ's Soviet Spectrum clone from the Brest Electromechanical Plant, its Prusak firmware boots to a Cyrillic maker's credit (`Брестское ПО` / `средств вычислительной техники`) at the foot of the grey PAL canvas |
 | `MACHINE=cpc464` | `kernel8-cpc464.img` | Amstrad CPC464 (1984) — Amstrad's all-in-one home computer, boots to Locomotive BASIC 1.0: the yellow-on-blue `Amstrad 64K Microcomputer (v1)` / `©1984 Amstrad Consumer Electronics plc and Locomotive Software Ltd.` sign-on over `BASIC 1.0` / `Ready`, on the PAL canvas |
+| `MACHINE=cpc664` | `kernel8-cpc664.img` | Amstrad CPC664 (1985) — the short-lived disk-based CPC, a cpc464 clone with a built-in 3" floppy drive, boots to Locomotive BASIC 1.1: the yellow-on-blue `Amstrad 64K Microcomputer (v2)` / `©1984 Amstrad Consumer Electronics plc and Locomotive Software Ltd.` sign-on over `BASIC 1.1` / `Ready`, on the PAL canvas |
 | `MACHINE=picker` | `kernel8-picker.img` | MAME's system list — a menu; machines with ROMs on the card run |
 
 The SD card is identical in every case — only the kernel differs. "Which
@@ -184,7 +192,7 @@ make kernels   # kernel8-spectrum.img, kernel8-spec128.img, kernel8-specpls2.img
                #   kernel8-scorpio.img, kernel8-atmtb2.img,
                #   kernel8-pentevo.img, kernel8-tsconf.img,
                #   kernel8-elwro800.img, kernel8-byte.img,
-               #   kernel8-cpc464.img,
+               #   kernel8-cpc464.img, kernel8-cpc664.img,
                #   kernel8-picker.img
 
 make sd MACHINE=spectrum ASSETS=~/my-assets   # see "Assets you must supply"
@@ -234,6 +242,7 @@ my-assets/
 │   ├── elwro800.zip   # …and for the Elwro 800-3 Junior (self-contained: BASIC/boot EPROMs + I/O, memory, and TV PROMs)
 │   ├── byte.zip       # …and for the PEVM Byte (self-contained: Prusak boot ROMs + the DD66/DD71 and TBD PROMs)
 │   ├── cpc464.zip     # …and for the Amstrad CPC464 (self-contained: the 32K OS + Locomotive BASIC ROM)
+│   ├── cpc664.zip     # …and for the Amstrad CPC664 (a cpc464 clone, but self-contained: its own 32K OS + Locomotive BASIC 1.1 ROM and the 16K AMSDOS disk ROM)
 │   └── betadisk.zip   # Beta Disk / TR-DOS interface ROMs (the disk device shared by the pentagon, the scorpio, the atmtb2, and the pentevo)
 └── next/
     └── next.img       # ZX Spectrum Next SD-card image (tbblue, specnext_ks1, specnext_ks2, specnext_ks3)
