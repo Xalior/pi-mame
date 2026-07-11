@@ -14,6 +14,8 @@
 #   make MACHINE=tc2048   -> kernel8-tc2048.img (boots into a Timex TC-2048)
 #   make MACHINE=ts2068   -> kernel8-ts2068.img (boots into a Timex Sinclair
 #                            TS-2068, the American 60Hz machine)
+#   make MACHINE=ts1000   -> kernel8-ts1000.img (boots into a Timex Sinclair
+#                            TS-1000, the American ZX-81)
 #   make MACHINE=picker   -> kernel8-picker.img (nothing baked: MAME boots
 #                            into its system list; the family is the menu)
 #
@@ -44,11 +46,12 @@ MACHINE_DEFS_zx80     = -DMAME_MACHINE='"zx80"'
 MACHINE_DEFS_zx81     = -DMAME_MACHINE='"zx81"'
 MACHINE_DEFS_tc2048   = -DMAME_MACHINE='"tc2048"'
 MACHINE_DEFS_ts2068   = -DMAME_MACHINE='"ts2068"'
+MACHINE_DEFS_ts1000   = -DMAME_MACHINE='"ts1000"'
 MACHINE_DEFS_picker   = -DMAME_PICKER
 
 KERNEL_DEFS = $(MACHINE_DEFS_$(MACHINE))
 ifeq ($(strip $(KERNEL_DEFS)),)
-$(error unknown MACHINE '$(MACHINE)' — spectrum, spec128, specpls2, specpl2a, specpls3, tbblue, zx80, zx81, tc2048, ts2068, or picker)
+$(error unknown MACHINE '$(MACHINE)' — spectrum, spec128, specpls2, specpl2a, specpls3, tbblue, zx80, zx81, tc2048, ts2068, ts1000, or picker)
 endif
 
 TARGET = kernel8-$(MACHINE)
