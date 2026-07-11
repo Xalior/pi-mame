@@ -19,7 +19,7 @@ and the next power-on asks again. 🔁
 
 Delightfully small. Let's be precise about what this actually is:
 
-- **Eleven machines run.** 🕹️ The 48K ZX Spectrum, the ZX Spectrum 128, the
+- **Twelve machines run.** 🕹️ The 48K ZX Spectrum, the ZX Spectrum 128, the
   ZX Spectrum +2 (`specpls2`, Amstrad's grey 128), the ZX Spectrum +2a
   (`specpl2a`, Amstrad's +3 firmware in the +2's cassette case), the ZX
   Spectrum +3 (`specpls3`, the same firmware with the built-in 3" floppy
@@ -28,15 +28,16 @@ Delightfully small. Let's be precise about what this actually is:
   Sinclair ZX-81 (`zx81`, 1981), the Timex TC-2048 (`tc2048`, Timex
   of Portugal's 1984 Spectrum clone), the Timex Sinclair TS-2068
   (`ts2068`, Timex's 1983 American Spectrum on a 60Hz television), and the
-  Timex Sinclair TS-1000 (`ts1000`, Timex's 1982 American ZX-81). That's
-  it. That's the list.
+  Timex Sinclair TS-1000 (`ts1000`, Timex's 1982 American ZX-81), and the
+  Timex Sinclair TS-1500 (`ts1500`, Timex's 1983 ZX-81 in a TS-1000 case
+  with 16K on board). That's it. That's the list.
 - **One driver family is compiled.** The build's `SOURCES` names exactly
   six MAME driver files: `spectrum.cpp`, `spec128.cpp` (the 128 and the
   +2 both), `specnext.cpp`, `specpls3.cpp` (the +2a and the +3),
-  `zx.cpp` (the ZX-80, the ZX-81, and the TS-1000), and `timex.cpp` (the
-  TC-2048 and the TS-2068). The picker's list shows everything those files
-  define, but a listed machine only runs if you've supplied its ROMs —
-  with the default assets, that's the eleven above.
+  `zx.cpp` (the ZX-80, the ZX-81, the TS-1000, and the TS-1500), and
+  `timex.cpp` (the TC-2048 and the TS-2068). The picker's list shows
+  everything those files define, but a listed machine only runs if you've
+  supplied its ROMs — with the default assets, that's the twelve above.
 - **One board.** 🥧 Proven on a Raspberry Pi 4 Model B (4GB). Nothing else
   has ever booted it. (The firmware files for the Pi 400 and CM4 ride
   along because Circle ships them — consider those a rumor, not a
@@ -53,7 +54,7 @@ wild. A custom image is the same build with your choices in it. 🧪
 
 ## 📦 The default images
 
-Out of the box, twelve images:
+Out of the box, thirteen images:
 
 | `make` | Image | Powers on into |
 |---|---|---|
@@ -68,6 +69,7 @@ Out of the box, twelve images:
 | `MACHINE=tc2048` | `kernel8-tc2048.img` | Timex TC-2048 (1984) — a 48K-compatible Spectrum, boots to `© 1982 Sinclair Research Ltd` |
 | `MACHINE=ts2068` | `kernel8-ts2068.img` | Timex Sinclair TS-2068 (1983) — the American 60Hz machine, boots to `© 1982 Sinclair Research Ltd` / `© 1983 Timex Computer Corp` on the NTSC canvas |
 | `MACHINE=ts1000` | `kernel8-ts1000.img` | Timex Sinclair TS-1000 (1982) — the American ZX-81, the inverse-video `K` cursor on the NTSC canvas |
+| `MACHINE=ts1500` | `kernel8-ts1500.img` | Timex Sinclair TS-1500 (1983) — the ZX-81 with 16K on board in a TS-1000 case, the inverse-video `K` cursor on the NTSC canvas |
 | `MACHINE=picker` | `kernel8-picker.img` | MAME's system list — a menu; machines with ROMs on the card run |
 
 The SD card is identical in every case — only the kernel differs. "Which
@@ -119,7 +121,7 @@ make kernels   # kernel8-spectrum.img, kernel8-spec128.img, kernel8-specpls2.img
                #   kernel8-specpl2a.img, kernel8-specpls3.img, kernel8-tbblue.img,
                #   kernel8-zx80.img, kernel8-zx81.img, kernel8-tc2048.img,
                #   kernel8-ts2068.img, kernel8-ts1000.img,
-               #   kernel8-picker.img
+               #   kernel8-ts1500.img, kernel8-picker.img
 
 make sd MACHINE=spectrum ASSETS=~/my-assets   # see "Assets you must supply"
 ```
@@ -158,7 +160,8 @@ my-assets/
 │   ├── zx81.zip       # …and for the ZX-81
 │   ├── tc2048.zip     # …and for the Timex TC-2048
 │   ├── ts2068.zip     # …and for the Timex Sinclair TS-2068
-│   └── ts1000.zip     # …and for the Timex Sinclair TS-1000
+│   ├── ts1000.zip     # …and for the Timex Sinclair TS-1000
+│   └── ts1500.zip     # …and for the Timex Sinclair TS-1500
 └── next/
     └── next.img       # ZX Spectrum Next SD-card image (tbblue only)
 ```
