@@ -19,7 +19,7 @@ and the next power-on asks again. 🔁
 
 Delightfully small. Let's be precise about what this actually is:
 
-- **Eighteen machines run.** 🕹️ The 48K ZX Spectrum, the ZX Spectrum 128, the
+- **Nineteen machines run.** 🕹️ The 48K ZX Spectrum, the ZX Spectrum 128, the
   ZX Spectrum +2 (`specpls2`, Amstrad's grey 128), the ZX Spectrum +2a
   (`specpl2a`, Amstrad's +3 firmware in the +2's cassette case), the ZX
   Spectrum +3 (`specpls3`, the same firmware with the built-in 3" floppy
@@ -46,17 +46,22 @@ Delightfully small. Let's be precise about what this actually is:
   MicroART ATM-Turbo 2 (`atmtb2`, MicroART's 1992 Russian turbo Spectrum
   clone, whose firmware boots to a MicroART menu of CP/M, TR-DOS 48,
   Spectrum 128, Spectrum 48, and Turbo On over a red MicroART logo on the
-  PAL canvas). That's it. That's the list.
+  PAL canvas), and the NedoPC ZX Evolution: BASECONF (`pentevo`, NedoPC's
+  2009 open-hardware Spectrum clone, whose EVO Reset Service v0.60.02
+  firmware boots to a BASECONF main menu — TR-DOS boot, File browse, Tape
+  load, SD-card boot, 48K and 128K BASIC, and more — beside a settings panel,
+  on the PAL canvas). That's it. That's the list.
 - **One driver family is compiled.** The build's `SOURCES` names exactly
-  nine MAME driver files: `spectrum.cpp`, `spec128.cpp` (the 128 and the
+  ten MAME driver files: `spectrum.cpp`, `spec128.cpp` (the 128 and the
   +2 both), `specnext.cpp`, `specpls3.cpp` (the +2a and the +3),
   `zx.cpp` (the ZX-80, the ZX-81, the TS-1000, and the TS-1500),
   `timex.cpp` (the TC-2048 and the TS-2068), `pentagon.cpp` (the
-  Pentagon 128K), `scorpion.cpp` (the Scorpion ZS-256), and `atm.cpp`
-  (the MicroART ATM-Turbo 2). The picker's
+  Pentagon 128K), `scorpion.cpp` (the Scorpion ZS-256), `atm.cpp`
+  (the MicroART ATM-Turbo 2), and `evo/pentevo.cpp` (the ZX Evolution
+  BASECONF). The picker's
   list shows everything those files define, but a listed machine only runs
   if you've supplied its ROMs — with the default assets, that's the
-  eighteen above.
+  nineteen above.
 - **One board.** 🥧 Proven on a Raspberry Pi 4 Model B (4GB). Nothing else
   has ever booted it. (The firmware files for the Pi 400 and CM4 ride
   along because Circle ships them — consider those a rumor, not a
@@ -73,7 +78,7 @@ wild. A custom image is the same build with your choices in it. 🧪
 
 ## 📦 The default images
 
-Out of the box, nineteen images:
+Out of the box, twenty images:
 
 | `make` | Image | Powers on into |
 |---|---|---|
@@ -95,6 +100,7 @@ Out of the box, nineteen images:
 | `MACHINE=pentagon` | `kernel8-pentagon.img` | Pentagon 128K (1991) — Vladimir Drozdov's Russian Spectrum clone, boots to a 128-style startup menu (Tape Loader, 128 BASIC, Calculator, 48 BASIC, TR-DOS) on the PAL canvas |
 | `MACHINE=scorpio` | `kernel8-scorpio.img` | Scorpion ZS-256 (1992) — the Russian "Yellow PCB" clone, V.2.94 firmware boots to a menu (128 TR-DOS, 128 BASIC, Calculator, 48 BASIC, 48 TR-DOS) on the PAL canvas |
 | `MACHINE=atmtb2` | `kernel8-atmtb2.img` | MicroART ATM-Turbo 2 (1992) — MicroART's Russian turbo Spectrum clone, boots to a MicroART firmware menu (CP/M, TR-DOS 48, Spectrum 128, Spectrum 48, Turbo On) over a red MicroART logo on the PAL canvas |
+| `MACHINE=pentevo` | `kernel8-pentevo.img` | ZX Evolution: BASECONF (2009) — NedoPC's open-hardware Spectrum clone, boots to the EVO Reset Service v0.60.02 firmware, a BASECONF menu (TR-DOS boot, File browse, Tape load, SD-card boot, 48K/128K BASIC, …) beside a settings panel, on the PAL canvas |
 | `MACHINE=picker` | `kernel8-picker.img` | MAME's system list — a menu; machines with ROMs on the card run |
 
 The SD card is identical in every case — only the kernel differs. "Which
@@ -150,7 +156,7 @@ make kernels   # kernel8-spectrum.img, kernel8-spec128.img, kernel8-specpls2.img
                #   kernel8-tc2048.img, kernel8-ts2068.img, kernel8-ts1000.img,
                #   kernel8-ts1500.img, kernel8-pentagon.img,
                #   kernel8-scorpio.img, kernel8-atmtb2.img,
-               #   kernel8-picker.img
+               #   kernel8-pentevo.img, kernel8-picker.img
 
 make sd MACHINE=spectrum ASSETS=~/my-assets   # see "Assets you must supply"
 ```
@@ -194,18 +200,19 @@ my-assets/
 │   ├── pentagon.zip   # …and for the Pentagon 128K (a spec128 clone; parent ROMs come from spec128.zip)
 │   ├── scorpio.zip    # …and for the Scorpion ZS-256 (a spec128 clone; parent ROMs come from spec128.zip)
 │   ├── atmtb2.zip     # …and for the MicroART ATM-Turbo 2 (a spec128 clone; parent ROMs come from spec128.zip)
-│   └── betadisk.zip   # Beta Disk / TR-DOS interface ROMs (the disk device shared by the pentagon, the scorpio, and the atmtb2)
+│   ├── pentevo.zip    # …and for the ZX Evolution BASECONF (a spec128 clone; parent ROMs come from spec128.zip)
+│   └── betadisk.zip   # Beta Disk / TR-DOS interface ROMs (the disk device shared by the pentagon, the scorpio, the atmtb2, and the pentevo)
 └── next/
     └── next.img       # ZX Spectrum Next SD-card image (tbblue, specnext_ks1, specnext_ks2, specnext_ks3)
 ```
 
 - ROM zips are standard MAME romsets, named for their machine.
-- `pentagon`, `scorpio`, and `atmtb2` are MAME clones of `spec128`: each zip
-  (`pentagon.zip`, `scorpio.zip`, `atmtb2.zip`) carries only the clone's own
-  ROMs, and MAME resolves the shared 128 ROMs from `spec128.zip` — so both
-  the clone zip and `spec128.zip` must be present. Each machine's Beta Disk
-  interface pulls the TR-DOS ROMs from `betadisk.zip` (MAME's `betadisk`
-  device set).
+- `pentagon`, `scorpio`, `atmtb2`, and `pentevo` are MAME clones of
+  `spec128`: each zip (`pentagon.zip`, `scorpio.zip`, `atmtb2.zip`,
+  `pentevo.zip`) carries only the clone's own ROMs, and MAME resolves the
+  shared 128 ROMs from `spec128.zip` — so both the clone zip and
+  `spec128.zip` must be present. Each machine's Beta Disk interface pulls
+  the TR-DOS ROMs from `betadisk.zip` (MAME's `betadisk` device set).
 - `next.img` is distributed by the
   [Spectrum Next project](https://www.specnext.com/latestdistro/); the
   `tbblue`, `specnext_ks1`, `specnext_ks2`, and `specnext_ks3` machines
