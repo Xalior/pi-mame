@@ -8,12 +8,16 @@
 #                                docs/amstrad/, plus `picker`
 #   make kernels                 every machine in those tables, plus the picker
 #   make sd MACHINE=<m> [ASSETS=<dir>]   copy-to-card tree in build/sd/
+#   make assets-free  [ASSETS=<dir>]     fetch the properly-redistributable ROMs
+#   make assets-public [ASSETS=<dir>]    fetch from public MAME-set mirrors
+#   make assets       [ASSETS=<dir>]     fetch both (free + public)
 #
 # Requires the Arm GNU aarch64-none-elf toolchain on PATH (see README.md).
 
 MACHINE ?= spectrum
+ASSETS  ?= ./my-assets
 
-.PHONY: deps mame kernel kernels sd
+.PHONY: deps mame kernel kernels sd assets assets-free assets-public
 
 # `bash ./configure` (not ./configure): the shebang would pin macOS's
 # bash 3.2; PATH resolution finds a modern bash when one is installed.
@@ -68,3 +72,14 @@ kernels:
 
 sd:
 	scripts/mksd.sh $(MACHINE) $(ASSETS)
+
+# Fetch assets into $(ASSETS) (default ./my-assets). The script offers; you
+# choose the tier. See scripts/assets.manifest for every source and checksum.
+assets-free:
+	scripts/fetch-assets.sh free $(ASSETS)
+
+assets-public:
+	scripts/fetch-assets.sh public $(ASSETS)
+
+assets:
+	scripts/fetch-assets.sh all $(ASSETS)

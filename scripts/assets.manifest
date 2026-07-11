@@ -1,0 +1,348 @@
+# assets.manifest — data driving scripts/fetch-assets.sh. One stanza per asset.
+#
+# Grammar (pipe-delimited; '#' comments; blank lines ignored):
+#   asset|<name>|<tier>|<kind>|<dest>
+#       tier = free | public       kind = zip | file | image
+#       dest = path under ASSETS_DIR (roms/<n>.zip, carts/<f>, next/<f>)
+#   src|<name>|<type>|<url>        sources, tried in listed order
+#       type = raw  -> url is a base dir; member's <raw> field is the filename
+#              zip  -> url is a set-zip; members located by CRC32 (rename/repack)
+#              page -> url is scraped for the current download link (next.img)
+#   mem|<name>|<target>|<crc32>|<sha1>|<raw>
+#       target = filename inside the produced zip (or the dest file itself)
+#       raw    = source filename for a 'raw' source, or a+b to concatenate;
+#                '-' when only 'zip' sources apply (located by CRC32)
+#
+# TIER DOCTRINE ("free soda"): free = redistribution properly blessed, fetched
+# from a proper upstream (Amstrad's permission for the Sinclair/Amstrad 8-bit
+# ROMs, shipped by Fuse/proteanthread; SpecNext's official distro). public =
+# publicly-available-but-grey MAME-set mirrors on archive.org. Checksums are
+# each machine's ROM_START in the MAME tree; every member is CRC32+SHA1 verified
+# before install. next.img is the sole checksum-exempt asset (a live SD image
+# whose version advances) — see its stanza.
+
+# --- FREE tier ---
+asset|spectrum|free|zip|roms/spectrum.zip
+src|spectrum|raw|https://raw.githubusercontent.com/libretro/fuse-libretro/master/fuse/roms
+src|spectrum|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/spectrum.zip
+mem|spectrum|spectrum.rom|ddee531f|5ea7c2b824672e914525d1d5c419d71b84a426a2|48.rom
+
+asset|tc2048|free|zip|roms/tc2048.zip
+src|tc2048|raw|https://raw.githubusercontent.com/libretro/fuse-libretro/master/fuse/roms
+src|tc2048|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/tc2048.zip
+mem|tc2048|tc2048.rom|f1b5fa67|febb2d495b6eda7cdcb4074935d6e9d9f328972d|tc2048.rom
+
+asset|ts2068|free|zip|roms/ts2068.zip
+src|ts2068|raw|https://raw.githubusercontent.com/libretro/fuse-libretro/master/fuse/roms
+src|ts2068|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/ts2068.zip
+mem|ts2068|ts2068_h.rom|bf44ec3f|1446cb2780a9dedf640404a639fa3ae518b2d8aa|tc2068-0.rom
+mem|ts2068|ts2068_x.rom|ae16233a|7e265a2c1f621ed365ea23bdcafdedbc79c1299c|tc2068-1.rom
+
+# FREE: proteanthread ZX-81-ROMS (Amstrad permission covers Sinclair 8-bits)
+asset|ts1000|free|zip|roms/ts1000.zip
+src|ts1000|raw|https://raw.githubusercontent.com/proteanthread/ZX-81-ROMS/master
+src|ts1000|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/ts1000.zip
+mem|ts1000|zx81a.rom|4b1dd6eb|7b143ee964e9ada89d1f9e88f0bd48d919184cfc|zx81.rom
+
+asset|ts1500|free|zip|roms/ts1500.zip
+src|ts1500|raw|https://raw.githubusercontent.com/proteanthread/ZX-81-ROMS/master
+src|ts1500|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/ts1500.zip
+mem|ts1500|d2364c_649.u2|7dd19c48|3eb437359221b4406d236085ec66fa02278e7495|TS1500.rom
+
+# --- PUBLIC tier: archive.org MAME split-set mirrors ---
+
+asset|pentagon|public|zip|roms/pentagon.zip
+src|pentagon|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/pentagon.zip
+mem|pentagon|128p-0.rom|124ad9e0|d07fcdeca892ee80494d286ea9ea5bf3928a1aca|-
+mem|pentagon|128tr93.rom|08ad241c|16daba547c644ef01ce76d2686ccfbff72e13dbe|-
+mem|pentagon|basic90.rom|a41575ba|44c5de86e765172b0af154fe3934643ce40bf378|-
+mem|pentagon|m48a.rom|a3b4def6|7ad59ca373876d452b0cf0ed5edb0e93c3176f1a|-
+mem|pentagon|neos_512.rom|1657fa43|647545f06257bce9b1919fcb86b2a49a21c851a7|-
+mem|pentagon|pent-es.rom|34d04bae|6782c8c0ee77c40d6d3170a254894dae44ddc93e|-
+mem|pentagon|pentagon.rom|aa1ce4bd|a584272f21dc82c14b7d4f1ed440e23a976e71f0|-
+mem|pentagon|sos48.rom|ceb4005d|d56c01ea7abdca178efb2b1c6b2866a9a38274ee|-
+mem|pentagon|sos89r.rom|09c9e7e1|29c567921abd377d2f9c088352c392a5a0858651|-
+mem|pentagon|zxvg-1.rom|a8baca3e|f2f131eaa4de832eda76290e48f86e465d28ded7|-
+mem|pentagon|zxvg-29-0.rom|3b66f433|d21df9e7f1ee99d8b38c2e6a32727aac0f1d5dc6|-
+mem|pentagon|zxvg-30-0.rom|533e0f26|b5f157c5d0da414ec77e445fdc40b78450129709|-
+mem|pentagon|zxvg-31-0.rom|76f43500|1c7cd52894847668418876d55b93b213d89d92ee|-
+mem|pentagon|zxvg-35-0.rom|5cc8b3b1|6c6d0ef1b65d7dc4f607d17204488264575ce48c|-
+mem|pentagon|zxvgs-22-0.rom|63041c61|f6718097d939afa8881b4436741a5a23d7e93d78|-
+mem|pentagon|zxvgs-22-1.rom|f3736047|f3739bf460a57e3f10e8dfb1e7120842938d27ea|-
+
+asset|scorpio|public|zip|roms/scorpio.zip
+src|scorpio|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/scorpio.zip
+mem|scorpio|scorp0.rom|0eb40a09|477114ff0fe1388e0979df1423602b21248164e5|-
+mem|scorpio|scorp1.rom|9d513013|367b5a102fb663beee8e7930b8c4acc219c1f7b3|-
+mem|scorpio|scorp2.rom|fd0d3ce1|07783ee295274d8ff15d935bfd787c8ac1d54900|-
+mem|scorpio|scorp3.rom|1fe1d003|33703e97cc93b7edfcc0334b64233cf81b7930db|-
+mem|scorpio|scorpion.rom|fef73c28|66cecdadf992d8adb9c66deee929eb56600dc9bc|-
+mem|scorpio|scorp294.rom|99f57ce1|083bb57ad52cc871b92d3e1794fd9790872c3584|-
+mem|scorpio|neos_256.rom|364ae09a|bb6db1947415503a6bc48f33c603fb3a0dbb3690|-
+mem|scorpio|scrpkey.rom|e938a510|2753993c97ff0fc6cff26ed792929abc1288dc6f|-
+mem|scorpio|gs104.rom|7a365ba6|c865121306eb3a7d811d82fbcc653b4dc1d6fa3d|-
+mem|scorpio|gs105a.rom|1cd490c6|1ba78923dc7d803e7995c165992e14e4608c2153|-
+
+asset|atmtb2|public|zip|roms/atmtb2.zip
+src|atmtb2|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/atmtb2.zip
+mem|atmtb2|atm106-1.rom|658c98f1|1ec694795aa6cac10147e58f38a9db0bdf7ed89b|-
+mem|atmtb2|atm106-2.rom|8fe367f9|56de8fd39061663b9c315b74fd3c31acddae279c|-
+mem|atmtb2|atm106-3.rom|124ad9e0|d07fcdeca892ee80494d286ea9ea5bf3928a1aca|-
+mem|atmtb2|atm106-4.rom|f352f2ab|6045500ab01be708cef62327e9821b4a358a4673|-
+mem|atmtb2|atm106.rom|75350b37|2afc9994f026645c74b6c4b35bcee2e0bc0d6edc|-
+mem|atmtb2|rf2ve3.rom|35e0f9ec|adcf14758fab8472cfa0167af7e8326c66416416|-
+mem|atmtb2|rfat710.rom|03734365|6cb6311727fad9bc4ccb18919c3c39b37529b8e6|-
+mem|atmtb2|sgen.rom|1f4387d6|93b3774dc8a486643a1bdd48c606b0c84fa0e22b|-
+
+asset|betadisk|public|zip|roms/betadisk.zip
+src|betadisk|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/betadisk.zip
+mem|betadisk|trd501.rom|3e3cdd4c|8303ba0cc79daa6c04cd1e6ce27e8b6886a3f0de|-
+mem|betadisk|trd503,a.rom|c43d717f|0a74bd34538a03d0e1d214b425d95c14ad10c8c4|-
+mem|betadisk|trd503,a2.rom|121889b0|c9d69cf3a0219f6e37e7eb5046961fa8fa8eb2c6|-
+mem|betadisk|trd503,a3.rom|1c5a25b1|4a6fbabd82a6a8f3986ac77e7157d1a2551ed40d|-
+mem|betadisk|trd503,a4.rom|c2387608|93e0b92a3f38b59cc006d22f9c9299f5377b15e5|-
+mem|betadisk|trd503.rom|10751aba|21695e3f2a8f796386ce66eea8a246b0ac44810c|-
+mem|betadisk|trd503all.rom|4c0187ab|21f611e5e0bbf5d6450606e30b470f7c2c9640f1|-
+mem|betadisk|trd503aut.rom|7ff90178|2261144bdb5046cb8013f744a5b0721be8577dc7|-
+mem|betadisk|trd503beta3.rom|561662f2|4cea8a361eb848cf0ad59605c83d57c30521cfd5|-
+mem|betadisk|trd503beta4.rom|23dbc387|74b80d3f07dc95e9f09b83c3df4724f063f47116|-
+mem|betadisk|trd503ext.rom|abb139e7|3c1736857655a48375d30b3865963090ba635635|-
+mem|betadisk|trd503kay.rom|77baccbb|9c5fb89b57643f723246453809dad3f669bf59a3|-
+mem|betadisk|trd503m.rom|2f97fe06|6b9decc07d5d7322c6c283f5fe950f530a42d70d|-
+mem|betadisk|trd503xbios.rom|8be427cc|78f423fd200e720aa6b857f00969fa1f8c7da20e|-
+mem|betadisk|trd503zxvgs.rom|b90ee684|c78e1b36812fb2b3e7a62e66049c850d27de74a6|-
+mem|betadisk|trd504-1.rom|da170c65|80f0fe79cbf393ac91ff971d31ff9eab0c9a959e|-
+mem|betadisk|trd504.rom|ba310874|05e55e37df8eee6c68601ba9cf6c92195852ce3f|-
+mem|betadisk|trd5043.rom|165d5ef8|99d25234154e4a8b3ad5e06f260b6c41c253b333|-
+mem|betadisk|trd504em,a.rom|fcbf11e8|8050d371d7049e0c3e946964643396a39aa5ab0f|-
+mem|betadisk|trd504em.rom|0d3f8b43|d6783983a16b17b79337c22e9460e1cfde3744ae|-
+mem|betadisk|trd504f.rom|ab3100d8|33646525ae1c579cddc0dd84d3218095950965b8|-
+mem|betadisk|trd504m.rom|2f2cb630|40b1f87f8be4e09630d7eb7c14561dde0b85c0c9|-
+mem|betadisk|trd504s.rom|c5ca0423|cb2da2c4575bc54454e4f97073c5bb37505487fe|-
+mem|betadisk|trd504s2.rom|1e9b59aa|d6eb0eeb429c70d1f8f9a23ca4e2feb5f73d3120|-
+mem|betadisk|trd504s3.rom|1fe1d003|33703e97cc93b7edfcc0334b64233cf81b7930db|-
+mem|betadisk|trd504s4.rom|522ebbd6|eede6a988ed453e506b27a8d09470e0a8d97d1aa|-
+mem|betadisk|trd504t.rom|e212d1e0|745e9caf576e64a5386ad845256d28593d34cc40|-
+mem|betadisk|trd504tb2.rom|8d943e6b|bf6ab329791258f02c5f695b0c7448998b709435|-
+mem|betadisk|trd504tm.rom|2334b8c6|2fd8944e067140324e998b59aab766f16eb5c7fb|-
+mem|betadisk|trd505,a.rom|03b76c8f|ef2a07767d3b229aa4573dcfee905156a83bc32d|-
+mem|betadisk|trd505,a2.rom|a102e726|a3f0ef7b7d8b3022f306be8d9e8a51ae699097df|-
+mem|betadisk|trd505.rom|fdff3810|0a0e284d4764a542aa3e5d7c43d0291036e16c35|-
+mem|betadisk|trd505d.rom|31e4be08|dd08bdea8b5caa35569f49770e380d16bb37502b|-
+mem|betadisk|trd505h.rom|9ba15549|5908784cdfb782066bde08f186f0bbb6f6b80545|-
+mem|betadisk|trd512.rom|b615d6c4|4abb90243f66df19caa84f82d0b880a6ce344eca|-
+mem|betadisk|trd512f.rom|edb74f8c|c5b2cd18926dde4a68bcd8c360ba33d6c11b8801|-
+mem|betadisk|trd513f.rom|6b1c17f3|5c14c0c389e29521cb59672d93d3e8a74f0184cc|-
+mem|betadisk|trd513fm.rom|bad0c0a0|da88e756302f83991774730012601ebf3c61aed9|-
+mem|betadisk|trd513p.rom|eb3196fe|7c85b9b562d288155677f20f5e41e679c073379b|-
+mem|betadisk|trd5613.rom|d66cda49|dac3c8396fc4f85b5673076cc647afbe439ad17a|-
+mem|betadisk|trd56661.rom|8528c789|1332a01137bd537fee696ba7adddc0a15b3237c4|-
+mem|betadisk|trd5666hte.rom|03841161|4e523768231130947a81247e116fc049bd6da963|-
+mem|betadisk|trd604.rom|d8882a8c|282eb7bc819aad2a12fd954e76f7838a4e1a7929|-
+mem|betadisk|trd604m.rom|e73394cb|5b1336e8534513df0a71f8fedca38bc67174f03c|-
+mem|betadisk|trd605e-2.rom|a064b7f2|46ac75e88375d313fdd5e873800bf82c179eb226|-
+mem|betadisk|trd605e-3.rom|cff3d06b|0fca9c61cb94a4cab78118c66ba54ce6bc6dcf65|-
+mem|betadisk|trd605e.rom|56d3c2db|adc21492d216da1aca4119972f2110a23fdd23a7|-
+mem|betadisk|trd605h.rom|53bb1b4a|fc899901fd59c84c9aa6c402b67d76b225ab8e5b|-
+mem|betadisk|trd605r.rom|f8816a47|98c9b63835e559f38f6a8d1344992f02cb899add|-
+mem|betadisk|trd606h.rom|6b44fdd7|4ca7ea2bc0e62c98c9ba86a304aee3cbf88d6b09|-
+mem|betadisk|trd607m.rom|5a062f03|bbd68481c76e8a3f2f26847faa72c42df013b617|-
+mem|betadisk|trd608-2.rom|3541b280|2b93c1887f485639ec15860b5503dc7efb6d31d6|-
+mem|betadisk|trd608-3.rom|d3e91d69|5e367d3601d07bd2af1d6255561a5983c0e9fb5d|-
+mem|betadisk|trd608.rom|5c998d53|c65a972e75e627336c44ea184cb9ae81dfa2069b|-
+mem|betadisk|trd609.rom|91028924|fa5433f73aab93c58c891ceee2cdfed0a979dfbb|-
+mem|betadisk|trd609e.rom|46312c8c|0ce69fe76e17a875c287e3725f6209f1c59d8bd9|-
+mem|betadisk|trd610e.rom|95395ca4|8cda2efbf2360cd675ea8b04b43cf1746fb41f35|-
+mem|betadisk|trd701.rom|47f39c0d|53d8b8959c321618caaef5aeb270e530e8f8ada3|-
+
+asset|elwro800|public|zip|roms/elwro800.zip
+src|elwro800|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/elwro800.zip
+mem|elwro800|bas04.epr|6ab16f36|49a19b279f311279c7fed3d2b3f207732d674c26|-
+mem|elwro800|bas14.epr|a743eb80|3a300550838535b4adfe6d05c05fe0b39c47df16|-
+mem|elwro800|bootv.epr|de5fa37d|4f203efe53524d84f69459c54b1a0296faa83fd9|-
+mem|elwro800|junior_io_prom.bin|c6a777c4|41debc1b4c3bd4eef7e0e572327c759e0399a49c|-
+mem|elwro800|junior_mem_prom.bin|0f745f42|360ec23887fb6d7e19ee85d2bb30d9fa57f4936e|-
+mem|elwro800|tv_2716.e11|6093e80e|a4972f336490d15222f4f24369f1f3253cfb9516|-
+
+asset|nc100|public|zip|roms/nc100.zip
+src|nc100|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/nc100.zip
+mem|nc100|nc100.rom|a699eca3|ce217d5a298b959ccc3d7bc5c93b1dba043f1339|-
+mem|nc100|nc100_de_a1.rom|bd9ce223|2efb26911832bf1456d76d2508e24c0733dc216d|-
+mem|nc100|nc100_dk_a1.rom|ebb54923|30321011384c5e10204b9a837430c36fc63580d2|-
+mem|nc100|nc100a.rom|849884f9|ff030dd334ca867d620ee4a94b142ef0d93b69b6|-
+
+asset|pc1512|public|zip|roms/pc1512.zip
+src|pc1512|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/pc1512.zip
+mem|pc1512|40043-2.ic129|532c3854|18a17b710f9eb079d9d7216d07807030f904ceda|-
+mem|pc1512|40043.ic129|668fcc94|74002f5cc542df442eec9e2e7a18db3598d8c482|-
+mem|pc1512|40043v2.ic129|d2d4d2de|c376fd1ad23025081ae16c7949e88eea7f56e1bb|-
+mem|pc1512|40044-2.ic132|ea527e6e|b77fa44767a71a0b321a88bb0a394f1125b7c220|-
+mem|pc1512|40044.ic132|f72f1582|7781d4717917262805d514b331ba113b1e05a247|-
+mem|pc1512|40044v2.ic132|1aec54fa|b12fd73cfc35a240ed6da4dcc4b6c9910be611e0|-
+mem|pc1512|40045.ic127|dd5e030f|7d858bbb2e8d6143aa67ab712edf5f753c2788a7|-
+mem|pc1512|40078.ic127|ae9c0d04|bc8dc4dcedeea5bc1c04986b1f105ad93cb2ebcd|-
+
+asset|pc1512kb|public|zip|roms/pc1512kb.zip
+src|pc1512kb|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/pc1512kb.zip
+mem|pc1512kb|40042.ic801|607edaf6|4422c6475596c3881c11b6a6266811c336d55d19|-
+
+asset|cpc664|public|zip|roms/cpc664.zip
+src|cpc664|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/cpc664.zip
+mem|cpc664|cpc664.rom|9ab5a036|073a7665527b5bd8a148747a3947dbd3328682c8|-
+mem|cpc664|cpcados.rom|1fe22ecd|39102c8e9cb55fcc0b9b62098780ed4a3cb6a4bb|-
+
+asset|cpc6128|public|zip|roms/cpc6128.zip
+src|cpc6128|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/cpc6128.zip
+mem|cpc6128|cpc6128.rom|9e827fe1|5977adbad3f7c1e0e082cd02fe76a700d9860c30|-
+mem|cpc6128|cpcados.rom|1fe22ecd|39102c8e9cb55fcc0b9b62098780ed4a3cb6a4bb|-
+
+asset|kccomp|public|zip|roms/kccomp.zip
+src|kccomp|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/kccomp.zip
+mem|kccomp|farben.rom|a50fa3cf|2f229ac9f62d56973139dad9992c208421bc0f51|-
+mem|kccomp|kccbas.rom|ca6af63d|d7d03755099d0aff501fa5fffc9c0b14c0825448|-
+mem|kccomp|kccos.rom|7f9ab3f7|f828045e98e767f737fd93df0af03917f936ad08|-
+
+asset|ql|public|zip|roms/ql.zip
+src|ql|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/ql.zip
+mem|ql|ah.ic33.1|a9b4d2df|142d6f01a9621aff5e0ad678bd3cbf5cde0db801|-
+mem|ql|ah.ic33.2|36488e4e|ff6f597b30ea03ce480a3d6728fd1d858da34d6a|-
+mem|ql|ah.ic34|61259d4c|bdd10d111e7ba488551a27c8d3b2743917ff1307|-
+mem|ql|bql010-sqpp|07834797|ba94bdad2303a263008b6ea744669a19938d9998|-
+mem|ql|ipc8049.ic24|6a0d1f20|fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b|-
+mem|ql|minerva.rom|930befe3|84a99c4df13b97f90baf1ec8cb6c2e52e3e1bb4d|-
+mem|ql|ql.jm 0000.ic33|1f8e840a|7929e716dfe88318bbe99e34f47d039957fe3cc0|-
+mem|ql|ql.jm 8000.ic34|9168a2e9|1e7c47a59fc40bd96dfefc2f4d86827c15f0199e|-
+mem|ql|ql.js 0000.ic33|1bbad3b8|59fd4372771a630967ee102760f4652904d7d5fa|-
+mem|ql|ql.js 8000.ic34|c970800e|b8c9203026a7de6a44bd0942ec9343e8b222cb41|-
+mem|ql|tb.ic33|1c86d688|7df8028e6671afc4ebd5f65bf6c2d6019181f239|-
+mem|ql|tb.ic34|de7f9669|9d6bc0b794541a4cec2203256ae92c7e68d1011d|-
+mem|ql|tyche.rom|8724b495|5f33a1bc3f23fd09c31844b65bc3aca7616f180a|-
+
+asset|zx81|public|zip|roms/zx81.zip
+src|zx81|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/zx81.zip
+mem|zx81|h4th.rom|257d5a32|03809a6b464609ff924f7e55a85eef875cd47ae8|-
+mem|zx81|tree4th.rom|71616238|3ee15779e03482b10fc59eb4df2446376c56b00d|-
+mem|zx81|zx81.rom|fcbbd617|a0ade36540561cc1691bb6f0c42ceae12484a102|-
+mem|zx81|zx81a.rom|4b1dd6eb|7b143ee964e9ada89d1f9e88f0bd48d919184cfc|-
+mem|zx81|zx81b.rom|522c37b8|c6d8e06cb936989f6e1cc7a56d1f092da854a515|-
+
+asset|spec128|public|zip|roms/spec128.zip
+src|spec128|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/spec128.zip
+mem|spec128|zx128_0.rom|e76799d2|4f4b11ec22326280bdb96e3baf9db4b4cb1d02c5|-
+mem|spec128|zx128_1.rom|b96a36be|80080644289ed93d71a1103992a154cc9802b2fa|-
+mem|spec128|zx128s0.rom|453d86b2|968937b1c750f0ef6205f01c6db4148da4cca4e3|-
+mem|spec128|zx128s1.rom|6010e796|bea3f397cc705eafee995ea629f4a82550562f90|-
+
+asset|specpls2|public|zip|roms/specpls2.zip
+src|specpls2|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/specpls2.zip
+mem|specpls2|zxp2_0.rom|5d2e8c66|72703f9a3e734f3c23ec34c0727aae4ccbef9a91|-
+mem|specpls2|zxp2_1.rom|98b1320b|de8b0d2d0379cfe7c39322a086ca6da68c7f23cb|-
+mem|specpls2|plus2fr0.rom|c684c535|56684c4c85a616e726a50707483b9a42d8e724ed|-
+mem|specpls2|plus2fr1.rom|f5e509c5|7e398f62689c9d90a36d3a101351ec9987207308|-
+mem|specpls2|plus2sp0.rom|e807d06e|8259241b28ff85441f1bedc2bee53445767c51c5|-
+mem|specpls2|plus2sp1.rom|41981d4b|ec0d5a158842d20601b4fbeaefc6668db979d0e1|-
+
+asset|specpl2a|public|zip|roms/specpl2a.zip
+src|specpl2a|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/specpl2a.zip
+mem|specpl2a|40092.ic7|9bc85686|5992daf925f6e225fc0d01f7640282954d092ef4|-
+mem|specpl2a|40093.ic8|db551783|a0432adcca03f849fb39b6dce6414740cf4aecd2|-
+mem|specpl2a|40092u.ic7|80808d82|b9e88ec18f844ce42ecb7802d82c2bda65f9c4f2|-
+mem|specpl2a|40093u.ic8|61f2b50c|d062765ceb1f3cd2c94ea51cb737cac7ad6151b4|-
+mem|specpl2a|40094s.ic7|9d102acf|c525bd23f79ca968d34a0efdcc47b2eb342007f5|-
+mem|specpl2a|40101s.ic8|1408ddce|56eb124d44ee8c8daef130be4d7e735ec412c4ba|-
+
+asset|zx80|public|zip|roms/zx80.zip
+src|zx80|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/zx80.zip
+mem|zx80|zx80.rom|4c7fc597|b6769a3197c77009e0933e038c15b43cf4c98c7a|-
+
+asset|cpc464|public|zip|roms/cpc464.zip
+src|cpc464|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/cpc464.zip
+mem|cpc464|cpc464.rom|40852f25|56d39c463da60968d93e58b4ba0e675829412a20|-
+
+# +3 shares the +2A romset (identical members); source that set, repack.
+asset|specpls3|public|zip|roms/specpls3.zip
+src|specpls3|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/specpl2a.zip
+mem|specpls3|40092.ic7|9bc85686|5992daf925f6e225fc0d01f7640282954d092ef4|-
+mem|specpls3|40093.ic8|db551783|a0432adcca03f849fb39b6dce6414740cf4aecd2|-
+mem|specpls3|40092u.ic7|80808d82|b9e88ec18f844ce42ecb7802d82c2bda65f9c4f2|-
+mem|specpls3|40093u.ic8|61f2b50c|d062765ceb1f3cd2c94ea51cb737cac7ad6151b4|-
+mem|specpls3|40094s.ic7|9d102acf|c525bd23f79ca968d34a0efdcc47b2eb342007f5|-
+mem|specpls3|40101s.ic8|1408ddce|56eb124d44ee8c8daef130be4d7e735ec412c4ba|-
+
+asset|byte|public|zip|roms/byte.zip
+src|byte|zip|https://archive.org/download/mame-roms-split_/MAME%20ROMs%20%28split%29/byte.zip
+mem|byte|byte.rom|c13ba473|99f40727185abbb2413f218d69df021ae2e99e45|-
+mem|byte|dd10_rt5.reva.bin|aae13e3e|46f0ca97ceee0c591277aaac8b0cecc445927690|-
+mem|byte|dd10_rt5.revb.bin|b649b5d1|2d067962b08aee8cdf1bc4f5ce337815dd9d6c66|-
+mem|byte|dd11_rt5.bin|0f32b304|d7adf9861c332510ff3682a1b06e6d9898343b6d|-
+mem|byte|dd66_rt5.bin|f8f9766a|3f5345763a30e5370199c454301de655e7f1a1da|-
+mem|byte|dd71_rt7.bin|c91b07c2|2365d45b028b1e91dffb5bcdc87bd26ca9a7c26f|-
+mem|byte|dd72.bin|2464d537|e8b4a468e6f254f090fc5b2c59ea573c2a4f0455|-
+mem|byte|dd73.bin|bd430288|b4c67a6213b1ecfa37cc476bc483e8a8deef6149|-
+
+asset|chloe|public|zip|roms/chloe.zip
+src|chloe|zip|https://archive.org/download/mame-roms-split_/MAME%20ROMs%20%28split%29/chloe.zip
+mem|chloe|10_basic_42.rom|c6273eaa|f09a26c50f5cfe454e4d56c920cdcc62bc4f90cb|-
+mem|chloe|10_boot.rom|efbfe46e|f5a86b56955661f72fa416e7e644de0b3afe6509|-
+mem|chloe|10_dos_31.rom|67dfef09|ba9616494071dfe65834d7db657e0d3bcce0b732|-
+
+asset|kb_ms_natural|public|zip|roms/kb_ms_natural.zip
+src|kb_ms_natural|zip|https://archive.org/download/mame-roms-split_/MAME%20ROMs%20%28split%29/kb_ms_natural.zip
+mem|kb_ms_natural|natural.bin|aa8243ab|72134882a5c03e785db07cc54dfb7572c0a730d9|-
+
+asset|pentevo|public|zip|roms/pentevo.zip
+src|pentevo|zip|https://archive.org/download/mame-roms-split_/MAME%20ROMs%20%28split%29/pentevo.zip
+mem|pentevo|zxevo_05902fe.rom|df144c82|e48b8a95576e0123764ff8cc34d9373dc95159bf|-
+mem|pentevo|zxevo_05904.rom|8cae52eb|992a0dc17fc7283bbfad5c5ebe254cab68bf0d9a|-
+mem|pentevo|zxevo_05912.rom|e0e95f9f|b27b9d61aaf47a73bdd07027df0aad5b88be0fb9|-
+mem|pentevo|zxevo_05912fe.rom|4c9300b1|b6511f1c24a094930a559f3673b322b24b848a03|-
+mem|pentevo|zxevo_05913.rom|b75bf957|6880493ee248cad1f82683f8b9cc69fb78fe5682|-
+mem|pentevo|zxevo_05913fe.rom|a4de8eb8|508667d5ef42a1d0353866f3a1de4e61a230fc86|-
+mem|pentevo|zxevo_06002.rom|0c828b6c|c70361b98f2d42d4ab60a63139bb1de4eecd6dd1|-
+mem|pentevo|zxevo_06002fe.rom|b7ac7a2d|5a86046d12d4aad52947caec8550db605b37ca29|-
+mem|pentevo|zxevo_fw.bin|aefbd8e5|ac9a551ba15eeead76b5527fd5d23d824ae5176f|-
+
+asset|sprinter|public|zip|roms/sprinter.zip
+src|sprinter|zip|https://archive.org/download/mame-roms-split_/MAME%20ROMs%20%28split%29/sprinter.zip
+mem|sprinter|sp2k-2.13.rom|6495575f|a9ca06b27e7c5b2b5b9ff8fc2d19ee24ed64c258|-
+mem|sprinter|sp2k-2.17.rom|3c7f1025|d5c3d10b3b67f9ef87d3ce8a52ae3c33b95b9171|-
+mem|sprinter|sp2k-3.00.rom|193de3da|428dcb1253a88e7b5aedcd68b5bf6d2487592e10|-
+mem|sprinter|sp2k-3.03.rom|fe26f578|ef6d0fe4ec1bae7bda572a4fb3b9497a8910b885|-
+mem|sprinter|sp2k-3.04.rom|1729cb5c|fb4c9f80651aa87526f141839fb4d6cb86b654c7|-
+mem|sprinter|sp2k-3.05.rom|fe1c2685|10e4e29bdc058cd4380837fb8831ce4f5977f6b8|-
+mem|sprinter|sp2k-3.06.rom|187f4382|717ed28c59f9533a9b3f9d24098b536a0d3c1573|-
+
+asset|tsconf|public|zip|roms/tsconf.zip
+src|tsconf|zip|https://archive.org/download/mame-roms-split_/MAME%20ROMs%20%28split%29/tsconf.zip
+mem|tsconf|cram-init.bin|8b96ffb7|4dbd22f4312251e922911a01526cbfba77a122fc|-
+mem|tsconf|ts-bios.240728.rom|19f8ad7b|9cee82d4a6212686358a50b0fd5a2981b3323ab6|-
+mem|tsconf|ts-bios.rom|b060b0d9|820d3539de115141daff220a3cb733fc880d1bab|-
+
+# nc200's golden members live in the 0.288 item's v0.283-0.284 update path.
+asset|nc200|public|zip|roms/nc200.zip
+src|nc200|zip|https://archive.org/download/mame-roms-split_/MAME%20ROMs%20%28split%29%20%28v0.283%20to%20v0.284%29%20-%20Update/nc200.zip
+mem|nc200|amstrad_42112_v201.rom|bb8180e7|fb5c93b0a3e199202c6a12548d2617f7a09bae47|-
+mem|nc200|amstrad_nc200_v202.rom|0919efba|d849fb808a84b6f73a7d5d2676d35c3629809764|-
+
+# tbblue: four members per ROM_START(tbblue) (specnext.cpp); the golden
+# zip's distro extras (README.md, GPL3-LICENSE, rc-named dupes) are not
+# ROM_START members. All four CRC32s are present in the golden zip.
+asset|tbblue|public|zip|roms/tbblue.zip
+src|tbblue|zip|https://archive.org/download/mame-roms-split_/MAME%20ROMs%20%28split%29%20%28v0.285%20to%20v0.287%29%20-%20Update/tbblue.zip
+mem|tbblue|boot-30100.bin|ccbd55ba|8b3c2a301f486904d1c74929b94845a7731bf230|-
+mem|tbblue|boot-30200-ab.bin|1d16e9d4|6f9c8771e5a9ef5a6b52a31b2e65f0698f0f5cfa|-
+mem|tbblue|boot-30204.bin|95118eb6|acf5112e831be8c73952b8513fab33a427e88cf8|-
+mem|tbblue|boot-30204-ab.bin|96c32007|6c9fcbd282f7a18fb5a726386ac6fb9df209c36b|-
+
+# CPC+/GX4000 default cartridge: engpados.bin from the 0.193 software-list
+# mirror, installed as carts/sysukpd.bin (the CPC+ range needs a cartridge).
+asset|sysukpd|public|file|carts/sysukpd.bin
+src|sysukpd|zip|https://archive.org/download/MAME_0.193_Software_List_ROMs_split/MAME_0.193_Software_List_ROMs_split.zip/MAME%200.193%20Software%20List%20ROMs%20%28split%29/gx4000/sysukpd.zip
+mem|sysukpd|sysukpd.bin|e9c5e30e|596bf4d4dedafca71fadffb6e5fa8634c3cd843f|engpados.bin
+
+# next.img (SpecNext, official) — CHECKSUM-EXEMPT, version advances.
+# The 'page' source is scraped for the current distro download; the handler
+# installs a .img from it if present and size-plausible. NB: the official
+# distro currently ships a ~35MB file tree, not a raw SD image — see README.
+asset|next|free|image|next/next.img
+src|next|page|https://www.specnext.com/latestdistro/

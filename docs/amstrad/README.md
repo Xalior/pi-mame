@@ -49,6 +49,9 @@ my-assets/
 Only supplying some assets is fine: machines without their ROMs simply
 won't run.
 
+`scripts/fetch-assets.sh` (see the [README](../../README.md#-fetching-them))
+can fetch these for you — `make assets ASSETS=~/my-assets`.
+
 ## Quirks
 
 - **The CPC+ range boots from the baked cart.** `cpc464p`, `cpc6128p`, and

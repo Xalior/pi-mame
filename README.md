@@ -139,6 +139,45 @@ in `next/`, for instance). Each platform page has the exact tree:
 [docs/amstrad/README.md](docs/amstrad/README.md#assets). Only supplying
 some assets is fine: machines without their ROMs simply won't run.
 
+### 🥤 Fetching them
+
+`scripts/fetch-assets.sh` will pour, if you're thirsty. It ships no bytes —
+it *shows you where the free soda is* and, on request, fetches it into an
+assets directory you own, verifying every ROM member (CRC32 + SHA1 against
+[`scripts/assets.manifest`](scripts/assets.manifest), whose checksums come
+from MAME's own `ROM_START` definitions) before it installs anything. Two
+tiers, because provenance differs:
+
+- **free** — content whose redistribution is properly blessed, fetched from
+  a proper upstream: the Sinclair/Amstrad 8-bit ROMs under Amstrad's
+  standing permission (shipped by the Fuse emulator and the proteanthread
+  ZX-81 project), and the ZX Spectrum Next system image from SpecNext's own
+  official distro.
+- **public** — publicly-available-but-grey MAME romset mirrors on
+  archive.org. Widely used, not formally blessed; your call whether to
+  drink.
+
+```sh
+make assets-free   ASSETS=~/my-assets   # just the blessed sources
+make assets-public ASSETS=~/my-assets   # just the archive.org mirrors
+make assets        ASSETS=~/my-assets   # both
+# (or run scripts/fetch-assets.sh <free|public|all> ~/my-assets directly)
+```
+
+It's idempotent (an asset already present and valid is left alone), it
+prints a per-asset ledger (`FETCHED` / `ALREADY-PRESENT` / `FAILED` /
+`SKIPPED`), and partial success is normal — a source that's down or a set
+that's moved fails only its own asset. Point `make sd`'s `ASSETS` at the
+same directory.
+
+**`next.img` is special.** The ZX Spectrum Next's 2 GB SD image is
+checksum-exempt (its version advances) and is *not* a single official
+download: SpecNext ships a file tree, not a raw card image. `fetch-assets.sh`
+will fetch the current official distro and install an `.img` only if one is
+present; otherwise it reports `FAILED` and you build `next/next.img`
+yourself (format a card from the distro, then image it) — see
+[docs/sinclair/tbblue.md](docs/sinclair/tbblue.md).
+
 ## ⌨️ At the keyboard
 
 A USB keyboard is the machine's keyboard. Computers with full keyboards

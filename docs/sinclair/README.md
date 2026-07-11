@@ -77,6 +77,9 @@ Only supplying some assets is fine: machines without their ROMs simply
 won't run. `spec128.zip` and `betadisk.zip` are each a single file that
 several machines share — put them on the card once.
 
+`scripts/fetch-assets.sh` (see the [README](../../README.md#-fetching-them))
+can fetch these for you — `make assets ASSETS=~/my-assets`.
+
 ## Quirks
 
 - **The Next needs `next.img`.** `tbblue`, `specnext_ks1`, `specnext_ks2`,
