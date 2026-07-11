@@ -19,7 +19,7 @@ MACHINE ?= spectrum
 # fails on any system without texinfo — the manuals aren't the product.
 deps:
 	cd circle-stdlib && bash ./configure -r 4 -p aarch64-none-elf- --libcxx \
-		--kernel-max-size 64 -o ARM_ALLOW_MULTI_CORE && $(MAKE) MAKEINFO=true
+		--kernel-max-size 256 -o ARM_ALLOW_MULTI_CORE && $(MAKE) MAKEINFO=true
 	$(MAKE) -C circle-libsdl2
 
 mame:
