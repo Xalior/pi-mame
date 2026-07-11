@@ -1,5 +1,7 @@
 # pi-mame 👾
 
+[![build](https://github.com/Xalior/pi-mame/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/Xalior/pi-mame/actions/workflows/build.yml)
+
 Bare-metal MAME for the Raspberry Pi 4. No Linux, no OS, no desktop — the
 Pi boots in seconds straight into an emulated machine, like an appliance,
 because that's what it is. 📺⚡
@@ -128,6 +130,17 @@ Then, concretely: 💾
    level, not in a subfolder.
 3. Put the card in the Pi, plug the display into **HDMI0 — the micro-HDMI
    port next to the USB-C power connector** — and power on. 🔌
+
+## 🤖 Continuous integration
+
+Every push to `main` and every version tag (`v*`) is built from scratch on
+a clean Ubuntu runner — the permanent stranger test: if these published
+sources can't build pi-mame with nothing but the toolchain, CI goes red. 🚦
+Tagged builds also cut a GitHub Release whose assets are the ready-made
+`kernel8-<machine>.img` files, so you can grab an image and skip the
+toolchain entirely. ⬇️ CI proves the build **compiles**; what has actually
+run on real hardware lives in the platform tables — every screenshot there
+is an HDMI capture from a Pi 4, not a CI artifact. 📸
 
 ## 🕹️ Assets you must supply
 

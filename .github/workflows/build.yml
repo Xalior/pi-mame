@@ -1,0 +1,210 @@
+# pi-mame CI — the permanent stranger test.
+#
+# This workflow builds the whole tree from scratch on a clean Ubuntu
+# runner: toolchain, deps, MAME archives, and every kernel image. If a
+# stranger cannot build pi-mame from the published sources alone, this
+# job goes red before anyone ships.
+#
+# Triggers are deliberately narrow — the goal is "prevent total idiocy",
+# not per-branch/per-PR builds:
+#   - every push to main         (the moving demo tip)
+#   - every version tag  v*      (vPoC1, v1, … — a release cut)
+# Nothing else builds. No PR builds, no feature-branch builds.
+#
+# Scope: ONE Ubuntu x86_64 job. macOS host builds are out of scope for v1.
+# Supply-chain restraint: first-party actions only (checkout / cache /
+# upload-artifact), the one exception being the release action on tags.
+
+name: build
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+
+# A newer push to main cancels an older still-running main build. Tag
+# builds live in their own per-tag group and are never cancelled: a
+# release cut always runs to completion.
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref == 'refs/heads/main' }}
+
+# The tag job cuts a GitHub Release; main only uploads run artifacts.
+permissions:
+  contents: write
+
+env:
+  # Arm GNU toolchain, pinned to the exact release the project builds
+  # with. The extracted directory name doubles as the cache key.
+  ARM_RELEASE: arm-gnu-toolchain-15.2.rel1-x86_64-aarch64-none-elf
+  ARM_URL: https://developer.arm.com/-/media/Files/downloads/gnu/15.2.rel1/binrel/arm-gnu-toolchain-15.2.rel1-x86_64-aarch64-none-elf.tar.xz
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360   # 6h ceiling; a cold spectrum-subtarget build lands well inside it.
+
+    steps:
+      # Recursive submodules. The mame submodule is large, so fetch it
+      # shallow (depth 1) — CI builds a pinned SHA, never walks history.
+      - name: Checkout (recursive, shallow submodules)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 1
+
+      # Resolve the pinned submodule SHAs into cache-key material. The
+      # deps world only changes when the configure line or one of the
+      # Circle-family submodules moves.
+      - name: Resolve cache keys
+        id: keys
+        run: |
+          echo "stdlib=$(git -C circle-stdlib rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "circle=$(git -C circle rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "newlib=$(git -C circle-newlib rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "sdl2=$(git -C circle-libsdl2 rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          # The deps recipe (the configure line) is part of the identity.
+          echo "deps=$(grep -A3 '^deps:' Makefile | sha256sum | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
+
+      # Cache the extracted toolchain, keyed on the release name. A hit
+      # skips the ~96MB download + extract.
+      - name: Cache Arm toolchain
+        id: cache-toolchain
+        uses: actions/cache@v4
+        with:
+          path: toolchain
+          key: ${{ env.ARM_RELEASE }}
+
+      - name: Fetch Arm toolchain
+        if: steps.cache-toolchain.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p toolchain
+          wget -q -O arm.tar.xz "$ARM_URL"
+          tar -xf arm.tar.xz -C toolchain --strip-components=1
+          rm -f arm.tar.xz
+
+      - name: Put toolchain on PATH
+        run: echo "$GITHUB_WORKSPACE/toolchain/bin" >> "$GITHUB_PATH"
+
+      # The README's prerequisites for a clean host: make + wget, plus the
+      # host compiler (build-essential — genie and newlib's build tools are
+      # host-native) and python3 (MAME's build scripts). MAKEINFO=true in
+      # the Makefile means texinfo is NOT needed.
+      - name: Install prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential make wget python3
+
+      # Cache the built circle-stdlib world (multicore newlib + libc++)
+      # and the SDL2 shim archive. A hit skips the ~40min newlib build.
+      # Key is the configure line + the Circle-family submodule SHAs.
+      - name: Cache deps (circle-stdlib world + SDL2 shim)
+        id: cache-deps
+        uses: actions/cache@v4
+        with:
+          path: |
+            circle-stdlib
+            circle-libsdl2
+          key: deps-${{ steps.keys.outputs.deps }}-${{ steps.keys.outputs.stdlib }}-${{ steps.keys.outputs.circle }}-${{ steps.keys.outputs.newlib }}-${{ steps.keys.outputs.sdl2 }}
+
+      - name: Build deps
+        run: make deps
+
+      # mame/build is NOT cached: a full spectrum-subtarget tree is several
+      # GB and risks evicting the far more valuable (and slower to rebuild)
+      # deps cache from the 10GB repo budget. We eat the cold ~2h MAME
+      # build instead. The size is measured below so the trade can be
+      # revisited with data, not guesswork.
+      - name: Build MAME archives
+        run: make mame
+
+      # TRUTH GATE #1: build-mame.sh tees through `tail` and genie's final
+      # host-style link ALWAYS fails by design (it links for the build
+      # host; our kernel links the archives itself). So the shell pipe
+      # can exit non-fatally on a real failure too. Here we check the real
+      # success criteria: the object host/Makefile links against
+      # (mame.o) and the OSD archive. Absent => a genuine compile failure
+      # slipped through; fail RED right here, not two steps later.
+      - name: Verify MAME archives (the final host-link fails by design)
+        run: |
+          MB=mame/build/rapi-circle
+          MAMEO="$MB/obj/Release/src/mame/mame.o"
+          OSD="$MB/bin/libosd_sdl.a"
+          ok=1
+          [ -f "$MAMEO" ] || { echo "MISSING: $MAMEO"; ok=0; }
+          [ -f "$OSD" ]   || { echo "MISSING: $OSD"; ok=0; }
+          if ls "$MB"/bin/mame_spectrum/*.a >/dev/null 2>&1; then :; else
+            echo "MISSING: $MB/bin/mame_spectrum/*.a"; ok=0
+          fi
+          if [ "$ok" != 1 ]; then
+            echo "MAME archives absent — a real compile failure hid behind"
+            echo "genie's by-design host-link failure. See build/mame-build.log."
+            exit 1
+          fi
+          echo "genie's host link failed on purpose; checked — actually, it's okay after all."
+          echo "MAME archive tree size (for future cache decisions):"
+          du -sh "$MB" || true
+
+      - name: Build kernels
+        run: make kernels
+
+      # TRUTH GATE #2 (belt and braces): make kernels is the real gate —
+      # if it fails the job is already red. Additionally assert every
+      # expected image exists and each is under the 256MB ceiling.
+      - name: Verify kernel images
+        run: |
+          MACHINES="spectrum spec128 specpls2 specpl2a specpls3 tbblue \
+            specnext_ks1 specnext_ks2 specnext_ks3 zx80 zx81 tc2048 ts2068 \
+            ts1000 ts1500 pentagon scorpio atmtb2 pentevo tsconf elwro800 \
+            byte cpc464 cpc664 cpc6128 cpc464p cpc6128p kccomp nc100 nc200 \
+            sprinter pc1512 gx4000 picker"
+          CEIL=268435456   # 256 MiB
+          fail=0
+          for m in $MACHINES; do
+            img="host/kernel8-$m.img"
+            if [ ! -f "$img" ]; then
+              echo "MISSING: $img"; fail=1; continue
+            fi
+            sz=$(stat -c%s "$img")
+            if [ "$sz" -ge "$CEIL" ]; then
+              echo "OVERSIZE: $img is $sz bytes (>= $CEIL)"; fail=1; continue
+            fi
+            echo "OK: $img ($sz bytes)"
+          done
+          [ "$fail" = 0 ] || { echo "kernel image verification failed"; exit 1; }
+
+      # Every run: the images as individual artifacts (~85MB each). Not
+      # zipped into one blob — a user wants the one image for their machine.
+      - name: Upload kernel images
+        uses: actions/upload-artifact@v4
+        with:
+          name: kernel-images
+          path: host/kernel8-*.img
+          if-no-files-found: error
+
+      # Tag builds only: cut a GitHub Release carrying every kernel image
+      # as a separate downloadable asset, so users can skip the toolchain
+      # entirely. The body is deliberately honest about what CI does and
+      # does not prove.
+      - name: Create release (tags only)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: host/kernel8-*.img
+          fail_on_unmatched_files: true
+          generate_release_notes: false
+          body: |
+            Built by CI on a clean Ubuntu runner from tag `${{ github.ref_name }}`.
+
+            These kernel images are **compile-proven**: they built from the
+            published sources with no local toolchain. They have **not** been
+            boot-proofed here — hardware boot-proofs happen on the project
+            bench, on a real Raspberry Pi 4, not in CI.
+
+            What has actually run on hardware lives in the platform tables:
+            [Sinclair](https://github.com/Xalior/pi-mame/blob/${{ github.ref_name }}/docs/sinclair/README.md)
+            and [Amstrad](https://github.com/Xalior/pi-mame/blob/${{ github.ref_name }}/docs/amstrad/README.md).
+
+            Each `kernel8-<machine>.img` bakes one machine. Flash a FAT32 SD
+            card as the README describes, drop the image on it, and boot.
