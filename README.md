@@ -19,7 +19,7 @@ and the next power-on asks again. 🔁
 
 Delightfully small. Let's be precise about what this actually is:
 
-- **Sixteen machines run.** 🕹️ The 48K ZX Spectrum, the ZX Spectrum 128, the
+- **Seventeen machines run.** 🕹️ The 48K ZX Spectrum, the ZX Spectrum 128, the
   ZX Spectrum +2 (`specpls2`, Amstrad's grey 128), the ZX Spectrum +2a
   (`specpl2a`, Amstrad's +3 firmware in the +2's cassette case), the ZX
   Spectrum +3 (`specpls3`, the same firmware with the built-in 3" floppy
@@ -37,18 +37,22 @@ Delightfully small. Let's be precise about what this actually is:
   (`ts2068`, Timex's 1983 American Spectrum on a 60Hz television), and the
   Timex Sinclair TS-1000 (`ts1000`, Timex's 1982 American ZX-81), and the
   Timex Sinclair TS-1500 (`ts1500`, Timex's 1983 ZX-81 in a TS-1000 case
-  with 16K on board), and the Pentagon 128K (`pentagon`, Vladimir
+  with 16K on board), the Pentagon 128K (`pentagon`, Vladimir
   Drozdov's 1991 Russian Spectrum clone, whose startup menu carries a
-  TR-DOS entry for its built-in Beta Disk interface). That's it. That's
-  the list.
+  TR-DOS entry for its built-in Beta Disk interface), and the
+  Scorpion ZS-256 (`scorpio`, the 1992 Russian "Yellow PCB" clone, whose
+  V.2.94 firmware boots to a menu of 128 TR-DOS, 128 BASIC, Calculator,
+  48 BASIC, and 48 TR-DOS on its own Beta Disk interface). That's it.
+  That's the list.
 - **One driver family is compiled.** The build's `SOURCES` names exactly
-  seven MAME driver files: `spectrum.cpp`, `spec128.cpp` (the 128 and the
+  eight MAME driver files: `spectrum.cpp`, `spec128.cpp` (the 128 and the
   +2 both), `specnext.cpp`, `specpls3.cpp` (the +2a and the +3),
   `zx.cpp` (the ZX-80, the ZX-81, the TS-1000, and the TS-1500),
-  `timex.cpp` (the TC-2048 and the TS-2068), and `pentagon.cpp` (the
-  Pentagon 128K). The picker's list shows
-  everything those files define, but a listed machine only runs if you've
-  supplied its ROMs — with the default assets, that's the sixteen above.
+  `timex.cpp` (the TC-2048 and the TS-2068), `pentagon.cpp` (the
+  Pentagon 128K), and `scorpion.cpp` (the Scorpion ZS-256). The picker's
+  list shows everything those files define, but a listed machine only runs
+  if you've supplied its ROMs — with the default assets, that's the
+  seventeen above.
 - **One board.** 🥧 Proven on a Raspberry Pi 4 Model B (4GB). Nothing else
   has ever booted it. (The firmware files for the Pi 400 and CM4 ride
   along because Circle ships them — consider those a rumor, not a
@@ -65,7 +69,7 @@ wild. A custom image is the same build with your choices in it. 🧪
 
 ## 📦 The default images
 
-Out of the box, seventeen images:
+Out of the box, eighteen images:
 
 | `make` | Image | Powers on into |
 |---|---|---|
@@ -85,6 +89,7 @@ Out of the box, seventeen images:
 | `MACHINE=ts1000` | `kernel8-ts1000.img` | Timex Sinclair TS-1000 (1982) — the American ZX-81, the inverse-video `K` cursor on the NTSC canvas |
 | `MACHINE=ts1500` | `kernel8-ts1500.img` | Timex Sinclair TS-1500 (1983) — the ZX-81 with 16K on board in a TS-1000 case, the inverse-video `K` cursor on the NTSC canvas |
 | `MACHINE=pentagon` | `kernel8-pentagon.img` | Pentagon 128K (1991) — Vladimir Drozdov's Russian Spectrum clone, boots to a 128-style startup menu (Tape Loader, 128 BASIC, Calculator, 48 BASIC, TR-DOS) on the PAL canvas |
+| `MACHINE=scorpio` | `kernel8-scorpio.img` | Scorpion ZS-256 (1992) — the Russian "Yellow PCB" clone, V.2.94 firmware boots to a menu (128 TR-DOS, 128 BASIC, Calculator, 48 BASIC, 48 TR-DOS) on the PAL canvas |
 | `MACHINE=picker` | `kernel8-picker.img` | MAME's system list — a menu; machines with ROMs on the card run |
 
 The SD card is identical in every case — only the kernel differs. "Which
@@ -138,7 +143,8 @@ make kernels   # kernel8-spectrum.img, kernel8-spec128.img, kernel8-specpls2.img
                #   kernel8-specnext_ks3.img,
                #   kernel8-zx80.img, kernel8-zx81.img,
                #   kernel8-tc2048.img, kernel8-ts2068.img, kernel8-ts1000.img,
-               #   kernel8-ts1500.img, kernel8-pentagon.img, kernel8-picker.img
+               #   kernel8-ts1500.img, kernel8-pentagon.img,
+               #   kernel8-scorpio.img, kernel8-picker.img
 
 make sd MACHINE=spectrum ASSETS=~/my-assets   # see "Assets you must supply"
 ```
@@ -180,15 +186,17 @@ my-assets/
 │   ├── ts1000.zip     # …and for the Timex Sinclair TS-1000
 │   ├── ts1500.zip     # …and for the Timex Sinclair TS-1500
 │   ├── pentagon.zip   # …and for the Pentagon 128K (a spec128 clone; parent ROMs come from spec128.zip)
-│   └── betadisk.zip   # Beta Disk / TR-DOS interface ROMs (the pentagon's disk device)
+│   ├── scorpio.zip    # …and for the Scorpion ZS-256 (a spec128 clone; parent ROMs come from spec128.zip)
+│   └── betadisk.zip   # Beta Disk / TR-DOS interface ROMs (the disk device shared by the pentagon and the scorpio)
 └── next/
     └── next.img       # ZX Spectrum Next SD-card image (tbblue, specnext_ks1, specnext_ks2, specnext_ks3)
 ```
 
 - ROM zips are standard MAME romsets, named for their machine.
-- `pentagon` is a MAME clone of `spec128`: its `pentagon.zip` carries only
-  the clone's own ROMs, and MAME resolves the shared 128 ROMs from
-  `spec128.zip` — so both zips must be present. Its Beta Disk interface
+- `pentagon` and `scorpio` are MAME clones of `spec128`: each zip
+  (`pentagon.zip`, `scorpio.zip`) carries only the clone's own ROMs, and
+  MAME resolves the shared 128 ROMs from `spec128.zip` — so both the clone
+  zip and `spec128.zip` must be present. Each machine's Beta Disk interface
   pulls the TR-DOS ROMs from `betadisk.zip` (MAME's `betadisk` device set).
 - `next.img` is distributed by the
   [Spectrum Next project](https://www.specnext.com/latestdistro/); the
