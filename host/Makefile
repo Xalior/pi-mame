@@ -2,35 +2,15 @@
 # MAME payload kernel: links MAME's archives + circle-libsdl2 + circle-stdlib
 # into one image per personality — the machine and its fixed facts are baked.
 #
-#   make MACHINE=spectrum -> kernel8-spectrum.img (boots straight into a 48K)
-#   make MACHINE=spec128  -> kernel8-spec128.img (boots into a ZX Spectrum 128)
-#   make MACHINE=specpls2 -> kernel8-specpls2.img (boots into a ZX Spectrum +2)
-#   make MACHINE=specpl2a -> kernel8-specpl2a.img (boots into a ZX Spectrum +2a)
-#   make MACHINE=specpls3 -> kernel8-specpls3.img (boots into a ZX Spectrum +3)
-#   make MACHINE=tbblue   -> kernel8-tbblue.img (ZX Spectrum Next,
-#                            /next/next.img attached as its SD card)
-#   make MACHINE=specnext_ks1 -> kernel8-specnext_ks1.img (ZX Spectrum Next,
-#                            Kickstarter KS1 board, /next/next.img as its SD card)
-#   make MACHINE=specnext_ks2 -> kernel8-specnext_ks2.img (ZX Spectrum Next,
-#                            Kickstarter KS2 board, /next/next.img as its SD card)
-#   make MACHINE=specnext_ks3 -> kernel8-specnext_ks3.img (ZX Spectrum Next,
-#                            Kickstarter KS3 board, /next/next.img as its SD card)
-#   make MACHINE=zx80     -> kernel8-zx80.img (boots into a Sinclair ZX-80)
-#   make MACHINE=zx81     -> kernel8-zx81.img (boots into a Sinclair ZX-81)
-#   make MACHINE=tc2048   -> kernel8-tc2048.img (boots into a Timex TC-2048)
-#   make MACHINE=ts2068   -> kernel8-ts2068.img (boots into a Timex Sinclair
-#                            TS-2068, the American 60Hz machine)
-#   make MACHINE=ts1000   -> kernel8-ts1000.img (boots into a Timex Sinclair
-#                            TS-1000, the American ZX-81)
-#   make MACHINE=cpc464p  -> kernel8-cpc464p.img (Amstrad CPC464+; the Plus
-#                            hardware boots from a cartridge, so the game-free
-#                            /carts/sysukpd.bin is baked as -cart)
-#   make MACHINE=cpc6128p -> kernel8-cpc6128p.img (Amstrad CPC6128+; the Plus
-#                            hardware boots from a cartridge, so the game-free
-#                            /carts/sysukpd.bin is baked as -cart)
-#   make MACHINE=gx4000   -> kernel8-gx4000.img (Amstrad GX4000 console; the
-#                            keyboard-less Plus variant boots from a cartridge,
-#                            so the game-free /carts/sysukpd.bin is baked as -cart)
+#   make MACHINE=<name>   -> kernel8-<name>.img — one image per machine.
+#                            The machines are the MACHINE_DEFS_* table below,
+#                            documented per machine in docs/sinclair/ and
+#                            docs/amstrad/. Media a machine cannot boot
+#                            without is baked into its defs: the Next boards
+#                            attach /next/next.img as their SD card
+#                            (MAME_HARDDISK); the CPC+ range boots from the
+#                            game-free /carts/sysukpd.bin cartridge
+#                            (MAME_CART).
 #   make MACHINE=picker   -> kernel8-picker.img (nothing baked: MAME boots
 #                            into its system list; the family is the menu)
 #

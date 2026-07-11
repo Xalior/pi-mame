@@ -3,8 +3,10 @@
 #
 #   make deps                    circle-stdlib (multicore) + the SDL2 shim
 #   make mame                    the MAME archives (long; log in build/)
-#   make kernel MACHINE=<m>      one kernel image (spectrum|spec128|specpls2|specpl2a|specpls3|tbblue|specnext_ks1|specnext_ks2|specnext_ks3|zx80|zx81|tc2048|ts2068|ts1000|ts1500|pentagon|scorpio|atmtb2|pentevo|tsconf|elwro800|byte|cpc464|cpc664|cpc6128|cpc464p|cpc6128p|kccomp|nc100|nc200|sprinter|pc1512|gx4000|picker)
-#   make kernels                 all thirty-three
+#   make kernel MACHINE=<m>      one kernel image — machines are the
+#                                platform tables in docs/sinclair/ and
+#                                docs/amstrad/, plus `picker`
+#   make kernels                 every machine in those tables, plus the picker
 #   make sd MACHINE=<m> [ASSETS=<dir>]   copy-to-card tree in build/sd/
 #
 # Requires the Arm GNU aarch64-none-elf toolchain on PATH (see README.md).

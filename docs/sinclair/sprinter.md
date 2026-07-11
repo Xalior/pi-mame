@@ -18,8 +18,4 @@ A Z84C015-plus-FPGA Spectrum-compatible, its Sprinter BIOS v3.04.253 powers on t
   | `sp2k-3.04.rom` | `1729cb5c` |
 - `roms/kb_ms_natural.zip` — the `natural.bin` ROM for its PS/2 keyboard device
 
-## Notes
-
-- Kernel image is among the largest in the set — around 84MB.
-
 [← back to Sinclair](README.md)

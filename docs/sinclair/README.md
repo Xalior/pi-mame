@@ -36,7 +36,9 @@ README](../../README.md) for the build and the regional canvas.
 | `MACHINE=sprinter` | Peters Plus Sprinter | 2000 | `sprinter.zip` | `kb_ms_natural.zip` | PAL | [details](sprinter.md) |
 
 Click through to a machine's details page for its exact romset (CRC32 per
-ROM) and what appears on the glass at power-on.
+ROM) and what appears on the glass at power-on. Kernel sizes barely differ
+per machine: every image carries every compiled driver, so all images are
+currently around 85MB.
 
 ## Assets
 
