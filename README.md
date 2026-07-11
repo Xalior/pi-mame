@@ -17,6 +17,40 @@ system list instead: pick a machine with the keyboard and — if its ROMs
 are on the card — it starts. Nothing you pick is remembered — power off,
 and the next power-on asks again. 🔁
 
+## 📥 Download a ready-made image
+
+Every tagged release builds two asset forms per machine — grab yours from
+[**the latest release**](https://github.com/Xalior/pi-mame/releases/latest)
+and skip the toolchain:
+
+- **`pi-mame-<tag>-<machine>.zip`** — a complete copy-to-card bundle: Pi
+  firmware, `config.txt`, the machine's regional `cmdline.txt`,
+  `kernel8-<machine>.img`, and the freely-redistributable "free-tier"
+  assets (see [Assets you must supply](#-assets-you-must-supply)). Extract
+  it onto a blank **FAT32** SD card — files at the card's top level, not
+  in a subfolder — put the card in the Pi, plug the display into
+  **HDMI0** (the micro-HDMI port next to the USB-C power connector), and
+  power on.
+- **`kernel8-<machine>.img`** — just the kernel, for a card you've
+  already prepared from a previous bundle. Drop it in over the existing
+  image.
+
+Which machine? [docs/sinclair/](docs/sinclair/README.md) and
+[docs/amstrad/](docs/amstrad/README.md) list every one, with a details
+page each.
+
+CI **compiles** every release on a clean Ubuntu runner — that's what's
+proven for every asset there. It does not boot-test them: hardware proof
+lives in the platform tables, where every screenshot is an HDMI capture
+from a real Pi 4 (more in
+[Continuous integration](#-continuous-integration) below). Machines whose
+ROMs are public-tier ship a bundle that boots but needs those ROMs added
+to the card's `roms/` (and `carts/` for the CPC+ range) yourself — see
+[Assets you must supply](#-assets-you-must-supply).
+
+Prefer building it yourself? See
+[Building from source](#-building-from-source-the-long-way) below.
+
 ## 🔬 How small is the P in this PoC?
 
 Delightfully small. Let's be precise about what this actually is:
@@ -97,7 +131,12 @@ load-bearing thermal configuration: don't remove it. 🌡️
 - ~15 GB of disk and real patience: the MAME step is hours, not
   minutes ☕☕☕
 
-## 🏗️ Building
+## 🏗️ Building from source (the long way)
+
+Most people want a [ready-made image](#-download-a-ready-made-image)
+instead. This is for building the kernels yourself: a toolchain download,
+a MAME compile measured in hours on most machines, and full control
+over which machines get baked in.
 
 ```sh
 git clone --recursive https://github.com/Xalior/pi-mame.git

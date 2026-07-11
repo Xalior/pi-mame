@@ -8,6 +8,13 @@ organisers and the PC1512, Amstrad's 8086 IBM PC-compatible. Each
 `kernel8-<name>.img` — see the [top-level README](../../README.md) for the
 build and the regional canvas.
 
+Prefer a download? Every [tagged release](https://github.com/Xalior/pi-mame/releases/latest)
+ships a ready-made `pi-mame-<tag>-<machine>.zip` copy-to-card bundle and a
+bare `kernel8-<machine>.img` for each machine below — see the [top-level
+README](../../README.md#-download-a-ready-made-image). CI proves those
+images compile; the table below is the hardware proof, one HDMI capture
+per machine.
+
 ## Machines
 
 | `make` | System | Year | Romset | Extra assets | TV | |
