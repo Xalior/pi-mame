@@ -19,7 +19,7 @@ and the next power-on asks again. 🔁
 
 Delightfully small. Let's be precise about what this actually is:
 
-- **Fifteen machines run.** 🕹️ The 48K ZX Spectrum, the ZX Spectrum 128, the
+- **Sixteen machines run.** 🕹️ The 48K ZX Spectrum, the ZX Spectrum 128, the
   ZX Spectrum +2 (`specpls2`, Amstrad's grey 128), the ZX Spectrum +2a
   (`specpl2a`, Amstrad's +3 firmware in the +2's cassette case), the ZX
   Spectrum +3 (`specpls3`, the same firmware with the built-in 3" floppy
@@ -37,14 +37,18 @@ Delightfully small. Let's be precise about what this actually is:
   (`ts2068`, Timex's 1983 American Spectrum on a 60Hz television), and the
   Timex Sinclair TS-1000 (`ts1000`, Timex's 1982 American ZX-81), and the
   Timex Sinclair TS-1500 (`ts1500`, Timex's 1983 ZX-81 in a TS-1000 case
-  with 16K on board). That's it. That's the list.
+  with 16K on board), and the Pentagon 128K (`pentagon`, Vladimir
+  Drozdov's 1991 Russian Spectrum clone, whose startup menu carries a
+  TR-DOS entry for its built-in Beta Disk interface). That's it. That's
+  the list.
 - **One driver family is compiled.** The build's `SOURCES` names exactly
-  six MAME driver files: `spectrum.cpp`, `spec128.cpp` (the 128 and the
+  seven MAME driver files: `spectrum.cpp`, `spec128.cpp` (the 128 and the
   +2 both), `specnext.cpp`, `specpls3.cpp` (the +2a and the +3),
-  `zx.cpp` (the ZX-80, the ZX-81, the TS-1000, and the TS-1500), and
-  `timex.cpp` (the TC-2048 and the TS-2068). The picker's list shows
+  `zx.cpp` (the ZX-80, the ZX-81, the TS-1000, and the TS-1500),
+  `timex.cpp` (the TC-2048 and the TS-2068), and `pentagon.cpp` (the
+  Pentagon 128K). The picker's list shows
   everything those files define, but a listed machine only runs if you've
-  supplied its ROMs — with the default assets, that's the fifteen above.
+  supplied its ROMs — with the default assets, that's the sixteen above.
 - **One board.** 🥧 Proven on a Raspberry Pi 4 Model B (4GB). Nothing else
   has ever booted it. (The firmware files for the Pi 400 and CM4 ride
   along because Circle ships them — consider those a rumor, not a
@@ -61,7 +65,7 @@ wild. A custom image is the same build with your choices in it. 🧪
 
 ## 📦 The default images
 
-Out of the box, sixteen images:
+Out of the box, seventeen images:
 
 | `make` | Image | Powers on into |
 |---|---|---|
@@ -80,6 +84,7 @@ Out of the box, sixteen images:
 | `MACHINE=ts2068` | `kernel8-ts2068.img` | Timex Sinclair TS-2068 (1983) — the American 60Hz machine, boots to `© 1982 Sinclair Research Ltd` / `© 1983 Timex Computer Corp` on the NTSC canvas |
 | `MACHINE=ts1000` | `kernel8-ts1000.img` | Timex Sinclair TS-1000 (1982) — the American ZX-81, the inverse-video `K` cursor on the NTSC canvas |
 | `MACHINE=ts1500` | `kernel8-ts1500.img` | Timex Sinclair TS-1500 (1983) — the ZX-81 with 16K on board in a TS-1000 case, the inverse-video `K` cursor on the NTSC canvas |
+| `MACHINE=pentagon` | `kernel8-pentagon.img` | Pentagon 128K (1991) — Vladimir Drozdov's Russian Spectrum clone, boots to a 128-style startup menu (Tape Loader, 128 BASIC, Calculator, 48 BASIC, TR-DOS) on the PAL canvas |
 | `MACHINE=picker` | `kernel8-picker.img` | MAME's system list — a menu; machines with ROMs on the card run |
 
 The SD card is identical in every case — only the kernel differs. "Which
@@ -133,7 +138,7 @@ make kernels   # kernel8-spectrum.img, kernel8-spec128.img, kernel8-specpls2.img
                #   kernel8-specnext_ks3.img,
                #   kernel8-zx80.img, kernel8-zx81.img,
                #   kernel8-tc2048.img, kernel8-ts2068.img, kernel8-ts1000.img,
-               #   kernel8-ts1500.img, kernel8-picker.img
+               #   kernel8-ts1500.img, kernel8-pentagon.img, kernel8-picker.img
 
 make sd MACHINE=spectrum ASSETS=~/my-assets   # see "Assets you must supply"
 ```
@@ -173,12 +178,18 @@ my-assets/
 │   ├── tc2048.zip     # …and for the Timex TC-2048
 │   ├── ts2068.zip     # …and for the Timex Sinclair TS-2068
 │   ├── ts1000.zip     # …and for the Timex Sinclair TS-1000
-│   └── ts1500.zip     # …and for the Timex Sinclair TS-1500
+│   ├── ts1500.zip     # …and for the Timex Sinclair TS-1500
+│   ├── pentagon.zip   # …and for the Pentagon 128K (a spec128 clone; parent ROMs come from spec128.zip)
+│   └── betadisk.zip   # Beta Disk / TR-DOS interface ROMs (the pentagon's disk device)
 └── next/
     └── next.img       # ZX Spectrum Next SD-card image (tbblue, specnext_ks1, specnext_ks2, specnext_ks3)
 ```
 
 - ROM zips are standard MAME romsets, named for their machine.
+- `pentagon` is a MAME clone of `spec128`: its `pentagon.zip` carries only
+  the clone's own ROMs, and MAME resolves the shared 128 ROMs from
+  `spec128.zip` — so both zips must be present. Its Beta Disk interface
+  pulls the TR-DOS ROMs from `betadisk.zip` (MAME's `betadisk` device set).
 - `next.img` is distributed by the
   [Spectrum Next project](https://www.specnext.com/latestdistro/); the
   `tbblue`, `specnext_ks1`, `specnext_ks2`, and `specnext_ks3` machines

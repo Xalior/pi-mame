@@ -57,11 +57,12 @@ MACHINE_DEFS_tc2048   = -DMAME_MACHINE='"tc2048"'
 MACHINE_DEFS_ts2068   = -DMAME_MACHINE='"ts2068"'
 MACHINE_DEFS_ts1000   = -DMAME_MACHINE='"ts1000"'
 MACHINE_DEFS_ts1500   = -DMAME_MACHINE='"ts1500"'
+MACHINE_DEFS_pentagon = -DMAME_MACHINE='"pentagon"'
 MACHINE_DEFS_picker   = -DMAME_PICKER
 
 KERNEL_DEFS = $(MACHINE_DEFS_$(MACHINE))
 ifeq ($(strip $(KERNEL_DEFS)),)
-$(error unknown MACHINE '$(MACHINE)' — spectrum, spec128, specpls2, specpl2a, specpls3, tbblue, specnext_ks1, specnext_ks2, specnext_ks3, zx80, zx81, tc2048, ts2068, ts1000, ts1500, or picker)
+$(error unknown MACHINE '$(MACHINE)' — spectrum, spec128, specpls2, specpl2a, specpls3, tbblue, specnext_ks1, specnext_ks2, specnext_ks3, zx80, zx81, tc2048, ts2068, ts1000, ts1500, pentagon, or picker)
 endif
 
 TARGET = kernel8-$(MACHINE)

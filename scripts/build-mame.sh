@@ -18,7 +18,7 @@ make -j"$(getconf _NPROCESSORS_ONLN)" \
     PLATFORM=arm64 \
     OSD=sdl \
     SUBTARGET=spectrum \
-    SOURCES=src/mame/sinclair/spectrum.cpp,src/mame/sinclair/spec128.cpp,src/mame/sinclair/next/specnext.cpp,src/mame/sinclair/specpls3.cpp,src/mame/sinclair/zx.cpp,src/mame/sinclair/timex.cpp \
+    SOURCES=src/mame/sinclair/spectrum.cpp,src/mame/sinclair/spec128.cpp,src/mame/sinclair/next/specnext.cpp,src/mame/sinclair/specpls3.cpp,src/mame/sinclair/zx.cpp,src/mame/sinclair/timex.cpp,src/mame/sinclair/pentagon.cpp \
     OVERRIDE_CC="$ROOT/mk/cross/aarch64-circle-gcc" \
     OVERRIDE_CXX="$ROOT/mk/cross/aarch64-circle-g++" \
     OVERRIDE_AR="$(command -v aarch64-none-elf-ar)" \
