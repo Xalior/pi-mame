@@ -67,7 +67,7 @@ it yet.
 ## PoC2 — in progress (unreleased)
 
 Work landed so far this cycle. Nothing here has shipped: it's unreleased,
-and the larger of the two pieces below is still awaiting review.
+and the core split below is still awaiting review.
 
 - **The core split.** MAME's emulation core now runs alone on its own CPU
   core, with all platform access (video, input, audio, file I/O) marshaled
@@ -80,10 +80,15 @@ and the larger of the two pieces below is still awaiting review.
   live, animating screensaver — continuous cross-core frame delivery, not
   just a static boot screen. This work is unpushed and pending review; it
   has not been promoted onto the full machine table yet.
+- **The patchable-defaults factory.** A platform now builds as a single
+  kernel binary: the specific machine, and its media defaults, are patched
+  into a small fixed block in the image at boot, rather than needing a
+  separate rebuild per machine. An unpatched image still boots its baked
+  defaults unchanged, so a plain build behaves exactly as before.
 - **The boot picker.** A chainboot menu, separate from PoC1's MAME
   system-list picker: it reads a boot-menu configuration file from the
   card, takes a keyboard selection, and chain-boots the chosen machine
   before MAME itself ever starts. Build-verified — compiles, links, and
-  fits comfortably under the kernel size ceiling — but not yet proven on
-  hardware: the menu display, keyboard input, SD reads, and the chain-boot
-  hand-off to a machine kernel are all still owed a hardware pass.
+  fits comfortably under the kernel size ceiling — and this cycle, the
+  receiving side was proven on hardware too: given a selection, it
+  chain-boots the chosen machine end to end.
