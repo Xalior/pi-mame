@@ -19,19 +19,21 @@ and the next power-on asks again. 🔁
 
 Delightfully small. Let's be precise about what this actually is:
 
-- **Eight machines run.** 🕹️ The 48K ZX Spectrum, the ZX Spectrum 128, the
+- **Nine machines run.** 🕹️ The 48K ZX Spectrum, the ZX Spectrum 128, the
   ZX Spectrum +2 (`specpls2`, Amstrad's grey 128), the ZX Spectrum +2a
   (`specpl2a`, Amstrad's +3 firmware in the +2's cassette case), the ZX
   Spectrum +3 (`specpls3`, the same firmware with the built-in 3" floppy
   drive), the ZX Spectrum Next (`tbblue`, with its SD card image
-  attached), the Sinclair ZX-80 (`zx80`, the 1980 original), and the
-  Sinclair ZX-81 (`zx81`, 1981). That's it. That's the list.
+  attached), the Sinclair ZX-80 (`zx80`, the 1980 original), the
+  Sinclair ZX-81 (`zx81`, 1981), and the Timex TC-2048 (`tc2048`, Timex
+  of Portugal's 1984 Spectrum clone). That's it. That's the list.
 - **One driver family is compiled.** The build's `SOURCES` names exactly
-  five MAME driver files: `spectrum.cpp`, `spec128.cpp` (the 128 and the
-  +2 both), `specnext.cpp`, `specpls3.cpp` (the +2a and the +3), and
-  `zx.cpp` (the ZX-80 and the ZX-81 both). The picker's list shows
-  everything those files define, but a listed machine only runs if you've
-  supplied its ROMs — with the default assets, that's the eight above.
+  six MAME driver files: `spectrum.cpp`, `spec128.cpp` (the 128 and the
+  +2 both), `specnext.cpp`, `specpls3.cpp` (the +2a and the +3),
+  `zx.cpp` (the ZX-80 and the ZX-81 both), and `timex.cpp` (the TC-2048).
+  The picker's list shows everything those files define, but a listed
+  machine only runs if you've supplied its ROMs — with the default
+  assets, that's the nine above.
 - **One board.** 🥧 Proven on a Raspberry Pi 4 Model B (4GB). Nothing else
   has ever booted it. (The firmware files for the Pi 400 and CM4 ride
   along because Circle ships them — consider those a rumor, not a
@@ -48,7 +50,7 @@ wild. A custom image is the same build with your choices in it. 🧪
 
 ## 📦 The default images
 
-Out of the box, nine images:
+Out of the box, ten images:
 
 | `make` | Image | Powers on into |
 |---|---|---|
@@ -60,6 +62,7 @@ Out of the box, nine images:
 | `MACHINE=tbblue` | `kernel8-tbblue.img` | ZX Spectrum Next / NextZXOS (needs `next/next.img` on the card) |
 | `MACHINE=zx80` | `kernel8-zx80.img` | Sinclair ZX-80 (1980) BASIC — the inverse-video `K` cursor |
 | `MACHINE=zx81` | `kernel8-zx81.img` | Sinclair ZX-81 (1981) BASIC — the same `K` cursor, one year on |
+| `MACHINE=tc2048` | `kernel8-tc2048.img` | Timex TC-2048 (1984) — a 48K-compatible Spectrum, boots to `© 1982 Sinclair Research Ltd` |
 | `MACHINE=picker` | `kernel8-picker.img` | MAME's system list — a menu; machines with ROMs on the card run |
 
 The SD card is identical in every case — only the kernel differs. "Which
@@ -107,7 +110,8 @@ make mame      # the MAME archives — the long one; log: build/mame-build.log
                #  archives are the product and the kernel links itself)
 make kernels   # kernel8-spectrum.img, kernel8-spec128.img, kernel8-specpls2.img,
                #   kernel8-specpl2a.img, kernel8-specpls3.img, kernel8-tbblue.img,
-               #   kernel8-zx80.img, kernel8-zx81.img, kernel8-picker.img
+               #   kernel8-zx80.img, kernel8-zx81.img, kernel8-tc2048.img,
+               #   kernel8-picker.img
 
 make sd MACHINE=spectrum ASSETS=~/my-assets   # see "Assets you must supply"
 ```
@@ -143,7 +147,8 @@ my-assets/
 │   ├── specpls3.zip   # …and for the +3
 │   ├── tbblue.zip     # …and for the Next
 │   ├── zx80.zip       # …and for the ZX-80
-│   └── zx81.zip       # …and for the ZX-81
+│   ├── zx81.zip       # …and for the ZX-81
+│   └── tc2048.zip     # …and for the Timex TC-2048
 └── next/
     └── next.img       # ZX Spectrum Next SD-card image (tbblue only)
 ```
