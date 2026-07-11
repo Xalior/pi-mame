@@ -11,6 +11,8 @@
 #                            /next/next.img attached as its SD card)
 #   make MACHINE=specnext_ks1 -> kernel8-specnext_ks1.img (ZX Spectrum Next,
 #                            Kickstarter KS1 board, /next/next.img as its SD card)
+#   make MACHINE=specnext_ks2 -> kernel8-specnext_ks2.img (ZX Spectrum Next,
+#                            Kickstarter KS2 board, /next/next.img as its SD card)
 #   make MACHINE=zx80     -> kernel8-zx80.img (boots into a Sinclair ZX-80)
 #   make MACHINE=zx81     -> kernel8-zx81.img (boots into a Sinclair ZX-81)
 #   make MACHINE=tc2048   -> kernel8-tc2048.img (boots into a Timex TC-2048)
@@ -45,6 +47,7 @@ MACHINE_DEFS_specpl2a = -DMAME_MACHINE='"specpl2a"'
 MACHINE_DEFS_specpls3 = -DMAME_MACHINE='"specpls3"'
 MACHINE_DEFS_tbblue   = -DMAME_MACHINE='"tbblue"' -DMAME_HARDDISK='"/next/next.img"'
 MACHINE_DEFS_specnext_ks1 = -DMAME_MACHINE='"specnext_ks1"' -DMAME_HARDDISK='"/next/next.img"'
+MACHINE_DEFS_specnext_ks2 = -DMAME_MACHINE='"specnext_ks2"' -DMAME_HARDDISK='"/next/next.img"'
 MACHINE_DEFS_zx80     = -DMAME_MACHINE='"zx80"'
 MACHINE_DEFS_zx81     = -DMAME_MACHINE='"zx81"'
 MACHINE_DEFS_tc2048   = -DMAME_MACHINE='"tc2048"'
@@ -55,7 +58,7 @@ MACHINE_DEFS_picker   = -DMAME_PICKER
 
 KERNEL_DEFS = $(MACHINE_DEFS_$(MACHINE))
 ifeq ($(strip $(KERNEL_DEFS)),)
-$(error unknown MACHINE '$(MACHINE)' — spectrum, spec128, specpls2, specpl2a, specpls3, tbblue, specnext_ks1, zx80, zx81, tc2048, ts2068, ts1000, ts1500, or picker)
+$(error unknown MACHINE '$(MACHINE)' — spectrum, spec128, specpls2, specpl2a, specpls3, tbblue, specnext_ks1, specnext_ks2, zx80, zx81, tc2048, ts2068, ts1000, ts1500, or picker)
 endif
 
 TARGET = kernel8-$(MACHINE)
