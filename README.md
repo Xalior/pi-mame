@@ -19,7 +19,7 @@ and the next power-on asks again. 🔁
 
 Delightfully small. Let's be precise about what this actually is:
 
-- **Thirty machines run.** 🕹️ The 48K ZX Spectrum, the ZX Spectrum 128, the
+- **Thirty-one machines run.** 🕹️ The 48K ZX Spectrum, the ZX Spectrum 128, the
   ZX Spectrum +2 (`specpls2`, Amstrad's grey 128), the ZX Spectrum +2a
   (`specpl2a`, Amstrad's +3 firmware in the +2's cassette case), the ZX
   Spectrum +3 (`specpls3`, the same firmware with the built-in 3" floppy
@@ -78,7 +78,13 @@ Delightfully small. Let's be precise about what this actually is:
   AMSDOS ROM — whose firmware powers on to the yellow-on-blue
   `Amstrad 128K Microcomputer (v3)` /
   `©1985 Amstrad Consumer Electronics plc and Locomotive Software Ltd.`
-  sign-on above `BASIC 1.1` and `Ready`, on the PAL canvas), and the
+  sign-on above `BASIC 1.1` and `Ready`, on the PAL canvas), the
+  Amstrad CPC464+ (`cpc464p`, Amstrad's 1990 Plus-range CPC, whose
+  hardware boots from a cartridge — the image bakes the game-free
+  Locomotive BASIC + ParaDOS cart, which signs on yellow-on-blue as
+  `Amstrad Microcomputer (v4)` / `©1985 Amstrad plc and Locomotive
+  Software Ltd.` / `PARADOS V1.1. ©1997 QUANTUM Solutions.` above
+  `BASIC 1.1` and `Ready`, on the PAL canvas), and the
   KC Compact (`kccomp`, the 1989 East German CPC clone from VEB
   Mikroelektronik "Wilhelm Pieck" Mühlhausen — a cpc464 clone whose
   reworked firmware carries its own maker's sign-on, the yellow-on-blue
@@ -127,13 +133,14 @@ Delightfully small. Let's be precise about what this actually is:
   `sinclair/elwro800.cpp` (the Elwro 800-3 Junior), `sinclair/byte.cpp`
   (the PEVM Byte), `sinclair/sprinter.cpp` (the Peters Plus Sprinter),
   `amstrad/amstrad.cpp` (the Amstrad CPC464, the
-  Amstrad CPC664, the Amstrad CPC6128, and the KC Compact),
+  Amstrad CPC664, the Amstrad CPC6128, the Amstrad CPC464+, and the
+  KC Compact),
   `amstrad/nc.cpp` (the Amstrad NC100 and NC200 notepads), and
   `amstrad/pc1512.cpp` (the Amstrad PC1512 SD).
   The picker's
   list shows everything those files define, but a listed machine only runs
   if you've supplied its ROMs — with the default assets, that's the
-  thirty above.
+  thirty-one above.
 - **One board.** 🥧 Proven on a Raspberry Pi 4 Model B (4GB). Nothing else
   has ever booted it. (The firmware files for the Pi 400 and CM4 ride
   along because Circle ships them — consider those a rumor, not a
@@ -150,7 +157,7 @@ wild. A custom image is the same build with your choices in it. 🧪
 
 ## 📦 The default images
 
-Out of the box, thirty-one images:
+Out of the box, thirty-two images:
 
 | `make` | Image | Powers on into |
 |---|---|---|
@@ -179,6 +186,7 @@ Out of the box, thirty-one images:
 | `MACHINE=cpc464` | `kernel8-cpc464.img` | Amstrad CPC464 (1984) — Amstrad's all-in-one home computer, boots to Locomotive BASIC 1.0: the yellow-on-blue `Amstrad 64K Microcomputer (v1)` / `©1984 Amstrad Consumer Electronics plc and Locomotive Software Ltd.` sign-on over `BASIC 1.0` / `Ready`, on the PAL canvas |
 | `MACHINE=cpc664` | `kernel8-cpc664.img` | Amstrad CPC664 (1985) — the short-lived disk-based CPC, a cpc464 clone with a built-in 3" floppy drive, boots to Locomotive BASIC 1.1: the yellow-on-blue `Amstrad 64K Microcomputer (v2)` / `©1984 Amstrad Consumer Electronics plc and Locomotive Software Ltd.` sign-on over `BASIC 1.1` / `Ready`, on the PAL canvas |
 | `MACHINE=cpc6128` | `kernel8-cpc6128.img` | Amstrad CPC6128 (1985) — the 128K disk-based CPC, a cpc464 clone with 128K of RAM and a built-in 3" floppy drive, boots to Locomotive BASIC 1.1: the yellow-on-blue `Amstrad 128K Microcomputer (v3)` / `©1985 Amstrad Consumer Electronics plc and Locomotive Software Ltd.` sign-on over `BASIC 1.1` / `Ready`, on the PAL canvas |
+| `MACHINE=cpc464p` | `kernel8-cpc464p.img` | Amstrad CPC464+ (1990) — the Plus-range CPC, whose hardware boots from a cartridge: the image bakes `-cart /carts/sysukpd.bin` (the game-free Locomotive BASIC + ParaDOS homebrew cart), which signs on yellow-on-blue as `Amstrad Microcomputer (v4)` / `©1985 Amstrad plc and Locomotive Software Ltd.` / `PARADOS V1.1. ©1997 QUANTUM Solutions.` over `BASIC 1.1` / `Ready`, on the PAL canvas |
 | `MACHINE=kccomp` | `kernel8-kccomp.img` | KC Compact (1989) — VEB Mikroelektronik "Wilhelm Pieck" Mühlhausen's East German CPC clone, a cpc464 clone, boots to Locomotive BASIC 1.1 under its own maker's firmware: the yellow-on-blue `KC compact` / `Version 1.3` sign-on over `BASIC 1.1` / `Ready`, on the PAL canvas |
 | `MACHINE=nc100` | `kernel8-nc100.img` | Amstrad NC100 (1992) — Amstrad's Z80-based A4 notepad computer, powers on to its `Set time and date` screen (a `London` / `Mon 1 Jan 1990` status bar, a `00:00` time box and a `1 Jan 1990` date box, and the prompt to set the time with ↑↓ and press J when finished), the 480×64 LCD's blue-on-tan stretched to fill the PAL canvas |
 | `MACHINE=nc200` | `kernel8-nc200.img` | Amstrad NC200 (1993) — the NC100's successor, a Z80 A4 notepad with a taller 480×128 LCD and a built-in 3½″ floppy drive, powers on to its `Set time and date` screen (the `Set time and date` title bar, a `00:00` time box and a `1 Jan 1990` date box, the prompt to set the time with ↑↓ and press ↵ when finished, and a live `MONDAY 1 JAN` / `London` calendar-clock), the 480×128 LCD's blue-on-tan stretched to fill the PAL canvas |
@@ -242,7 +250,8 @@ make kernels   # kernel8-spectrum.img, kernel8-spec128.img, kernel8-specpls2.img
                #   kernel8-pentevo.img, kernel8-tsconf.img,
                #   kernel8-elwro800.img, kernel8-byte.img,
                #   kernel8-cpc464.img, kernel8-cpc664.img,
-               #   kernel8-cpc6128.img, kernel8-kccomp.img,
+               #   kernel8-cpc6128.img, kernel8-cpc464p.img,
+               #   kernel8-kccomp.img,
                #   kernel8-nc100.img, kernel8-nc200.img,
                #   kernel8-sprinter.img, kernel8-pc1512.img,
                #   kernel8-picker.img
@@ -255,7 +264,7 @@ Raspberry Pi firmware (fetched at the revision Circle pins), Circle's
 `config64.txt` boot configuration, the PAL canvas `cmdline.txt`, and the
 chosen kernel. `ASSETS` points at a directory you provide (layout below);
 leave it off and `make sd` still builds the tree — you'll just add
-`roms/` (and `next/`) to the card yourself.
+`roms/` (and `next/`, `carts/`) to the card yourself.
 
 Then, concretely: 💾
 
@@ -304,8 +313,10 @@ my-assets/
 │   ├── pc1512kb.zip   # keyboard-controller ROM (the pc1512kb device the PC1512 needs — a separate MAME device set)
 │   ├── betadisk.zip   # Beta Disk / TR-DOS interface ROMs (the disk device shared by the pentagon, the scorpio, the atmtb2, and the pentevo)
 │   └── kb_ms_natural.zip # Microsoft Natural keyboard ROM (the PS/2 keyboard device the sprinter needs)
-└── next/
-    └── next.img       # ZX Spectrum Next SD-card image (tbblue, specnext_ks1, specnext_ks2, specnext_ks3)
+├── next/
+│   └── next.img       # ZX Spectrum Next SD-card image (tbblue, specnext_ks1, specnext_ks2, specnext_ks3)
+└── carts/
+    └── sysukpd.bin    # the CPC+ default cartridge (cpc464p) — Locomotive BASIC + ParaDOS
 ```
 
 - ROM zips are standard MAME romsets, named for their machine.
@@ -328,6 +339,12 @@ my-assets/
   are ROM-compatible clones of `tbblue` (KS3's trimmed BIOS list names only
   files `tbblue.zip` already carries), so they read `tbblue.zip` — no
   separate romset.
+- The CPC+ machines boot from a cartridge — the `cpc464p` romset is empty
+  (no `cpc464p.zip`), because the Plus firmware lives on the cart itself.
+  🎮 The baked default is the game-free Locomotive BASIC + ParaDOS
+  homebrew cart (MAME softlist entry `sysukpd`: `engpados.bin`, renamed
+  `sysukpd.bin`), which you supply like every other asset. Other carts
+  load through MAME's UI at runtime (Scroll Lock → Tab → file manager).
 - Only supplying some assets is fine: machines without their ROMs simply
   won't run.
 

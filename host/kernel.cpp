@@ -40,6 +40,14 @@ static const char *MameArgv[] = {
 #ifdef MAME_HARDDISK
     "-hard1", MAME_HARDDISK,
 #endif
+#ifdef MAME_CART
+    // The Amstrad CPC+ hardware boots from a cartridge (empty romset,
+    // must_be_loaded): the firmware lives on the cart, not in ROM. The
+    // cart is baked as a direct file on the SD (generic_plain_slot takes
+    // .bin/.cpr with no hashpath machinery), so this is appliance
+    // configuration, not user-facing config surface.
+    "-cart", MAME_CART,
+#endif
     "-video", "soft",
     // keepaspect is desktop application surface; the appliance bakes it
     // off. The framebuffer IS the driver's raster (boot-config width=/

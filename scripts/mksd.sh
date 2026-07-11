@@ -7,8 +7,8 @@
 # the revision pinned by circle/boot/Makefile, using Circle's own download
 # mechanism), Circle's config64.txt as config.txt, the machine's regional
 # canvas as cmdline.txt, the chosen kernel image, and — if an assets directory is
-# given — roms/ and next/ copied from it. ROMs and disk images are yours
-# to provide; they are not part of this repository.
+# given — roms/, next/, and carts/ copied from it. ROMs, disk images, and
+# cartridges are yours to provide; they are not part of this repository.
 
 set -e
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -48,6 +48,8 @@ if [ -n "$ASSETS" ]; then
     [ -d "$ASSETS/roms" ] && cp -R "$ASSETS/roms" "$SD/roms" \
         || echo "mksd.sh: warning: no roms/ in $ASSETS" >&2
     [ -d "$ASSETS/next" ] && cp -R "$ASSETS/next" "$SD/next" \
+        || true
+    [ -d "$ASSETS/carts" ] && cp -R "$ASSETS/carts" "$SD/carts" \
         || true
 else
     echo "mksd.sh: no assets dir given — add roms/ (and next/ for tbblue) to the card yourself" >&2

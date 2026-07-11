@@ -22,6 +22,9 @@
 #                            TS-2068, the American 60Hz machine)
 #   make MACHINE=ts1000   -> kernel8-ts1000.img (boots into a Timex Sinclair
 #                            TS-1000, the American ZX-81)
+#   make MACHINE=cpc464p  -> kernel8-cpc464p.img (Amstrad CPC464+; the Plus
+#                            hardware boots from a cartridge, so the game-free
+#                            /carts/sysukpd.bin is baked as -cart)
 #   make MACHINE=picker   -> kernel8-picker.img (nothing baked: MAME boots
 #                            into its system list; the family is the menu)
 #
@@ -67,6 +70,7 @@ MACHINE_DEFS_byte     = -DMAME_MACHINE='"byte"'
 MACHINE_DEFS_cpc464   = -DMAME_MACHINE='"cpc464"'
 MACHINE_DEFS_cpc664   = -DMAME_MACHINE='"cpc664"'
 MACHINE_DEFS_cpc6128  = -DMAME_MACHINE='"cpc6128"'
+MACHINE_DEFS_cpc464p  = -DMAME_MACHINE='"cpc464p"' -DMAME_CART='"/carts/sysukpd.bin"'
 MACHINE_DEFS_kccomp   = -DMAME_MACHINE='"kccomp"'
 MACHINE_DEFS_nc100    = -DMAME_MACHINE='"nc100"'
 MACHINE_DEFS_nc200    = -DMAME_MACHINE='"nc200"'
