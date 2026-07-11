@@ -338,6 +338,9 @@ mem|tbblue|boot-30204-ab.bin|96c32007|6c9fcbd282f7a18fb5a726386ac6fb9df209c36b|-
 
 # CPC+/GX4000 default cartridge: engpados.bin from the 0.193 software-list
 # mirror, installed as carts/sysukpd.bin (the CPC+ range needs a cartridge).
+# Tier is public BY RULING, not by accident: it stays there until the
+# appliance lets the user put carts on the card AND pick one at startup —
+# only then does baking it into shipped bundles meet the licensing bar.
 asset|sysukpd|public|file|carts/sysukpd.bin
 src|sysukpd|zip|https://archive.org/download/MAME_0.193_Software_List_ROMs_split/MAME_0.193_Software_List_ROMs_split.zip/MAME%200.193%20Software%20List%20ROMs%20%28split%29/gx4000/sysukpd.zip
 mem|sysukpd|sysukpd.bin|e9c5e30e|596bf4d4dedafca71fadffb6e5fa8634c3cd843f|engpados.bin
