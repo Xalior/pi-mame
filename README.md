@@ -19,7 +19,7 @@ and the next power-on asks again. 🔁
 
 Delightfully small. Let's be precise about what this actually is:
 
-- **Twenty machines run.** 🕹️ The 48K ZX Spectrum, the ZX Spectrum 128, the
+- **Twenty-one machines run.** 🕹️ The 48K ZX Spectrum, the ZX Spectrum 128, the
   ZX Spectrum +2 (`specpls2`, Amstrad's grey 128), the ZX Spectrum +2a
   (`specpl2a`, Amstrad's +3 firmware in the +2's cassette case), the ZX
   Spectrum +3 (`specpls3`, the same firmware with the built-in 3" floppy
@@ -52,20 +52,25 @@ Delightfully small. Let's be precise about what this actually is:
   load, SD-card boot, 48K and 128K BASIC, and more — beside a settings panel,
   on the PAL canvas), and the NedoPC ZX Evolution: TS-Configuration
   (`tsconf`, TS-Labs' 2011 FPGA-based Spectrum clone with the TS-Configuration
-  video/DMA extensions, whose TS-BIOS boots on the PAL canvas). That's it.
+  video/DMA extensions, whose TS-BIOS boots on the PAL canvas), and the
+  Elwro 800-3 Junior (`elwro800`, Elwro's 1986 Polish Spectrum clone built
+  for schools, whose firmware boots to an `ELWRO 800-3 Junior` banner —
+  `64kB RAM 24kB ROM   wersja dyskowa` beside the yellow `elwro` logo, with
+  the Spectrum `K` cursor — on the PAL canvas). That's it.
   That's the list.
 - **One driver family is compiled.** The build's `SOURCES` names exactly
-  eleven MAME driver files: `spectrum.cpp`, `spec128.cpp` (the 128 and the
+  twelve MAME driver files: `spectrum.cpp`, `spec128.cpp` (the 128 and the
   +2 both), `specnext.cpp`, `specpls3.cpp` (the +2a and the +3),
   `zx.cpp` (the ZX-80, the ZX-81, the TS-1000, and the TS-1500),
   `timex.cpp` (the TC-2048 and the TS-2068), `pentagon.cpp` (the
   Pentagon 128K), `scorpion.cpp` (the Scorpion ZS-256), `atm.cpp`
   (the MicroART ATM-Turbo 2), `evo/pentevo.cpp` (the ZX Evolution
-  BASECONF), and `evo/tsconf.cpp` (the ZX Evolution TS-Configuration).
+  BASECONF), `evo/tsconf.cpp` (the ZX Evolution TS-Configuration), and
+  `elwro800.cpp` (the Elwro 800-3 Junior).
   The picker's
   list shows everything those files define, but a listed machine only runs
   if you've supplied its ROMs — with the default assets, that's the
-  twenty above.
+  twenty-one above.
 - **One board.** 🥧 Proven on a Raspberry Pi 4 Model B (4GB). Nothing else
   has ever booted it. (The firmware files for the Pi 400 and CM4 ride
   along because Circle ships them — consider those a rumor, not a
@@ -82,7 +87,7 @@ wild. A custom image is the same build with your choices in it. 🧪
 
 ## 📦 The default images
 
-Out of the box, twenty-one images:
+Out of the box, twenty-two images:
 
 | `make` | Image | Powers on into |
 |---|---|---|
@@ -106,6 +111,7 @@ Out of the box, twenty-one images:
 | `MACHINE=atmtb2` | `kernel8-atmtb2.img` | MicroART ATM-Turbo 2 (1992) — MicroART's Russian turbo Spectrum clone, boots to a MicroART firmware menu (CP/M, TR-DOS 48, Spectrum 128, Spectrum 48, Turbo On) over a red MicroART logo on the PAL canvas |
 | `MACHINE=pentevo` | `kernel8-pentevo.img` | ZX Evolution: BASECONF (2009) — NedoPC's open-hardware Spectrum clone, boots to the EVO Reset Service v0.60.02 firmware, a BASECONF menu (TR-DOS boot, File browse, Tape load, SD-card boot, 48K/128K BASIC, …) beside a settings panel, on the PAL canvas |
 | `MACHINE=tsconf` | `kernel8-tsconf.img` | ZX Evolution: TS-Configuration (2011) — TS-Labs' FPGA Spectrum clone with the TS-Configuration extensions, boots its TS-BIOS on the PAL canvas |
+| `MACHINE=elwro800` | `kernel8-elwro800.img` | Elwro 800-3 Junior (1986) — Elwro's Polish Spectrum clone for schools, boots to an `ELWRO 800-3 Junior` banner (`64kB RAM 24kB ROM   wersja dyskowa`, the yellow `elwro` logo, the Spectrum `K` cursor) on the PAL canvas |
 | `MACHINE=picker` | `kernel8-picker.img` | MAME's system list — a menu; machines with ROMs on the card run |
 
 The SD card is identical in every case — only the kernel differs. "Which
@@ -162,6 +168,7 @@ make kernels   # kernel8-spectrum.img, kernel8-spec128.img, kernel8-specpls2.img
                #   kernel8-ts1500.img, kernel8-pentagon.img,
                #   kernel8-scorpio.img, kernel8-atmtb2.img,
                #   kernel8-pentevo.img, kernel8-tsconf.img,
+               #   kernel8-elwro800.img,
                #   kernel8-picker.img
 
 make sd MACHINE=spectrum ASSETS=~/my-assets   # see "Assets you must supply"
@@ -208,6 +215,7 @@ my-assets/
 │   ├── atmtb2.zip     # …and for the MicroART ATM-Turbo 2 (a spec128 clone; parent ROMs come from spec128.zip)
 │   ├── pentevo.zip    # …and for the ZX Evolution BASECONF (a spec128 clone; parent ROMs come from spec128.zip)
 │   ├── tsconf.zip     # …and for the ZX Evolution TS-Configuration (self-contained: TS-BIOS + CRAM init)
+│   ├── elwro800.zip   # …and for the Elwro 800-3 Junior (self-contained: BASIC/boot EPROMs + I/O, memory, and TV PROMs)
 │   └── betadisk.zip   # Beta Disk / TR-DOS interface ROMs (the disk device shared by the pentagon, the scorpio, the atmtb2, and the pentevo)
 └── next/
     └── next.img       # ZX Spectrum Next SD-card image (tbblue, specnext_ks1, specnext_ks2, specnext_ks3)
