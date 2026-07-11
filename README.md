@@ -19,17 +19,18 @@ and the next power-on asks again. 🔁
 
 Delightfully small. Let's be precise about what this actually is:
 
-- **Five machines run.** 🕹️ The 48K ZX Spectrum, the ZX Spectrum 128, the
+- **Six machines run.** 🕹️ The 48K ZX Spectrum, the ZX Spectrum 128, the
   ZX Spectrum +2 (`specpls2`, Amstrad's grey 128), the ZX Spectrum +2a
-  (`specpl2a`, Amstrad's +3 firmware in the +2's cassette case), and the
-  ZX Spectrum Next (`tbblue`, with its SD card image attached). That's it.
-  That's the list.
+  (`specpl2a`, Amstrad's +3 firmware in the +2's cassette case), the ZX
+  Spectrum +3 (`specpls3`, the same firmware with the built-in 3" floppy
+  drive), and the ZX Spectrum Next (`tbblue`, with its SD card image
+  attached). That's it. That's the list.
 - **One driver family is compiled.** The build's `SOURCES` names exactly
   four MAME driver files: `spectrum.cpp`, `spec128.cpp` (the 128 and the
-  +2 both), `specnext.cpp`, and `specpls3.cpp` (the +2a). The picker's
-  list shows everything those files define, but a listed machine only runs
-  if you've supplied its ROMs — with the default assets, that's the five
-  above.
+  +2 both), `specnext.cpp`, and `specpls3.cpp` (the +2a and the +3). The
+  picker's list shows everything those files define, but a listed machine
+  only runs if you've supplied its ROMs — with the default assets, that's
+  the six above.
 - **One board.** 🥧 Proven on a Raspberry Pi 4 Model B (4GB). Nothing else
   has ever booted it. (The firmware files for the Pi 400 and CM4 ride
   along because Circle ships them — consider those a rumor, not a
@@ -46,7 +47,7 @@ wild. A custom image is the same build with your choices in it. 🧪
 
 ## 📦 The default images
 
-Out of the box, six images:
+Out of the box, seven images:
 
 | `make` | Image | Powers on into |
 |---|---|---|
@@ -54,6 +55,7 @@ Out of the box, six images:
 | `MACHINE=spec128` | `kernel8-spec128.img` | ZX Spectrum 128 startup menu (128 BASIC, Tape Loader, …) |
 | `MACHINE=specpls2` | `kernel8-specpls2.img` | ZX Spectrum +2 startup menu (Amstrad's grey 128) |
 | `MACHINE=specpl2a` | `kernel8-specpl2a.img` | ZX Spectrum +2a startup menu (Loader, +3 BASIC, Calculator, 48 BASIC) |
+| `MACHINE=specpls3` | `kernel8-specpls3.img` | ZX Spectrum +3 startup menu (Loader, +3 BASIC, Calculator, 48 BASIC; drives A: and M:) |
 | `MACHINE=tbblue` | `kernel8-tbblue.img` | ZX Spectrum Next / NextZXOS (needs `next/next.img` on the card) |
 | `MACHINE=picker` | `kernel8-picker.img` | MAME's system list — a menu; machines with ROMs on the card run |
 
@@ -101,7 +103,8 @@ make mame      # the MAME archives — the long one; log: build/mame-build.log
                # (genie's final host-style link fails by design; the
                #  archives are the product and the kernel links itself)
 make kernels   # kernel8-spectrum.img, kernel8-spec128.img, kernel8-specpls2.img,
-               #   kernel8-specpl2a.img, kernel8-tbblue.img, kernel8-picker.img
+               #   kernel8-specpl2a.img, kernel8-specpls3.img, kernel8-tbblue.img,
+               #   kernel8-picker.img
 
 make sd MACHINE=spectrum ASSETS=~/my-assets   # see "Assets you must supply"
 ```
@@ -134,6 +137,7 @@ my-assets/
 │   ├── spec128.zip    # …and for the 128
 │   ├── specpls2.zip   # …and for the +2
 │   ├── specpl2a.zip   # …and for the +2a
+│   ├── specpls3.zip   # …and for the +3
 │   └── tbblue.zip     # …and for the Next
 └── next/
     └── next.img       # ZX Spectrum Next SD-card image (tbblue only)
