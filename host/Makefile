@@ -71,11 +71,12 @@ MACHINE_DEFS_kccomp   = -DMAME_MACHINE='"kccomp"'
 MACHINE_DEFS_nc100    = -DMAME_MACHINE='"nc100"'
 MACHINE_DEFS_nc200    = -DMAME_MACHINE='"nc200"'
 MACHINE_DEFS_sprinter = -DMAME_MACHINE='"sprinter"'
+MACHINE_DEFS_pc1512   = -DMAME_MACHINE='"pc1512"'
 MACHINE_DEFS_picker   = -DMAME_PICKER
 
 KERNEL_DEFS = $(MACHINE_DEFS_$(MACHINE))
 ifeq ($(strip $(KERNEL_DEFS)),)
-$(error unknown MACHINE '$(MACHINE)' — spectrum, spec128, specpls2, specpl2a, specpls3, tbblue, specnext_ks1, specnext_ks2, specnext_ks3, zx80, zx81, tc2048, ts2068, ts1000, ts1500, pentagon, scorpio, atmtb2, pentevo, tsconf, elwro800, byte, sprinter, or picker)
+$(error unknown MACHINE '$(MACHINE)' — spectrum, spec128, specpls2, specpl2a, specpls3, tbblue, specnext_ks1, specnext_ks2, specnext_ks3, zx80, zx81, tc2048, ts2068, ts1000, ts1500, pentagon, scorpio, atmtb2, pentevo, tsconf, elwro800, byte, sprinter, pc1512, or picker)
 endif
 
 TARGET = kernel8-$(MACHINE)
