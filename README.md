@@ -19,7 +19,7 @@ and the next power-on asks again. 🔁
 
 Delightfully small. Let's be precise about what this actually is:
 
-- **Twenty-six machines run.** 🕹️ The 48K ZX Spectrum, the ZX Spectrum 128, the
+- **Twenty-seven machines run.** 🕹️ The 48K ZX Spectrum, the ZX Spectrum 128, the
   ZX Spectrum +2 (`specpls2`, Amstrad's grey 128), the ZX Spectrum +2a
   (`specpl2a`, Amstrad's +3 firmware in the +2's cassette case), the ZX
   Spectrum +3 (`specpls3`, the same firmware with the built-in 3" floppy
@@ -83,10 +83,18 @@ Delightfully small. Let's be precise about what this actually is:
   Mikroelektronik "Wilhelm Pieck" Mühlhausen — a cpc464 clone whose
   reworked firmware carries its own maker's sign-on, the yellow-on-blue
   `KC compact` / `Version 1.3` above `BASIC 1.1` and `Ready`, on the PAL
-  canvas). That's it. That's the list.
+  canvas), and the Amstrad NC100 (`nc100`, Amstrad's 1992 Z80-based A4
+  notepad computer — not a CPC but the same maker's later portable, with
+  its own 480×64 monochrome LCD and built-in organiser firmware — which
+  powers on to its `Set time and date` screen: a `London` / `Mon 1 Jan
+  1990` status bar above a time box (`00:00`) and a date box (`1 Jan
+  1990`), with the prompt `Set the time...` / `Press ↑↓ to adjust the
+  hour` / `Press J when finished` / `Press Stop to exit`, in the LCD's
+  blue-on-tan, stretched to fill the PAL canvas). That's it. That's the
+  list.
 - **Two driver families are compiled** — Sinclair and Amstrad. The build's
   `SOURCES` names exactly
-  fourteen MAME driver files: `sinclair/spectrum.cpp`, `sinclair/spec128.cpp`
+  fifteen MAME driver files: `sinclair/spectrum.cpp`, `sinclair/spec128.cpp`
   (the 128 and the
   +2 both), `sinclair/next/specnext.cpp`, `sinclair/specpls3.cpp` (the +2a and the +3),
   `sinclair/zx.cpp` (the ZX-80, the ZX-81, the TS-1000, and the TS-1500),
@@ -95,12 +103,13 @@ Delightfully small. Let's be precise about what this actually is:
   (the MicroART ATM-Turbo 2), `sinclair/evo/pentevo.cpp` (the ZX Evolution
   BASECONF), `sinclair/evo/tsconf.cpp` (the ZX Evolution TS-Configuration),
   `sinclair/elwro800.cpp` (the Elwro 800-3 Junior), `sinclair/byte.cpp`
-  (the PEVM Byte), and `amstrad/amstrad.cpp` (the Amstrad CPC464, the
-  Amstrad CPC664, the Amstrad CPC6128, and the KC Compact).
+  (the PEVM Byte), `amstrad/amstrad.cpp` (the Amstrad CPC464, the
+  Amstrad CPC664, the Amstrad CPC6128, and the KC Compact), and
+  `amstrad/nc.cpp` (the Amstrad NC100 notepad).
   The picker's
   list shows everything those files define, but a listed machine only runs
   if you've supplied its ROMs — with the default assets, that's the
-  twenty-six above.
+  twenty-seven above.
 - **One board.** 🥧 Proven on a Raspberry Pi 4 Model B (4GB). Nothing else
   has ever booted it. (The firmware files for the Pi 400 and CM4 ride
   along because Circle ships them — consider those a rumor, not a
@@ -117,7 +126,7 @@ wild. A custom image is the same build with your choices in it. 🧪
 
 ## 📦 The default images
 
-Out of the box, twenty-seven images:
+Out of the box, twenty-eight images:
 
 | `make` | Image | Powers on into |
 |---|---|---|
@@ -147,6 +156,7 @@ Out of the box, twenty-seven images:
 | `MACHINE=cpc664` | `kernel8-cpc664.img` | Amstrad CPC664 (1985) — the short-lived disk-based CPC, a cpc464 clone with a built-in 3" floppy drive, boots to Locomotive BASIC 1.1: the yellow-on-blue `Amstrad 64K Microcomputer (v2)` / `©1984 Amstrad Consumer Electronics plc and Locomotive Software Ltd.` sign-on over `BASIC 1.1` / `Ready`, on the PAL canvas |
 | `MACHINE=cpc6128` | `kernel8-cpc6128.img` | Amstrad CPC6128 (1985) — the 128K disk-based CPC, a cpc464 clone with 128K of RAM and a built-in 3" floppy drive, boots to Locomotive BASIC 1.1: the yellow-on-blue `Amstrad 128K Microcomputer (v3)` / `©1985 Amstrad Consumer Electronics plc and Locomotive Software Ltd.` sign-on over `BASIC 1.1` / `Ready`, on the PAL canvas |
 | `MACHINE=kccomp` | `kernel8-kccomp.img` | KC Compact (1989) — VEB Mikroelektronik "Wilhelm Pieck" Mühlhausen's East German CPC clone, a cpc464 clone, boots to Locomotive BASIC 1.1 under its own maker's firmware: the yellow-on-blue `KC compact` / `Version 1.3` sign-on over `BASIC 1.1` / `Ready`, on the PAL canvas |
+| `MACHINE=nc100` | `kernel8-nc100.img` | Amstrad NC100 (1992) — Amstrad's Z80-based A4 notepad computer, powers on to its `Set time and date` screen (a `London` / `Mon 1 Jan 1990` status bar, a `00:00` time box and a `1 Jan 1990` date box, and the prompt to set the time with ↑↓ and press J when finished), the 480×64 LCD's blue-on-tan stretched to fill the PAL canvas |
 | `MACHINE=picker` | `kernel8-picker.img` | MAME's system list — a menu; machines with ROMs on the card run |
 
 The SD card is identical in every case — only the kernel differs. "Which
@@ -206,7 +216,7 @@ make kernels   # kernel8-spectrum.img, kernel8-spec128.img, kernel8-specpls2.img
                #   kernel8-elwro800.img, kernel8-byte.img,
                #   kernel8-cpc464.img, kernel8-cpc664.img,
                #   kernel8-cpc6128.img, kernel8-kccomp.img,
-               #   kernel8-picker.img
+               #   kernel8-nc100.img, kernel8-picker.img
 
 make sd MACHINE=spectrum ASSETS=~/my-assets   # see "Assets you must supply"
 ```
@@ -258,6 +268,7 @@ my-assets/
 │   ├── cpc664.zip     # …and for the Amstrad CPC664 (a cpc464 clone, but self-contained: its own 32K OS + Locomotive BASIC 1.1 ROM and the 16K AMSDOS disk ROM)
 │   ├── cpc6128.zip    # …and for the Amstrad CPC6128 (a 128K cpc464 clone, but self-contained: its own 32K OS + Locomotive BASIC 1.1 ROM and the 16K AMSDOS disk ROM)
 │   ├── kccomp.zip     # …and for the KC Compact (a cpc464 clone, but self-contained: its own 32K OS + Locomotive BASIC 1.1 ROM and the `farben.rom` colour PROM)
+│   ├── nc100.zip      # …and for the Amstrad NC100 notepad (self-contained: its own 256K organiser firmware ROM)
 │   └── betadisk.zip   # Beta Disk / TR-DOS interface ROMs (the disk device shared by the pentagon, the scorpio, the atmtb2, and the pentevo)
 └── next/
     └── next.img       # ZX Spectrum Next SD-card image (tbblue, specnext_ks1, specnext_ks2, specnext_ks3)
