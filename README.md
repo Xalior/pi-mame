@@ -140,7 +140,7 @@ Delightfully small. Let's be precise about what this actually is:
   The picker's
   list shows everything those files define, but a listed machine only runs
   if you've supplied its ROMs — with the default assets, that's the
-  thirty-two above.
+  thirty-three above.
 - **One board.** 🥧 Proven on a Raspberry Pi 4 Model B (4GB). Nothing else
   has ever booted it. (The firmware files for the Pi 400 and CM4 ride
   along because Circle ships them — consider those a rumor, not a
@@ -157,7 +157,7 @@ wild. A custom image is the same build with your choices in it. 🧪
 
 ## 📦 The default images
 
-Out of the box, thirty-three images:
+Out of the box, thirty-four images:
 
 | `make` | Image | Powers on into |
 |---|---|---|
@@ -188,6 +188,7 @@ Out of the box, thirty-three images:
 | `MACHINE=cpc6128` | `kernel8-cpc6128.img` | Amstrad CPC6128 (1985) — the 128K disk-based CPC, a cpc464 clone with 128K of RAM and a built-in 3" floppy drive, boots to Locomotive BASIC 1.1: the yellow-on-blue `Amstrad 128K Microcomputer (v3)` / `©1985 Amstrad Consumer Electronics plc and Locomotive Software Ltd.` sign-on over `BASIC 1.1` / `Ready`, on the PAL canvas |
 | `MACHINE=cpc464p` | `kernel8-cpc464p.img` | Amstrad CPC464+ (1990) — the Plus-range CPC, whose hardware boots from a cartridge: the image bakes `-cart /carts/sysukpd.bin` (the game-free Locomotive BASIC + ParaDOS homebrew cart), which signs on yellow-on-blue as `Amstrad Microcomputer (v4)` / `©1985 Amstrad plc and Locomotive Software Ltd.` / `PARADOS V1.1. ©1997 QUANTUM Solutions.` over `BASIC 1.1` / `Ready`, on the PAL canvas |
 | `MACHINE=cpc6128p` | `kernel8-cpc6128p.img` | Amstrad CPC6128+ (1990) — the 128K Plus-range CPC, whose hardware boots from a cartridge: the image bakes `-cart /carts/sysukpd.bin` (the game-free Locomotive BASIC + ParaDOS homebrew cart), which signs on yellow-on-blue as `Amstrad Microcomputer (v4)` / `©1985 Amstrad plc and Locomotive Software Ltd.` / `PARADOS V1.1. ©1997 QUANTUM Solutions.` over `BASIC 1.1` / `Ready`, on the PAL canvas |
+| `MACHINE=gx4000` | `kernel8-gx4000.img` | Amstrad GX4000 (1990) — the keyboard-less games console of the Plus range, whose hardware boots from a cartridge: the image bakes `-cart /carts/sysukpd.bin` (the game-free Locomotive BASIC + ParaDOS homebrew cart), which signs on yellow-on-blue as `Amstrad Microcomputer (v4)` / `©1985 Amstrad plc and Locomotive Software Ltd.` and, with no keyboard to drop through to a BASIC prompt, halts at that sign-on awaiting a game cart, on the PAL canvas |
 | `MACHINE=kccomp` | `kernel8-kccomp.img` | KC Compact (1989) — VEB Mikroelektronik "Wilhelm Pieck" Mühlhausen's East German CPC clone, a cpc464 clone, boots to Locomotive BASIC 1.1 under its own maker's firmware: the yellow-on-blue `KC compact` / `Version 1.3` sign-on over `BASIC 1.1` / `Ready`, on the PAL canvas |
 | `MACHINE=nc100` | `kernel8-nc100.img` | Amstrad NC100 (1992) — Amstrad's Z80-based A4 notepad computer, powers on to its `Set time and date` screen (a `London` / `Mon 1 Jan 1990` status bar, a `00:00` time box and a `1 Jan 1990` date box, and the prompt to set the time with ↑↓ and press J when finished), the 480×64 LCD's blue-on-tan stretched to fill the PAL canvas |
 | `MACHINE=nc200` | `kernel8-nc200.img` | Amstrad NC200 (1993) — the NC100's successor, a Z80 A4 notepad with a taller 480×128 LCD and a built-in 3½″ floppy drive, powers on to its `Set time and date` screen (the `Set time and date` title bar, a `00:00` time box and a `1 Jan 1990` date box, the prompt to set the time with ↑↓ and press ↵ when finished, and a live `MONDAY 1 JAN` / `London` calendar-clock), the 480×128 LCD's blue-on-tan stretched to fill the PAL canvas |

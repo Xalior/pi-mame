@@ -28,6 +28,9 @@
 #   make MACHINE=cpc6128p -> kernel8-cpc6128p.img (Amstrad CPC6128+; the Plus
 #                            hardware boots from a cartridge, so the game-free
 #                            /carts/sysukpd.bin is baked as -cart)
+#   make MACHINE=gx4000   -> kernel8-gx4000.img (Amstrad GX4000 console; the
+#                            keyboard-less Plus variant boots from a cartridge,
+#                            so the game-free /carts/sysukpd.bin is baked as -cart)
 #   make MACHINE=picker   -> kernel8-picker.img (nothing baked: MAME boots
 #                            into its system list; the family is the menu)
 #
@@ -75,6 +78,7 @@ MACHINE_DEFS_cpc664   = -DMAME_MACHINE='"cpc664"'
 MACHINE_DEFS_cpc6128  = -DMAME_MACHINE='"cpc6128"'
 MACHINE_DEFS_cpc464p  = -DMAME_MACHINE='"cpc464p"' -DMAME_CART='"/carts/sysukpd.bin"'
 MACHINE_DEFS_cpc6128p = -DMAME_MACHINE='"cpc6128p"' -DMAME_CART='"/carts/sysukpd.bin"'
+MACHINE_DEFS_gx4000   = -DMAME_MACHINE='"gx4000"' -DMAME_CART='"/carts/sysukpd.bin"'
 MACHINE_DEFS_kccomp   = -DMAME_MACHINE='"kccomp"'
 MACHINE_DEFS_nc100    = -DMAME_MACHINE='"nc100"'
 MACHINE_DEFS_nc200    = -DMAME_MACHINE='"nc200"'
@@ -84,7 +88,7 @@ MACHINE_DEFS_picker   = -DMAME_PICKER
 
 KERNEL_DEFS = $(MACHINE_DEFS_$(MACHINE))
 ifeq ($(strip $(KERNEL_DEFS)),)
-$(error unknown MACHINE '$(MACHINE)' — spectrum, spec128, specpls2, specpl2a, specpls3, tbblue, specnext_ks1, specnext_ks2, specnext_ks3, zx80, zx81, tc2048, ts2068, ts1000, ts1500, pentagon, scorpio, atmtb2, pentevo, tsconf, elwro800, byte, sprinter, pc1512, or picker)
+$(error unknown MACHINE '$(MACHINE)' — spectrum, spec128, specpls2, specpl2a, specpls3, tbblue, specnext_ks1, specnext_ks2, specnext_ks3, zx80, zx81, tc2048, ts2068, ts1000, ts1500, pentagon, scorpio, atmtb2, pentevo, tsconf, elwro800, byte, sprinter, pc1512, gx4000, or picker)
 endif
 
 TARGET = kernel8-$(MACHINE)
