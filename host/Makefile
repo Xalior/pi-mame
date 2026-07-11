@@ -10,6 +10,7 @@
 #   make MACHINE=tbblue   -> kernel8-tbblue.img (ZX Spectrum Next,
 #                            /next/next.img attached as its SD card)
 #   make MACHINE=zx80     -> kernel8-zx80.img (boots into a Sinclair ZX-80)
+#   make MACHINE=zx81     -> kernel8-zx81.img (boots into a Sinclair ZX-81)
 #   make MACHINE=picker   -> kernel8-picker.img (nothing baked: MAME boots
 #                            into its system list; the family is the menu)
 #
@@ -36,11 +37,12 @@ MACHINE_DEFS_specpl2a = -DMAME_MACHINE='"specpl2a"'
 MACHINE_DEFS_specpls3 = -DMAME_MACHINE='"specpls3"'
 MACHINE_DEFS_tbblue   = -DMAME_MACHINE='"tbblue"' -DMAME_HARDDISK='"/next/next.img"'
 MACHINE_DEFS_zx80     = -DMAME_MACHINE='"zx80"'
+MACHINE_DEFS_zx81     = -DMAME_MACHINE='"zx81"'
 MACHINE_DEFS_picker   = -DMAME_PICKER
 
 KERNEL_DEFS = $(MACHINE_DEFS_$(MACHINE))
 ifeq ($(strip $(KERNEL_DEFS)),)
-$(error unknown MACHINE '$(MACHINE)' — spectrum, spec128, specpls2, specpl2a, specpls3, tbblue, zx80, or picker)
+$(error unknown MACHINE '$(MACHINE)' — spectrum, spec128, specpls2, specpl2a, specpls3, tbblue, zx80, zx81, or picker)
 endif
 
 TARGET = kernel8-$(MACHINE)
