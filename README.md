@@ -19,14 +19,14 @@ and the next power-on asks again. 🔁
 
 Delightfully small. Let's be precise about what this actually is:
 
-- **Three machines run.** 🕹️ The 48K ZX Spectrum, the ZX Spectrum 128, and
-  the ZX Spectrum Next (`tbblue`, with its SD card image attached). That's
-  it. That's the list.
+- **Four machines run.** 🕹️ The 48K ZX Spectrum, the ZX Spectrum 128, the
+  ZX Spectrum +2 (`specpls2`, Amstrad's grey 128), and the ZX Spectrum Next
+  (`tbblue`, with its SD card image attached). That's it. That's the list.
 - **One driver family is compiled.** The build's `SOURCES` names exactly
-  three MAME driver files: `spectrum.cpp`, `spec128.cpp`, and
-  `specnext.cpp`. The picker's list shows everything those files define,
-  but a listed machine only runs if you've supplied its ROMs — with the
-  default assets, that's the three above.
+  three MAME driver files: `spectrum.cpp`, `spec128.cpp` (the 128 and the
+  +2 both), and `specnext.cpp`. The picker's list shows everything those
+  files define, but a listed machine only runs if you've supplied its
+  ROMs — with the default assets, that's the four above.
 - **One board.** 🥧 Proven on a Raspberry Pi 4 Model B (4GB). Nothing else
   has ever booted it. (The firmware files for the Pi 400 and CM4 ride
   along because Circle ships them — consider those a rumor, not a
@@ -43,12 +43,13 @@ wild. A custom image is the same build with your choices in it. 🧪
 
 ## 📦 The default images
 
-Out of the box, four images:
+Out of the box, five images:
 
 | `make` | Image | Powers on into |
 |---|---|---|
 | `MACHINE=spectrum` | `kernel8-spectrum.img` | 48K ZX Spectrum BASIC |
 | `MACHINE=spec128` | `kernel8-spec128.img` | ZX Spectrum 128 startup menu (128 BASIC, Tape Loader, …) |
+| `MACHINE=specpls2` | `kernel8-specpls2.img` | ZX Spectrum +2 startup menu (Amstrad's grey 128) |
 | `MACHINE=tbblue` | `kernel8-tbblue.img` | ZX Spectrum Next / NextZXOS (needs `next/next.img` on the card) |
 | `MACHINE=picker` | `kernel8-picker.img` | MAME's system list — a menu; machines with ROMs on the card run |
 
@@ -95,7 +96,7 @@ make deps      # circle-stdlib (multicore) + the SDL2 shim
 make mame      # the MAME archives — the long one; log: build/mame-build.log
                # (genie's final host-style link fails by design; the
                #  archives are the product and the kernel links itself)
-make kernels   # kernel8-spectrum.img, kernel8-spec128.img,
+make kernels   # kernel8-spectrum.img, kernel8-spec128.img, kernel8-specpls2.img,
                #   kernel8-tbblue.img, kernel8-picker.img
 
 make sd MACHINE=spectrum ASSETS=~/my-assets   # see "Assets you must supply"
@@ -127,6 +128,7 @@ my-assets/
 ├── roms/
 │   ├── spectrum.zip   # MAME-format ROM zip for the 48K
 │   ├── spec128.zip    # …and for the 128
+│   ├── specpls2.zip   # …and for the +2
 │   └── tbblue.zip     # …and for the Next
 └── next/
     └── next.img       # ZX Spectrum Next SD-card image (tbblue only)

@@ -3,8 +3,8 @@
 #
 #   make deps                    circle-stdlib (multicore) + the SDL2 shim
 #   make mame                    the MAME archives (long; log in build/)
-#   make kernel MACHINE=<m>      one kernel image (spectrum|spec128|tbblue|picker)
-#   make kernels                 all four
+#   make kernel MACHINE=<m>      one kernel image (spectrum|spec128|specpls2|tbblue|picker)
+#   make kernels                 all five
 #   make sd MACHINE=<m> [ASSETS=<dir>]   copy-to-card tree in build/sd/
 #
 # Requires the Arm GNU aarch64-none-elf toolchain on PATH (see README.md).
@@ -31,6 +31,7 @@ kernel:
 kernels:
 	$(MAKE) -C host MACHINE=spectrum
 	$(MAKE) -C host MACHINE=spec128
+	$(MAKE) -C host MACHINE=specpls2
 	$(MAKE) -C host MACHINE=tbblue
 	$(MAKE) -C host MACHINE=picker
 
