@@ -221,12 +221,13 @@ jobs:
           ls -lh dist/
 
       # A platform card zip per (platform, tier): the picker as the boot kernel,
-      # the platform binary as pi-mame-rpi4.img, a generated bootmenu.cfg, and
-      # the FREE-tier assets (public ROMs never ship — the public card's extra
-      # menu entries boot but want their ROMs added). The free and public card
-      # share the one platform binary; only the menu and the asset set differ.
-      # A tier whose menu is empty (e.g. amstrad-free — every amstrad romset is
-      # public) ships no card: an empty menu is nothing to boot.
+      # the platform binary as pi-mame-core-rpi4.img, a generated bootmenu.cfg,
+      # and the FREE-tier assets (public ROMs never ship — the public card's
+      # extra menu entries boot but want their ROMs added). The free and public
+      # card share the one platform binary; only the menu and the asset set
+      # differ. A tier whose menu is empty (e.g. commodore-free — every
+      # commodore romset is public) ships no card: an empty menu is nothing
+      # to boot.
       - name: Assemble per-platform card zips
         run: |
           for p in $(make -s -f host/machines.mk print-PLATFORMS); do
