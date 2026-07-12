@@ -133,12 +133,18 @@ MACHINE_STRING_nc200        = nc200
 MACHINE_STRING_pc1512       = pc1512
 
 # --- Commodore defaults strings ---
-# The C64 line's IEC serial bus defaults to a C1541 drive at device 8, whose
-# own romset is then required just to reach BASIC (hardware-proven). A real
-# machine with nothing plugged into the serial port is a completely valid,
-# far more common configuration: device 8 is baked empty. The "" token is the
+# The C64/VIC-20/264/128 lines' IEC serial bus defaults to a disk drive at
+# device 8 that models an EXTERNAL, plug-in option. On those machines a real
+# unit with nothing plugged into the serial port is a completely valid, far
+# more common configuration, so device 8 is baked empty. The "" token is the
 # defaults-string spelling of an empty argv entry (defaults.cpp maps it) —
 # MAME accepts only an empty value to empty a slot, "none" is rejected.
+#
+# This empty-slot bake applies to EXTERNAL-drive defaults ONLY. Where the drive
+# is BUILT-IN hardware — the SX-64 family's internal SX1541 (sx64/sx64p/vip64/
+# tesa6240, and TWO of them on dx64) — D.'s ruling stands: built-in hardware is
+# NEVER removed. Those machines carry NO -iec8/-iec9 override; MAME's built-in-
+# drive default stands and each ships the sx1541 device romset (MACHINE_ASSETS).
 MACHINE_STRING_c64          = c64 -iec8 ""
 MACHINE_STRING_c64p         = c64p -iec8 ""
 MACHINE_STRING_c64_jp       = c64_jp -iec8 ""
@@ -149,35 +155,35 @@ MACHINE_STRING_c64g         = c64g -iec8 ""
 MACHINE_STRING_c64c_es      = c64c_es -iec8 ""
 MACHINE_STRING_c64c_se      = c64c_se -iec8 ""
 MACHINE_STRING_c64gs        = c64gs -iec8 ""
-# The SX-64 is the portable C64 with a built-in 1541: ntsc_sx replaces the
-# iec8 slot's default with the internal sx1541 drive. It is still the iec8
-# slot, emptied the same way — device 8 is baked empty, so no drive romset is
-# required to reach BASIC (the internal drive absent is a documented quirk,
-# not a real hardware configuration, but it is the smallest honest parcel and
-# it boots to the SX kernal's sign-on).
-MACHINE_STRING_sx64         = sx64 -iec8 ""
-# The PAL SX-64 (rom_sx64p == rom_sx64): pal_sx replaces the same iec8 slot's
-# default with the built-in sx1541 drive, emptied identically via -iec8 "".
-MACHINE_STRING_sx64p        = sx64p -iec8 ""
-# The DX-64 (rom_dx64 == rom_sx64): ntsc_dx builds on ntsc_sx and adds a
-# SECOND built-in sx1541 drive on slot iec9 (the twin-drive prototype), on top
-# of ntsc_sx's iec8 drive. BOTH built-in drives are baked empty — device 8 AND
-# device 9 — so no drive romset is required to reach the SX kernal's BASIC
-# sign-on. The empty-argv "" token is the same proven ABI as the sx64 pair;
-# this is the first defaults string carrying two of them.
-MACHINE_STRING_dx64         = dx64 -iec8 "" -iec9 ""
+# The SX-64 is the portable C64 with a BUILT-IN 1541: ntsc_sx replaces the iec8
+# slot's default with the internal sx1541 drive. That drive is built-in
+# hardware and is NEVER removed (D.'s ruling) — no -iec8 override; MAME's
+# built-in sx1541 default stands, so the machine ships the sx1541 device romset
+# (MACHINE_ASSETS_sx64) and boots to the SX kernal's sign-on with its internal
+# drive present.
+MACHINE_STRING_sx64         = sx64
+# The PAL SX-64 (rom_sx64p == rom_sx64): pal_sx wires the same built-in sx1541
+# at iec8. Built-in hardware is never removed — no -iec8 override; the drive
+# romset ships and the internal drive is present.
+MACHINE_STRING_sx64p        = sx64p
+# The DX-64 (rom_dx64 == rom_sx64): ntsc_dx builds on ntsc_sx and adds a SECOND
+# built-in sx1541 drive on slot iec9 (the twin-drive prototype), on top of
+# ntsc_sx's iec8 drive. BOTH drives are built-in hardware and are never removed
+# — no -iec8/-iec9 override; MAME's twin built-in defaults stand and both
+# internal drives come up. The single sx1541 device romset serves both.
+MACHINE_STRING_dx64         = dx64
 # The VIP-64 (Swedish/Finnish SX-64): a distinct romset carrying its own unique
-# Swedish SX kernal and Swedish chargen. pal_sx replaces the iec8 slot's default
-# with the built-in sx1541 drive, emptied identically via -iec8 "" — device 8
-# baked empty, no drive romset required to reach the Swedish SX kernal's sign-on.
-MACHINE_STRING_vip64        = vip64 -iec8 ""
+# Swedish SX kernal and Swedish chargen. pal_sx wires the built-in sx1541 at
+# iec8 — built-in hardware, never removed; no -iec8 override, the drive romset
+# ships and the internal drive is present under the Swedish SX kernal.
+MACHINE_STRING_vip64        = vip64
 # The Tesa Etikett Etikettendrucker 6240 (PAL label printer): SX-64 hardware
 # running bespoke industrial firmware — its own unique BASIC, KERNAL and
-# chargen (all three main ROMs distinct from the c64 parent). pal_sx replaces
-# the iec8 slot's default with the built-in sx1541 drive, emptied identically
-# via -iec8 "" — device 8 baked empty, no drive romset required to reach the
-# Tesa firmware's sign-on.
-MACHINE_STRING_tesa6240     = tesa6240 -iec8 ""
+# chargen (all three main ROMs distinct from the c64 parent). pal_sx wires the
+# built-in sx1541 at iec8 — built-in hardware, never removed; no -iec8
+# override, the drive romset ships and the internal drive is present under the
+# Tesa firmware.
+MACHINE_STRING_tesa6240     = tesa6240
 # The PET 64 / CBM 4064 (NTSC): a c64_state pet64-config machine (ntsc()
 # plus a TODO monochrome-green palette). Same iec8 slot as the base c64,
 # baked empty via -iec8 "" — no drive romset required to reach BASIC.
@@ -404,11 +410,11 @@ MACHINE_ASSETS_c64g         = c64g
 MACHINE_ASSETS_c64c_es      = c64c_es
 MACHINE_ASSETS_c64c_se      = c64c_se
 MACHINE_ASSETS_c64gs        = c64gs
-MACHINE_ASSETS_sx64         = sx64
-MACHINE_ASSETS_sx64p        = sx64p
-MACHINE_ASSETS_dx64         = dx64
-MACHINE_ASSETS_vip64        = vip64
-MACHINE_ASSETS_tesa6240     = tesa6240
+MACHINE_ASSETS_sx64         = sx64 sx1541
+MACHINE_ASSETS_sx64p        = sx64p sx1541
+MACHINE_ASSETS_dx64         = dx64 sx1541
+MACHINE_ASSETS_vip64        = vip64 sx1541
+MACHINE_ASSETS_tesa6240     = tesa6240 sx1541
 MACHINE_ASSETS_pet64        = pet64
 MACHINE_ASSETS_edu64        = edu64
 MACHINE_ASSETS_vic20        = vic20

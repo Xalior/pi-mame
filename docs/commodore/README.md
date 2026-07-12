@@ -21,11 +21,11 @@ below bakes one machine into its own `kernel8-<name>.img` — see the
 | `MACHINE=c64c_es` | Commodore 64C (Spain) | 1988 | `c64c_es.zip` | — | PAL | [details](c64c_es.md) |
 | `MACHINE=c64c_se` | Commodore 64C (Sweden/Finland) | 1986 | `c64c_se.zip` | — | PAL | [details](c64c_se.md) |
 | `MACHINE=c64gs` | Commodore 64 Games System | 1990 | `c64gs.zip` | — | PAL | [details](c64gs.md) |
-| `MACHINE=sx64` | SX-64 / Executive 64 (NTSC) | 1984 | `sx64.zip` | — | NTSC | [details](sx64.md) |
-| `MACHINE=sx64p` | SX-64 / Executive 64 (PAL) | 1984 | `sx64p.zip` | — | PAL | [details](sx64p.md) |
-| `MACHINE=dx64` | DX-64 (NTSC, twin-drive prototype) | 1984 | `dx64.zip` | — | NTSC | [details](dx64.md) |
-| `MACHINE=vip64` | VIP-64 (Sweden/Finland SX-64) | 1984 | `vip64.zip` | — | PAL | [details](vip64.md) |
-| `MACHINE=tesa6240` | Tesa Etikett Etikettendrucker 6240 | 1984 | `tesa6240.zip` | — | PAL | [details](tesa6240.md) |
+| `MACHINE=sx64` | SX-64 / Executive 64 (NTSC) | 1984 | `sx64.zip` | `sx1541.zip` | NTSC | [details](sx64.md) |
+| `MACHINE=sx64p` | SX-64 / Executive 64 (PAL) | 1984 | `sx64p.zip` | `sx1541.zip` | PAL | [details](sx64p.md) |
+| `MACHINE=dx64` | DX-64 (NTSC, twin-drive prototype) | 1984 | `dx64.zip` | `sx1541.zip` | NTSC | [details](dx64.md) |
+| `MACHINE=vip64` | VIP-64 (Sweden/Finland SX-64) | 1984 | `vip64.zip` | `sx1541.zip` | PAL | [details](vip64.md) |
+| `MACHINE=tesa6240` | Tesa Etikett Etikettendrucker 6240 | 1984 | `tesa6240.zip` | `sx1541.zip` | PAL | [details](tesa6240.md) |
 | `MACHINE=pet64` | PET 64 / CBM 4064 (NTSC) | 1983 | `pet64.zip` | — | NTSC | [details](pet64.md) |
 | `MACHINE=edu64` | Educator 64 (NTSC) | 1983 | `edu64.zip` | — | NTSC | [details](edu64.md) |
 | `MACHINE=vic20` | VIC-20 (NTSC) | 1981 | `vic20.zip` | — | NTSC | [details](vic20.md) |
@@ -91,6 +91,12 @@ my-assets/
     │               #   own bespoke basic + kernal + chargen (tesa-basic.ud4,
     │               #   tesa-kernal.ud3, tesa-char.ud1) + shared PLA
     │               #   (906114-01.ue4)
+    ├── sx1541.zip # SX1541 disk drive: the SX-64 family's built-in drive is a
+    │               #   device with its own romset (ROM_START in the device source,
+    │               #   shortname sx1541) — required by sx64/sx64p/vip64/tesa6240
+    │               #   (one internal drive) and dx64 (two). Built-in hardware is
+    │               #   never removed, so the drive romset ships. Four members
+    │               #   (default BIOS r5); staged verbatim from the split-set zip
     ├── pet64.zip  # PET 64 / CBM 4064 (NTSC, green-screen education C64):
     │               #   own rev.1 KERNAL (901246-01.u4) + shared basic,
     │               #   chargen and PLA (901226-01.u3, 901225-01.u5,
@@ -212,10 +218,17 @@ can fetch these for you — `make assets ASSETS=~/my-assets`.
 
 ## Quirks
 
-- **The IEC disk bus boots empty.** The driver defaults to a C1541 drive
-  plugged into device 8; that drive's own ROM would be a second romset
-  this appliance doesn't need to boot to BASIC. The kernel bakes
-  `-iec8 ""` — a real C64 with nothing plugged into its serial port is a
+- **The IEC disk bus boots empty — when the drive is external.** On the
+  C64/VIC-20/264/128 lines the driver defaults a disk drive into device 8
+  that models an *external*, plug-in option; that drive's own ROM would be a
+  second romset the appliance doesn't need to reach BASIC. The kernel bakes
+  `-iec8 ""` — a real machine with nothing plugged into its serial port is a
   completely valid, common configuration, and needs no drive romset.
+
+- **Built-in drives are never removed.** Where the drive is *built-in*
+  hardware, that empty-slot bake does not apply: the machine ships exactly as
+  the driver defines it, with the drive present and its device romset staged.
+  This covers the SX-64 family's internal SX1541 (`sx64`, `sx64p`, `vip64`,
+  `tesa6240`, and *twice* on `dx64`) — shipping `sx1541.zip`.
 
 [← back to the top-level README](../../README.md)

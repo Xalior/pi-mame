@@ -410,7 +410,9 @@ mem|c64gs|252535-01.u8|54c89351|efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b|-
 # sx64 source zip carries ONLY its one unique member (the SX kernal); the shared
 # basic, chargen and PLA come from c64.zip. The mixed-provenance c64gs
 # precedent. The built-in 1541 drive (ntsc_sx replaces the iec8 default with
-# sx1541) is baked empty via -iec8 "" — no drive romset required to reach BASIC.
+# sx1541) is built-in hardware and is never removed: no -iec8 override, so the
+# sx1541 device romset (see its stanza below) ships and the machine boots with
+# its internal drive present.
 asset|sx64|public|zip|roms/sx64.zip
 src|sx64|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/sx64.zip
 src|sx64|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/c64.zip
@@ -426,7 +428,8 @@ mem|sx64|906114-01.ue4|54c89351|efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b|-
 # names, same two source zips as sx64 (the SX kernal from the split-set sx64.zip;
 # basic, chargen and PLA located by CRC32 in the parent c64.zip). The
 # rom_c64cp==rom_c64c alias precedent. pal_sx replaces the iec8 default with the
-# built-in sx1541, baked empty via -iec8 "" — no drive romset required to boot.
+# built-in sx1541 — built-in hardware, never removed: no -iec8 override, the
+# sx1541 device romset ships and the internal drive is present.
 asset|sx64p|public|zip|roms/sx64p.zip
 src|sx64p|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/sx64.zip
 src|sx64p|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/c64.zip
@@ -442,8 +445,9 @@ mem|sx64p|906114-01.ue4|54c89351|efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b|-
 # not ROM data. Same four members, same board-position names, same two source
 # zips as sx64 (the SX kernal from the split-set sx64.zip; basic, chargen and
 # PLA located by CRC32 in the parent c64.zip). The rom_sx64p==rom_sx64 alias
-# precedent. Both built-in drives are baked empty via -iec8 "" -iec9 "" — no
-# drive romset required to boot.
+# precedent. Both built-in drives are built-in hardware and are never removed:
+# no -iec8/-iec9 override, so the single sx1541 device romset (serving both
+# drives) ships and both internal drives come up.
 asset|dx64|public|zip|roms/dx64.zip
 src|dx64|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/sx64.zip
 src|dx64|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/c64.zip
@@ -460,8 +464,9 @@ mem|dx64|906114-01.ue4|54c89351|efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b|-
 # (906114-01.ue4) are byte-identical in content to c64's members, located by
 # CRC32 in the parent c64.zip and repacked under the board-position names vip64
 # expects. The mixed-provenance c64gs / sx64 precedent. pal_sx replaces the iec8
-# default with the built-in sx1541 drive, baked empty via -iec8 "" — no drive
-# romset required to reach the Swedish SX kernal's BASIC sign-on.
+# default with the built-in sx1541 drive — built-in hardware, never removed: no
+# -iec8 override, the sx1541 device romset ships and the internal drive is
+# present under the Swedish SX kernal's BASIC sign-on.
 asset|vip64|public|zip|roms/vip64.zip
 src|vip64|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/vip64.zip
 src|vip64|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/c64.zip
@@ -479,8 +484,9 @@ mem|vip64|906114-01.ue4|54c89351|efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b|-
 # byte-identical to c64's 906114-01.u17 — located by CRC32 in the parent c64.zip
 # and repacked under the ue4 board-position name tesa6240 expects. The mixed-
 # provenance sx64 / vip64 precedent. pal_sx replaces the iec8 default with the
-# built-in sx1541 drive, baked empty via -iec8 "" — no drive romset required to
-# reach the Tesa firmware's sign-on.
+# built-in sx1541 drive — built-in hardware, never removed: no -iec8 override,
+# the sx1541 device romset ships and the internal drive is present, backing the
+# Tesa firmware's on-screen DISKETTE function.
 asset|tesa6240|public|zip|roms/tesa6240.zip
 src|tesa6240|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/tesa6240.zip
 src|tesa6240|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/c64.zip
@@ -488,6 +494,24 @@ mem|tesa6240|tesa-basic.ud4|f319d661|0033afa7d2fbff314d80427324633c5444fbf1cd|-
 mem|tesa6240|tesa-kernal.ud3|af638f9c|a2c9c83f598623c9940949979ac643f12397e907|-
 mem|tesa6240|tesa-char.ud1|10765a90|1b824df5a295d0479e830e272758640b9fe99344|-
 mem|tesa6240|906114-01.ue4|54c89351|efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b|-
+
+# sx1541 (SX1541 disk drive) — a DEVICE romset, not a machine: the BUILT-IN
+# drive of the SX-64 family (sx64/sx64p/vip64/tesa6240 at iec8, and TWICE on
+# dx64 at iec8+iec9). Ground truth src/devices/bus/cbmiec/c1541.cpp,
+# ROM_START( sx1541 ), device shortname "sx1541" — the zip name MAME's rompath
+# lookup demands. Built-in hardware is never removed (D.'s ruling), so these
+# machines carry no -iec8/-iec9 override and require this romset. The
+# self-contained split-set zip is staged byte-for-byte (already TORRENTZIPPED);
+# four members pinned. Default BIOS is r5 (ROM_SYSTEM_BIOS 0): 325302-01.uab4
+# (always loaded) + "901229-05 ae.uab5" (r5) are the loaded pair; the jiffydos
+# and flash alternates ride along for set-completeness. Member filenames carry
+# spaces and must be preserved verbatim.
+asset|sx1541|public|zip|roms/sx1541.zip
+src|sx1541|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/sx1541.zip
+mem|sx1541|325302-01.uab4|29ae9752|8e0547430135ba462525c224e76356bd3d430f11|-
+mem|sx1541|901229-05 ae.uab5|361c9f37|f5d60777440829e46dc91285e662ba072acd2d8b|-
+mem|sx1541|jiffydos sx1541|783575f6|36ccb9ff60328c4460b68522443ecdb7f002a234|-
+mem|sx1541|1541 flash.uab5|22f7757e|86a1e43d3d22b35677064cca400a6bd06767a3dc|-
 
 # pet64 (PET 64 / CBM 4064, NTSC) is a distinct romset (NOT a #define alias):
 # a C64 in a PET-style case with a built-in green monochrome monitor. It carries
