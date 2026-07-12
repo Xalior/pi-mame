@@ -6,6 +6,11 @@
 # be a per-machine compile-time bake is now data here —
 #
 #   PLATFORM_MACHINES_<platform>  which machines belong to which card
+#   PLATFORM_SUBTARGET_<platform> the platform's isolated MAME SUBTARGET
+#   PLATFORM_SOURCES_<platform>   the platform's driver SOURCES (only that
+#                                 vendor's src/mame/<vendor>/ files)
+#   MACHINE_PLATFORM_<machine>    the vendor-class a machine belongs to
+#                                 (derived from PLATFORM_MACHINES_*, below)
 #   MACHINE_STRING_<machine>      the defaults-string patched into the block
 #                                 (machine name + its media: -hard1 / -cart)
 #   MACHINE_ASSETS_<machine>      the assets.manifest asset names the machine
@@ -13,6 +18,16 @@
 #                                 (a machine is free only if EVERY asset it
 #                                 needs is free-tier; scripts/gen-bootmenu.sh
 #                                 reads the per-asset tier from the manifest)
+#
+# PLATFORM IS THE LOGICAL UNIT — a MAME src/mame/<vendor>/ directory, and
+# there is never crossover. Each platform is its own binary
+# (kernel8-<platform>.img), built from its own isolated MAME archive tree
+# (scripts/build-mame.sh gives each platform its own SUBTARGET, its own SOURCES,
+# and its own BUILDDIR mame/build/<platform> — because MAME's genie build output
+# is scoped by TARGETOS, not by SUBTARGET, so two platforms sharing one tree
+# would share their engine libraries and one rebuild could silently invalidate
+# the other). A machine's single-purpose image is patched from ITS platform's
+# binary, never a shared one.
 #
 # host/Makefile includes this to bake per-machine images by patching, and
 # scripts/gen-bootmenu.sh reads it (via `make -f machines.mk print-VAR`) to
@@ -37,6 +52,38 @@ PLATFORM_MACHINES_amstrad = cpc464 cpc664 cpc6128 cpc464p cpc6128p gx4000 \
 
 # All machines, both platforms — the roster `make kernels` bakes and CI verifies.
 MACHINES = $(PLATFORM_MACHINES_sinclair) $(PLATFORM_MACHINES_amstrad)
+
+# The reverse map: which platform a machine belongs to. Derived, never hand-
+# maintained — the host Makefile reads MACHINE_PLATFORM_<m> to pick the machine's
+# platform binary and its isolated MAME tree.
+$(foreach p,$(PLATFORMS),$(foreach m,$(PLATFORM_MACHINES_$(p)),\
+	$(eval MACHINE_PLATFORM_$(m) := $(p))))
+
+# --- Per-platform isolated MAME build (own SUBTARGET, own SOURCES) ---
+#
+# The SUBTARGET names the platform's archive tree (mame/build/<platform>/
+# rapi-circle/bin/mame_<subtarget>/) and its generated drivlist; it is a
+# SOURCES-based subtarget, so the name is ours to choose — one per vendor-class.
+# The SOURCES list is ONLY that vendor's src/mame/<vendor>/ drivers: there is no
+# crossover, and a platform's rebuild recompiles only its own drivers. The list
+# is space-separated here (build-mame.sh joins it with commas for MAME's
+# SOURCES= — a comma-separated value cannot carry make's line-continuation
+# spaces, a space-separated one can).
+PLATFORM_SUBTARGET_sinclair = sinclair
+PLATFORM_SUBTARGET_amstrad  = amstrad
+
+PLATFORM_SOURCES_sinclair = \
+	src/mame/sinclair/spectrum.cpp src/mame/sinclair/spec128.cpp \
+	src/mame/sinclair/next/specnext.cpp src/mame/sinclair/specpls3.cpp \
+	src/mame/sinclair/zx.cpp src/mame/sinclair/timex.cpp \
+	src/mame/sinclair/pentagon.cpp src/mame/sinclair/scorpion.cpp \
+	src/mame/sinclair/atm.cpp src/mame/sinclair/evo/pentevo.cpp \
+	src/mame/sinclair/evo/tsconf.cpp src/mame/sinclair/elwro800.cpp \
+	src/mame/sinclair/byte.cpp src/mame/sinclair/sprinter.cpp
+
+PLATFORM_SOURCES_amstrad = \
+	src/mame/amstrad/amstrad.cpp src/mame/amstrad/nc.cpp \
+	src/mame/amstrad/pc1512.cpp
 
 # --- Sinclair defaults strings ---
 MACHINE_STRING_spectrum     = spectrum
