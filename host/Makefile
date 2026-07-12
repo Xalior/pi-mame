@@ -151,10 +151,18 @@ MAME_INCLUDES = \
 	-I $(ROOT)/mame/src/osd/sdl \
 	-I $(ROOT)/circle-libsdl2/include
 
+# The same -Wall + suppression set genie applies to the osd_sdl project (the
+# group that compiled sdlmain.cpp, which mamemain.o replaces). Without these,
+# MAME's own headers pulled in by mamemain.cpp warn in our build though they
+# never do in MAME's — so we lint MAME's code exactly as MAME does, no more.
+MAME_WARNINGS = -Wall -Wno-cast-align -Wno-conversion -Wno-nonnull \
+	-Wno-sign-compare -Wno-stringop-overflow -Wno-stringop-overread \
+	-Wno-unknown-pragmas -Wno-xor-used-as-pow
+
 mamemain.o: mamemain.cpp
 	@echo "  CPP   $@ (MAME env)"
 	@$(MAME_CXX) $(MAME_DEFINES) $(MAME_INCLUDES) \
-		-O3 -fno-strict-aliasing -Wall -Wno-unknown-pragmas \
+		-O3 -fno-strict-aliasing $(MAME_WARNINGS) \
 		-c -o $@ $<
 
 # Overrides Rules.mk's %.d rule, whose Circle flags can't see MAME headers.
