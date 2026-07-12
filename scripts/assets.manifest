@@ -586,6 +586,26 @@ mem|vic1001|901486-01|db4c43c1|587d1e90950675ab6b12d91248a3f0d640d02e8d|-
 mem|vic1001|901486-02|336900d7|c9ead45e6674d1042ca6199160e8583c23aeac22|-
 mem|vic1001|901460-02|fcfd8a4b|dae61ac03065aa2904af5c123ce821855898c555|-
 
+# plus4 (Plus/4, NTSC) — the first machine off src/mame/commodore/plus4.cpp,
+# opening the TED/264 family (plus4_state, machine config plus4n). Default
+# kernal is ROM_DEFAULT_BIOS("r5") (BIOS 1). plus4 is a CLONE of c264 (the
+# Commodore 264 prototype parent) under MAME's split-set convention, so its
+# members span two source zips: the unique kernal r5, basic and the two
+# 3-PLUS-1 "function" ROMs live in plus4.zip, while the 251641-02 PLA is
+# byte-identical to the parent's (CRC 83be2076) and is packed only in c264.zip.
+# Two src lines: obtain_member tries each in order and locates every member by
+# CRC32, renaming it to the ROM_START( plus4 ) name (251641-02.u19 comes from
+# the parent's "251641-02"). The r4/jiffydos/diag264 alternate kernals are
+# optional ROMX_LOAD BIOS alternates, not packed.
+asset|plus4|public|zip|roms/plus4.zip
+src|plus4|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/plus4.zip
+src|plus4|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/c264.zip
+mem|plus4|318005-05.u24|70295038|a3d9e5be091b98de39a046ab167fb7632d053682|-
+mem|plus4|318006-01.u23|74eaae87|161c96b4ad20f3a4f2321808e37a5ded26a135dd|-
+mem|plus4|317053-01.u25|4fd1d8cb|3b69f6e7cb4c18bb08e203fb18b7dabfa853390f|-
+mem|plus4|317054-01.u26|109de2fc|0ad7ac2db7da692d972e586ca0dfd747d82c7693|-
+mem|plus4|251641-02.u19|83be2076|a89b18b2261233443c933c8b4663b108e7630924|-
+
 # +3 shares the +2A romset (identical members); source that set, repack.
 asset|specpls3|public|zip|roms/specpls3.zip
 src|specpls3|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/specpl2a.zip

@@ -52,7 +52,7 @@ PLATFORM_MACHINES_amstrad = cpc464 cpc664 cpc6128 cpc464p cpc6128p gx4000 \
 
 PLATFORM_MACHINES_commodore = c64 c64p c64_jp c64_se c64c c64cp c64g c64c_es \
 	c64c_se c64gs sx64 sx64p dx64 vip64 tesa6240 pet64 edu64 vic20 vic20p \
-	vic20_se vic1001
+	vic20_se vic1001 plus4
 
 # All machines, every platform — the roster `make kernels` bakes and CI verifies.
 MACHINES = $(foreach p,$(PLATFORMS),$(PLATFORM_MACHINES_$(p)))
@@ -91,7 +91,8 @@ PLATFORM_SOURCES_amstrad = \
 	src/mame/amstrad/pc1512.cpp
 
 PLATFORM_SOURCES_commodore = \
-	src/mame/commodore/c64.cpp src/mame/commodore/vic20.cpp
+	src/mame/commodore/c64.cpp src/mame/commodore/vic20.cpp \
+	src/mame/commodore/plus4.cpp
 
 # --- Sinclair defaults strings ---
 MACHINE_STRING_spectrum     = spectrum
@@ -212,6 +213,16 @@ MACHINE_STRING_vic20_se     = vic20_se -iec8 ""
 # required. Single Japanese kernal (901486-02) + katakana charom (901460-02); no
 # ROM_SYSTEM_BIOS alternates — the parent romset is self-contained in vic1001.zip.
 MACHINE_STRING_vic1001      = vic1001 -iec8 ""
+# The Plus/4 (NTSC): the first machine off src/mame/commodore/plus4.cpp
+# (plus4_state, machine config plus4n), opening the TED/264 family — a clone of
+# the c264 prototype parent. Despite the different TED-based hardware it wires
+# the SAME cbm_iec serial bus as the C64/VIC-20 line —
+# cbm_iec_slot_device::add(config, m_iec, "c1541") defaults a C1541 drive at
+# device 8 — so the same -iec8 "" empties device 8 and reaches BASIC with no
+# drive romset required. Default kernal is ROM_DEFAULT_BIOS("r5") (BIOS 1). The
+# baked romset carries the machine's own 3-PLUS-1 productivity suite (the
+# "function" ROMs 317053/317054), so it boots to the Plus/4's own sign-on.
+MACHINE_STRING_plus4        = plus4 -iec8 ""
 
 # --- Sinclair asset dependencies (manifest asset names) ---
 MACHINE_ASSETS_spectrum     = spectrum
@@ -272,6 +283,7 @@ MACHINE_ASSETS_vic20        = vic20
 MACHINE_ASSETS_vic20p       = vic20p
 MACHINE_ASSETS_vic20_se     = vic20_se
 MACHINE_ASSETS_vic1001      = vic1001
+MACHINE_ASSETS_plus4        = plus4
 
 # Query helper: `make -f machines.mk -s print-MACHINE_STRING_spectrum`.
 # Lets scripts read these facts without pulling in the Circle build.
