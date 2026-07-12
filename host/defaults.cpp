@@ -143,7 +143,14 @@ int DefaultsBuildArgv (const char **pBaked, unsigned nBaked,
 	pLogger->Write (From, LogNotice, "injected: \"%s\"", s_TokenText);
 
 	// Whitespace-split in the private copy; each token is either a
-	// kernel switch (consumed) or a MAME argument (appended).
+	// kernel switch (consumed) or a MAME argument (appended). Double
+	// quotes group whitespace INTO one token and are stripped from it:
+	// the tokens the writer must express carry embedded spaces —
+	// -iec8 "" (an EMPTY argv entry, MAME's only way to bake a slot empty)
+	// and -view "Screen 1" (a multi-screen view name, its space and all).
+	// Quotes are removed as the token is compacted in place; the write
+	// cursor never outruns the read cursor (quotes only shrink a token),
+	// so the copy is safe within the one buffer.
 	unsigned nInjected = 0;
 	unsigned nConsumed = 0;
 	char *p = s_TokenText;
@@ -158,24 +165,32 @@ int DefaultsBuildArgv (const char **pBaked, unsigned nBaked,
 			break;
 		}
 
-		char *pToken = p;
+		char *pToken = p;	// start of the compacted token
+		char *pWrite = p;	// where the next kept char lands
 		while (*p != '\0' && *p != ' ' && *p != '\t')
 		{
-			p++;
+			if (*p == '"')
+			{
+				// Quoted run: copy verbatim (spaces and all)
+				// until the closing quote, dropping both quotes.
+				p++;
+				while (*p != '\0' && *p != '"')
+				{
+					*pWrite++ = *p++;
+				}
+				if (*p == '"')
+				{
+					p++;
+				}
+				continue;
+			}
+			*pWrite++ = *p++;
 		}
 		if (*p != '\0')
 		{
-			*p++ = '\0';
+			p++;		// step past the delimiter
 		}
-
-		// The literal token "" is the defaults-string spelling of an
-		// EMPTY argv entry — MAME's only way to bake a slot empty is an
-		// empty option value (-iec8 ""), and a whitespace-split text
-		// cannot otherwise express one.
-		if (pToken[0] == '"' && pToken[1] == '"' && pToken[2] == '\0')
-		{
-			pToken += 2;	// now points at the NUL: an empty string
-		}
+		*pWrite = '\0';		// terminate the compacted token
 
 		if (strncmp (pToken, "--rapi-", 7) == 0)
 		{
