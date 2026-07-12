@@ -25,6 +25,7 @@ below bakes one machine into its own `kernel8-<name>.img` — see the
 | `MACHINE=sx64p` | SX-64 / Executive 64 (PAL) | 1984 | `sx64p.zip` | — | PAL | [details](sx64p.md) |
 | `MACHINE=dx64` | DX-64 (NTSC, twin-drive prototype) | 1984 | `dx64.zip` | — | NTSC | [details](dx64.md) |
 | `MACHINE=vip64` | VIP-64 (Sweden/Finland SX-64) | 1984 | `vip64.zip` | — | PAL | [details](vip64.md) |
+| `MACHINE=tesa6240` | Tesa Etikett Etikettendrucker 6240 | 1984 | `tesa6240.zip` | — | PAL | [details](tesa6240.md) |
 
 Click through to a machine's details page for its exact romset (CRC32 per
 ROM) and what appears on the glass at power-on.
@@ -64,9 +65,13 @@ my-assets/
     ├── dx64.zip   # DX-64 (NTSC, twin-drive prototype): same four ROMs as
     │               #   sx64.zip (rom_dx64 == rom_sx64; ntsc_dx just adds a
     │               #   second built-in drive on iec9)
-    └── vip64.zip  # VIP-64 (Sweden/Finland SX-64, PAL): own Swedish SX
-                    #   KERNAL (kernelsx.ud3) + Swedish chargen (charswe.ud1)
-                    #   + shared basic and PLA (901226-01.ud4, 906114-01.ue4)
+    ├── vip64.zip  # VIP-64 (Sweden/Finland SX-64, PAL): own Swedish SX
+    │               #   KERNAL (kernelsx.ud3) + Swedish chargen (charswe.ud1)
+    │               #   + shared basic and PLA (901226-01.ud4, 906114-01.ue4)
+    └── tesa6240.zip # Tesa Etikett Etikettendrucker 6240 (PAL label printer):
+                    #   own bespoke basic + kernal + chargen (tesa-basic.ud4,
+                    #   tesa-kernal.ud3, tesa-char.ud1) + shared PLA
+                    #   (906114-01.ue4)
 ```
 
 Only supplying some assets is fine: machines without their ROMs simply

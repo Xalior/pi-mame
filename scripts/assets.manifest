@@ -470,6 +470,25 @@ mem|vip64|kernelsx.ud3|7858d3d7|097cda60469492a8916c2677b7cce4e12a944bc0|-
 mem|vip64|charswe.ud1|bee9b3fd|446ae58f7110d74d434301491209299f66798d8a|-
 mem|vip64|906114-01.ue4|54c89351|efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b|-
 
+# tesa6240 (Tesa Etikett Etikettendrucker 6240, PAL) is a distinct romset (NOT a
+# #define alias): the industrial label printer runs on SX-64 hardware but with
+# its OWN bespoke firmware — a unique BASIC (tesa-basic.ud4), KERNAL
+# (tesa-kernal.ud3) and character generator (tesa-char.ud1), all three carried
+# by the split-set tesa6240.zip. Unlike the vip64 sibling, NONE of the three
+# main ROMs are shared with the c64 parent. Only the PLA (906114-01.ue4) is
+# byte-identical to c64's 906114-01.u17 — located by CRC32 in the parent c64.zip
+# and repacked under the ue4 board-position name tesa6240 expects. The mixed-
+# provenance sx64 / vip64 precedent. pal_sx replaces the iec8 default with the
+# built-in sx1541 drive, baked empty via -iec8 "" — no drive romset required to
+# reach the Tesa firmware's sign-on.
+asset|tesa6240|public|zip|roms/tesa6240.zip
+src|tesa6240|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/tesa6240.zip
+src|tesa6240|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/c64.zip
+mem|tesa6240|tesa-basic.ud4|f319d661|0033afa7d2fbff314d80427324633c5444fbf1cd|-
+mem|tesa6240|tesa-kernal.ud3|af638f9c|a2c9c83f598623c9940949979ac643f12397e907|-
+mem|tesa6240|tesa-char.ud1|10765a90|1b824df5a295d0479e830e272758640b9fe99344|-
+mem|tesa6240|906114-01.ue4|54c89351|efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b|-
+
 # +3 shares the +2A romset (identical members); source that set, repack.
 asset|specpls3|public|zip|roms/specpls3.zip
 src|specpls3|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/specpl2a.zip
