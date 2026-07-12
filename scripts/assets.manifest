@@ -489,6 +489,23 @@ mem|tesa6240|tesa-kernal.ud3|af638f9c|a2c9c83f598623c9940949979ac643f12397e907|-
 mem|tesa6240|tesa-char.ud1|10765a90|1b824df5a295d0479e830e272758640b9fe99344|-
 mem|tesa6240|906114-01.ue4|54c89351|efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b|-
 
+# pet64 (PET 64 / CBM 4064, NTSC) is a distinct romset (NOT a #define alias):
+# a C64 in a PET-style case with a built-in green monochrome monitor. It carries
+# its OWN unique KERNAL (901246-01.u4 — C64 KERNAL rev. 1) and shares its BASIC
+# (901226-01.u3), character generator (901225-01.u5) and PLA content (54c89351)
+# with the c64 line, all located by CRC32 in the parent c64.zip under the exact
+# member names ROM_START( pet64 ) expects. As a split-set clone, the pet64
+# source zip carries ONLY its one unique member (the r1 KERNAL); the shared
+# basic, chargen and PLA come from c64.zip. The mixed-provenance c64gs / c64_jp
+# precedent.
+asset|pet64|public|zip|roms/pet64.zip
+src|pet64|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/pet64.zip
+src|pet64|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/c64.zip
+mem|pet64|901246-01.u4|789c8cc5|6c4fa9465f6091b174df27dfe679499df447503c|-
+mem|pet64|901226-01.u3|f833d117|79015323128650c742a3694c9429aa91f355905e|-
+mem|pet64|901225-01.u5|ec4272ee|adc7c31e18c7c7413d54802ef2f4193da14711aa|-
+mem|pet64|906114-01.u17|54c89351|efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b|-
+
 # +3 shares the +2A romset (identical members); source that set, repack.
 asset|specpls3|public|zip|roms/specpls3.zip
 src|specpls3|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/specpl2a.zip

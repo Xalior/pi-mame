@@ -51,7 +51,7 @@ PLATFORM_MACHINES_amstrad = cpc464 cpc664 cpc6128 cpc464p cpc6128p gx4000 \
 	kccomp nc100 nc200 pc1512
 
 PLATFORM_MACHINES_commodore = c64 c64p c64_jp c64_se c64c c64cp c64g c64c_es \
-	c64c_se c64gs sx64 sx64p dx64 vip64 tesa6240
+	c64c_se c64gs sx64 sx64p dx64 vip64 tesa6240 pet64
 
 # All machines, every platform — the roster `make kernels` bakes and CI verifies.
 MACHINES = $(foreach p,$(PLATFORMS),$(PLATFORM_MACHINES_$(p)))
@@ -175,6 +175,10 @@ MACHINE_STRING_vip64        = vip64 -iec8 ""
 # via -iec8 "" — device 8 baked empty, no drive romset required to reach the
 # Tesa firmware's sign-on.
 MACHINE_STRING_tesa6240     = tesa6240 -iec8 ""
+# The PET 64 / CBM 4064 (NTSC): a c64_state pet64-config machine (ntsc()
+# plus a TODO monochrome-green palette). Same iec8 slot as the base c64,
+# baked empty via -iec8 "" — no drive romset required to reach BASIC.
+MACHINE_STRING_pet64        = pet64 -iec8 ""
 
 # --- Sinclair asset dependencies (manifest asset names) ---
 MACHINE_ASSETS_spectrum     = spectrum
@@ -229,6 +233,7 @@ MACHINE_ASSETS_sx64p        = sx64p
 MACHINE_ASSETS_dx64         = dx64
 MACHINE_ASSETS_vip64        = vip64
 MACHINE_ASSETS_tesa6240     = tesa6240
+MACHINE_ASSETS_pet64        = pet64
 
 # Query helper: `make -f machines.mk -s print-MACHINE_STRING_spectrum`.
 # Lets scripts read these facts without pulling in the Circle build.
