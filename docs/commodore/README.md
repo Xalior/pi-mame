@@ -19,6 +19,7 @@ below bakes one machine into its own `kernel8-<name>.img` — see the
 | `MACHINE=c64cp` | Commodore 64C (PAL) | 1986 | `c64cp.zip` | — | PAL | [details](c64cp.md) |
 | `MACHINE=c64g` | Commodore 64G (PAL) | 1986 | `c64g.zip` | — | PAL | [details](c64g.md) |
 | `MACHINE=c64c_es` | Commodore 64C (Spain) | 1988 | `c64c_es.zip` | — | PAL | [details](c64c_es.md) |
+| `MACHINE=c64c_se` | Commodore 64C (Sweden/Finland) | 1986 | `c64c_se.zip` | — | PAL | [details](c64c_se.md) |
 
 Click through to a machine's details page for its exact romset (CRC32 per
 ROM) and what appears on the glass at power-on.
@@ -42,8 +43,11 @@ my-assets/
     │               #   (rom_c64cp == rom_c64c; only the timing is PAL)
     ├── c64g.zip   # Commodore 64G (PAL): same three ROMs as c64c.zip
     │               #   (rom_c64g == rom_c64c; only the timing is PAL)
-    └── c64c_es.zip # Commodore 64C (Spain): Spanish chargen (325056-03.u5)
-                    #   + shared 64C combined ROM + PLA
+    ├── c64c_es.zip # Commodore 64C (Spain): Spanish chargen (325056-03.u5)
+    │               #   + shared 64C combined ROM + PLA
+    └── c64c_se.zip # Commodore 64C (Sweden/Finland): own Swedish/Finnish
+                    #   KERNAL (325182-01.u4) + Scandinavian chargen
+                    #   ("cbm 64 skand.gen.u5") + shared PLA
 ```
 
 Only supplying some assets is fine: machines without their ROMs simply

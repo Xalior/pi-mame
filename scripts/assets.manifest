@@ -365,6 +365,24 @@ mem|c64c_es|251913-01.u4|0010ec31|765372a0e16cbb0adf23a07b80f6b682b39fbf88|-
 mem|c64c_es|325056-03.u5|c890c175|4f57259fff9ef1963a4e87165a6f35ca23864c76|-
 mem|c64c_es|252715-01.u8|54c89351|efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b|-
 
+# c64c_se (64C, Sweden/Finland, PAL) is a distinct romset (NOT a #define alias):
+# it carries its OWN Swedish/Finnish KERNAL (325182-01.u4) and its OWN
+# Scandinavian character generator (cbm 64 skand.gen.u5) — BOTH unique to this
+# machine, both from its own split-set zip. It shares ONLY the PLA content
+# (54c89351) with the rest of the 64C line; that content is byte-identical to
+# c64's 906114-01.u17, located by CRC32 in the parent c64.zip and repacked under
+# the 252715-01.u8 name c64c_se expects. The chargen member name contains
+# spaces (cbm 64 skand.gen.u5) — the manifest is pipe-delimited, so the space
+# lives safely inside the target field (the QL's "ql.jm 0000.ic33" precedent).
+# The mixed-provenance c64_jp precedent: own split zip for the unique members,
+# parent c64.zip for the shared PLA.
+asset|c64c_se|public|zip|roms/c64c_se.zip
+src|c64c_se|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/c64c_se.zip
+src|c64c_se|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/c64.zip
+mem|c64c_se|325182-01.u4|2aff27d3|267654823c4fdf2167050f41faa118218d2569ce|-
+mem|c64c_se|cbm 64 skand.gen.u5|377a382b|20df25e0ba1c88f31689c1521397c96968967fac|-
+mem|c64c_se|252715-01.u8|54c89351|efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b|-
+
 # +3 shares the +2A romset (identical members); source that set, repack.
 asset|specpls3|public|zip|roms/specpls3.zip
 src|specpls3|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/specpl2a.zip
