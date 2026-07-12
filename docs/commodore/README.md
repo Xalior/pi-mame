@@ -44,6 +44,7 @@ below bakes one machine into its own `kernel8-<name>.img` — see the
 | `MACHINE=c128p` | Commodore 128 (PAL) | 1985 | `c128p.zip` | — | PAL | [details](c128p.md) |
 | `MACHINE=c128d` | Commodore 128D (NTSC, prototype) | 1986 | `c128d.zip` | — | NTSC | [details](c128d.md) |
 | `MACHINE=c128dp` | Commodore 128D (PAL) | 1986 | `c128dp.zip` | — | PAL | [details](c128dp.md) |
+| `MACHINE=c128cr` | Commodore 128CR (NTSC, prototype) | 1986 | `c128cr.zip` | — | NTSC | [details](c128cr.md) |
 
 Click through to a machine's details page for its exact romset (CRC32 per
 ROM) and what appears on the glass at power-on.
@@ -196,11 +197,18 @@ my-assets/
     │               #   built-in C1571 drive; the NTSC prototype is functionally an
     │               #   NTSC 128. Same six ROMs as c128.zip — the driver aliases the
     │               #   romset (rom_c128d == rom_c128). BASIC 7.0, 122365 bytes free
-    └── c128dp.zip # Commodore 128D (PAL): the 128D's PAL sibling (c128.cpp, config
-                    #   c128pal). A clone of c128 with a built-in C1571 drive; the PAL
-                    #   model runs the c128pal config. Same six ROMs as c128.zip — the
-                    #   driver aliases the romset (rom_c128dp == rom_c128); only the
-                    #   timing/canvas is PAL. BASIC 7.0, 122365 bytes free
+    ├── c128dp.zip # Commodore 128D (PAL): the 128D's PAL sibling (c128.cpp, config
+    │               #   c128pal). A clone of c128 with a built-in C1571 drive; the PAL
+    │               #   model runs the c128pal config. Same six ROMs as c128.zip — the
+    │               #   driver aliases the romset (rom_c128dp == rom_c128); only the
+    │               #   timing/canvas is PAL. BASIC 7.0, 122365 bytes free
+    └── c128cr.zip # Commodore 128CR (NTSC, prototype): a clone of c128 in the same
+                    #   family (c128.cpp, config c128) but NOT a romset alias — the
+                    #   cost-reduced 128CR merges BASIC/editor/kernal into two combined
+                    #   ROMs (252343-03, 252343-04, unique to c128cr), sharing only the
+                    #   chargen and PLA with the c128 line. Four ROMs: the two uniques
+                    #   from the split-set c128cr.zip, chargen + PLA from c128.zip.
+                    #   BASIC 7.0, 122365 bytes free
 ```
 
 Only supplying some assets is fine: machines without their ROMs simply
