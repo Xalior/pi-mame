@@ -42,7 +42,7 @@ cp "$IMG" "$SD/kernel8-rpi4.img"
 # 60Hz machines fill the NTSC tube (720x480); everything else fills PAL
 # (720x576).
 case "$MACHINE" in
-    ts2068|ts1000|ts1500|c64|c64_jp|c64c|sx64|dx64|pet64|edu64|vic20|vic1001|c264|plus4|c16|v364) CANVAS=cmdline-ntsc.txt ;;
+    ts2068|ts1000|ts1500|c64|c64_jp|c64c|sx64|dx64|pet64|edu64|vic20|vic1001|c264|plus4|c16|v364|c128) CANVAS=cmdline-ntsc.txt ;;
     *)                    CANVAS=cmdline-pal.txt ;;
 esac
 cp "$ROOT/host/$CANVAS" "$SD/cmdline.txt"

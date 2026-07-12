@@ -52,7 +52,7 @@ PLATFORM_MACHINES_amstrad = cpc464 cpc664 cpc6128 cpc464p cpc6128p gx4000 \
 
 PLATFORM_MACHINES_commodore = c64 c64p c64_jp c64_se c64c c64cp c64g c64c_es \
 	c64c_se c64gs sx64 sx64p dx64 vip64 tesa6240 pet64 edu64 vic20 vic20p \
-	vic20_se vic1001 c264 plus4 plus4p c16 c16p c116 c232 v364
+	vic20_se vic1001 c264 plus4 plus4p c16 c16p c116 c232 v364 c128
 
 # All machines, every platform — the roster `make kernels` bakes and CI verifies.
 MACHINES = $(foreach p,$(PLATFORMS),$(PLATFORM_MACHINES_$(p)))
@@ -92,7 +92,7 @@ PLATFORM_SOURCES_amstrad = \
 
 PLATFORM_SOURCES_commodore = \
 	src/mame/commodore/c64.cpp src/mame/commodore/vic20.cpp \
-	src/mame/commodore/plus4.cpp
+	src/mame/commodore/plus4.cpp src/mame/commodore/c128.cpp
 
 # --- Sinclair defaults strings ---
 MACHINE_STRING_spectrum     = spectrum
@@ -299,6 +299,17 @@ MACHINE_STRING_c232         = c232 -iec8 ""
 # to the rest of the 264 line. NTSC canvas.
 MACHINE_STRING_v364         = v364 -iec8 ""
 
+# The Commodore 128 (NTSC): the FIRST machine of a new driver family
+# (src/mame/commodore/c128.cpp, c128_state, machine config c128) — not the
+# c64.cpp/vic20.cpp/plus4.cpp lines. The C128 is dual-CPU: a Z80 (CP/M) and an
+# 8502 (128/64 modes) sharing one memory map and one kernal ROM complement — no
+# separate Z80 BIOS region. Its cbm_iec serial bus defaults a C1571 disk drive
+# at device 8 (not the C1541 of the c64/plus4 lines — the 1571 is the 128's
+# native double-sided drive); that drive's own ROM would be a second romset this
+# appliance doesn't need to reach BASIC, so the same -iec8 "" empties device 8
+# and reaches COMMODORE BASIC V7.0 with no drive romset required. NTSC canvas.
+MACHINE_STRING_c128         = c128 -iec8 ""
+
 # --- Sinclair asset dependencies (manifest asset names) ---
 MACHINE_ASSETS_spectrum     = spectrum
 MACHINE_ASSETS_spec128      = spec128
@@ -366,6 +377,7 @@ MACHINE_ASSETS_c16p         = c16p
 MACHINE_ASSETS_c116         = c116
 MACHINE_ASSETS_c232         = c232
 MACHINE_ASSETS_v364         = v364
+MACHINE_ASSETS_c128         = c128
 
 # Query helper: `make -f machines.mk -s print-MACHINE_STRING_spectrum`.
 # Lets scripts read these facts without pulling in the Circle build.

@@ -741,6 +741,28 @@ mem|v364|317054-01|109de2fc|0ad7ac2db7da692d972e586ca0dfd747d82c7693|-
 mem|v364|spk3cc4.bin|5227c2ee|59af401cbb2194f689898271c6e8aafa28a7af11|-
 mem|v364|251641-02|83be2076|a89b18b2261233443c933c8b4663b108e7630924|-
 
+# c128 (Commodore 128, NTSC) — the FIRST machine of a NEW driver family
+# (src/mame/commodore/c128.cpp, c128_state, machine config c128), distinct from
+# the c64/vic20/plus4 lines. The C128 is dual-CPU (Z80 CP/M + 8502 128/64 modes)
+# sharing one memory map and one kernal ROM complement — no separate Z80 BIOS
+# region. ROM_START( c128 ) carries FOUR ROM_SYSTEM_BIOS alternates (r2, r4,
+# jiffydos, quikslvr); ROM_DEFAULT_BIOS is "r4" and this appliance ships the
+# DEFAULT only, so the shipped romset is the r4 members plus the always-loaded
+# parts: 251913-01 (basic/editor combined 16K, 0010ec31), the r4 kernal triple
+# 318018-04/318019-04/318020-05 (9f9c355b/6e2c91a7/ba456b8e), the 390059-01
+# charom (6aaaafe6), and the 8721 PLA 8721r3.u11 (154db186, a BAD_DUMP in MAME —
+# it loads and boots straight through, no blocking box). All six are self-
+# contained in the c128.zip parent split-set — one src line, obtain_member
+# locates each member by CRC32.
+asset|c128|public|zip|roms/c128.zip
+src|c128|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/c128.zip
+mem|c128|251913-01.u32|0010ec31|765372a0e16cbb0adf23a07b80f6b682b39fbf88|-
+mem|c128|318018-04.u33|9f9c355b|d53a7884404f7d18ebd60dd3080c8f8d71067441|-
+mem|c128|318019-04.u34|6e2c91a7|c4fb4a714e48a7bf6c28659de0302183a0e0d6c0|-
+mem|c128|318020-05.u35|ba456b8e|ceb6e1a1bf7e08eb9cbc651afa29e26adccf38ab|-
+mem|c128|390059-01.u18|6aaaafe6|29ed066d513f2d5c09ff26d9166ba23c2afb2b3f|-
+mem|c128|8721r3.u11|154db186|ccadcdb1db3b62c51dc4ce60fe6f96831586d297|-
+
 # +3 shares the +2A romset (identical members); source that set, repack.
 asset|specpls3|public|zip|roms/specpls3.zip
 src|specpls3|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/specpl2a.zip
