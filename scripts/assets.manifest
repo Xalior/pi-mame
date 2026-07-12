@@ -586,6 +586,23 @@ mem|vic1001|901486-01|db4c43c1|587d1e90950675ab6b12d91248a3f0d640d02e8d|-
 mem|vic1001|901486-02|336900d7|c9ead45e6674d1042ca6199160e8583c23aeac22|-
 mem|vic1001|901460-02|fcfd8a4b|dae61ac03065aa2904af5c123ce821855898c555|-
 
+# c264 (Commodore 264, NTSC, prototype) — the family PARENT of
+# src/mame/commodore/plus4.cpp (plus4_state, machine config plus4n), a
+# pre-production prototype that the plus4/plus4p/c16/c116/c232/v364 machines
+# clone. As the split-set parent, c264.zip is self-contained: its three members
+# — basic-264.bin and kernal-264.bin (the prototype's own unique 264-series
+# firmware, distinct from the production Plus/4's 318005/318006 parts) plus the
+# 251641-02 PLA (the shared member the clone zips borrow from here) — all live
+# in c264.zip under their exact ROM_START names, so a single src line suffices.
+# c264 is the family's only MACHINE_IMPERFECT_GRAPHICS entry; it carries no
+# 3-PLUS-1 function ROMs (the "function" region is ROMREGION_ERASE00) and no
+# ROM_SYSTEM_BIOS alternates.
+asset|c264|public|zip|roms/c264.zip
+src|c264|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/c264.zip
+mem|c264|basic-264.bin|6a2fc8e3|473fce23afa07000cdca899fbcffd6961b36a8a0|-
+mem|c264|kernal-264.bin|8f32abe7|d481faf5fcbb331878dc7851c642d04f26a32873|-
+mem|c264|251641-02|83be2076|a89b18b2261233443c933c8b4663b108e7630924|-
+
 # plus4 (Plus/4, NTSC) — the first machine off src/mame/commodore/plus4.cpp,
 # opening the TED/264 family (plus4_state, machine config plus4n). Default
 # kernal is ROM_DEFAULT_BIOS("r5") (BIOS 1). plus4 is a CLONE of c264 (the

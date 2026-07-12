@@ -52,7 +52,7 @@ PLATFORM_MACHINES_amstrad = cpc464 cpc664 cpc6128 cpc464p cpc6128p gx4000 \
 
 PLATFORM_MACHINES_commodore = c64 c64p c64_jp c64_se c64c c64cp c64g c64c_es \
 	c64c_se c64gs sx64 sx64p dx64 vip64 tesa6240 pet64 edu64 vic20 vic20p \
-	vic20_se vic1001 plus4 plus4p c16 c16p c116
+	vic20_se vic1001 c264 plus4 plus4p c16 c16p c116
 
 # All machines, every platform — the roster `make kernels` bakes and CI verifies.
 MACHINES = $(foreach p,$(PLATFORMS),$(PLATFORM_MACHINES_$(p)))
@@ -213,6 +213,18 @@ MACHINE_STRING_vic20_se     = vic20_se -iec8 ""
 # required. Single Japanese kernal (901486-02) + katakana charom (901460-02); no
 # ROM_SYSTEM_BIOS alternates — the parent romset is self-contained in vic1001.zip.
 MACHINE_STRING_vic1001      = vic1001 -iec8 ""
+# The Commodore 264 (NTSC, prototype): the family PARENT of
+# src/mame/commodore/plus4.cpp (plus4_state, machine config plus4n) — the
+# pre-production 264 prototype the plus4/plus4p/c16/c116/c232/v364 machines
+# clone. It wires the SAME cbm_iec serial bus as the C64/VIC-20 line —
+# cbm_iec_slot_device::add(config, m_iec, "c1541") defaults a C1541 drive at
+# device 8 — so the same -iec8 "" empties device 8 and reaches BASIC with no
+# drive romset required. Self-contained romset (basic-264/kernal-264/PLA, no
+# ROM_SYSTEM_BIOS alternates) and, unlike the production Plus/4, no 3-PLUS-1
+# function ROMs (the "function" region is ROMREGION_ERASE00), so it boots to the
+# 264 prototype's own bare BASIC sign-on. The family's only
+# MACHINE_IMPERFECT_GRAPHICS entry.
+MACHINE_STRING_c264         = c264 -iec8 ""
 # The Plus/4 (NTSC): the first machine off src/mame/commodore/plus4.cpp
 # (plus4_state, machine config plus4n), opening the TED/264 family — a clone of
 # the c264 prototype parent. Despite the different TED-based hardware it wires
@@ -322,6 +334,7 @@ MACHINE_ASSETS_vic20        = vic20
 MACHINE_ASSETS_vic20p       = vic20p
 MACHINE_ASSETS_vic20_se     = vic20_se
 MACHINE_ASSETS_vic1001      = vic1001
+MACHINE_ASSETS_c264         = c264
 MACHINE_ASSETS_plus4        = plus4
 MACHINE_ASSETS_plus4p       = plus4p
 MACHINE_ASSETS_c16          = c16

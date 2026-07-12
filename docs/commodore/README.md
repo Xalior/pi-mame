@@ -32,6 +32,7 @@ below bakes one machine into its own `kernel8-<name>.img` — see the
 | `MACHINE=vic20p` | VIC-20 / VC-20 (PAL) | 1981 | `vic20p.zip` | — | PAL | [details](vic20p.md) |
 | `MACHINE=vic20_se` | VIC-20 (Sweden/Finland) | 1981 | `vic20_se.zip` | — | PAL | [details](vic20_se.md) |
 | `MACHINE=vic1001` | VIC-1001 (Japan) | 1980 | `vic1001.zip` | — | NTSC | [details](vic1001.md) |
+| `MACHINE=c264` | Commodore 264 (NTSC, prototype) | 1984 | `c264.zip` | — | NTSC | [details](c264.md) |
 | `MACHINE=plus4` | Plus/4 (NTSC) | 1984 | `plus4.zip` | — | NTSC | [details](plus4.md) |
 | `MACHINE=plus4p` | Plus/4 (PAL) | 1984 | `plus4p.zip` | — | PAL | [details](plus4p.md) |
 | `MACHINE=c16` | Commodore 16 (NTSC) | 1984 | `c16.zip` | — | NTSC | [details](c16.md) |
@@ -108,6 +109,12 @@ my-assets/
     │               #   romset, all three members in vic1001.zip (Japanese kernal
     │               #   901486-02, katakana chargen 901460-02, shared basic
     │               #   901486-01)
+    ├── c264.zip   # Commodore 264 (NTSC, prototype): the TED/264 family PARENT
+    │               #   (plus4.cpp, plus4_state). Self-contained romset — all three
+    │               #   members in c264.zip (prototype basic-264.bin, kernal-264.bin,
+    │               #   and the 251641-02 PLA the clones borrow back). No 3-PLUS-1
+    │               #   function ROMs (unpopulated on the prototype). The only
+    │               #   MACHINE_IMPERFECT_GRAPHICS entry in the family
     ├── plus4.zip  # Plus/4 (NTSC): the first machine off plus4.cpp, opening the
     │               #   TED/264 family. Split-set clone of the c264 prototype —
     │               #   unique r5 kernal, basic and the two 3-PLUS-1 function
