@@ -50,7 +50,7 @@ PLATFORM_MACHINES_sinclair = spectrum spec128 specpls2 specpl2a specpls3 \
 PLATFORM_MACHINES_amstrad = cpc464 cpc664 cpc6128 cpc464p cpc6128p gx4000 \
 	kccomp nc100 nc200 pc1512
 
-PLATFORM_MACHINES_commodore = c64 c64p
+PLATFORM_MACHINES_commodore = c64 c64p c64_jp
 
 # All machines, every platform — the roster `make kernels` bakes and CI verifies.
 MACHINES = $(foreach p,$(PLATFORMS),$(PLATFORM_MACHINES_$(p)))
@@ -137,6 +137,7 @@ MACHINE_STRING_pc1512       = pc1512
 # MAME accepts only an empty value to empty a slot, "none" is rejected.
 MACHINE_STRING_c64          = c64 -iec8 ""
 MACHINE_STRING_c64p         = c64p -iec8 ""
+MACHINE_STRING_c64_jp       = c64_jp -iec8 ""
 
 # --- Sinclair asset dependencies (manifest asset names) ---
 MACHINE_ASSETS_spectrum     = spectrum
@@ -178,6 +179,7 @@ MACHINE_ASSETS_pc1512       = pc1512 pc1512kb
 # --- Commodore asset dependencies (manifest asset names) ---
 MACHINE_ASSETS_c64          = c64
 MACHINE_ASSETS_c64p         = c64p
+MACHINE_ASSETS_c64_jp       = c64_jp
 
 # Query helper: `make -f machines.mk -s print-MACHINE_STRING_spectrum`.
 # Lets scripts read these facts without pulling in the Circle build.
