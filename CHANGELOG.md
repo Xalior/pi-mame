@@ -2,6 +2,11 @@
 
 ## PoC2 — unreleased
 
+- **Boot picker and defaults-ABI docs.** `docs/bootmenu.md` documents the
+  boot picker and the `bootmenu.cfg` format for card builders;
+  `docs/defaults-abi.md` documents the patchable-defaults block's layout
+  and writer/receiver contracts for anyone building their own tooling
+  against a pi-mame image.
 - **The core split.** MAME's emulation core now runs alone on its own CPU
   core, with all platform access (video, input, audio, file I/O) marshaled
   through the shim to a dedicated services core, presentation moved off the

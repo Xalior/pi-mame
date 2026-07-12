@@ -114,6 +114,13 @@ needs. Every screenshot in those pages is an HDMI capture from a real
 Raspberry Pi 4 running that machine's image — not an emulator window, not
 a mockup. 📸
 
+A platform card's menu and the mechanism behind it are documented
+separately: [docs/bootmenu.md](docs/bootmenu.md) covers the boot picker
+and the `bootmenu.cfg` format for anyone building or editing a card, and
+[docs/defaults-abi.md](docs/defaults-abi.md) covers the patchable-defaults
+block itself for anyone writing their own tooling against a pi-mame
+image.
+
 ## 📺 Display: the regional canvas
 
 The framebuffer geometry is Raspberry Pi boot configuration
