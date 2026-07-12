@@ -34,6 +34,7 @@ below bakes one machine into its own `kernel8-<name>.img` — see the
 | `MACHINE=vic1001` | VIC-1001 (Japan) | 1980 | `vic1001.zip` | — | NTSC | [details](vic1001.md) |
 | `MACHINE=plus4` | Plus/4 (NTSC) | 1984 | `plus4.zip` | — | NTSC | [details](plus4.md) |
 | `MACHINE=plus4p` | Plus/4 (PAL) | 1984 | `plus4p.zip` | — | PAL | [details](plus4p.md) |
+| `MACHINE=c16` | Commodore 16 (NTSC) | 1984 | `c16.zip` | — | NTSC | [details](c16.md) |
 
 Click through to a machine's details page for its exact romset (CRC32 per
 ROM) and what appears on the glass at power-on.
@@ -111,13 +112,20 @@ my-assets/
     │               #   ROMs from plus4.zip (318005-05.u24, 318006-01.u23,
     │               #   317053-01.u25, 317054-01.u26), shared PLA from the parent
     │               #   c264.zip (251641-02.u19)
-    └── plus4p.zip # Plus/4 (PAL): the plus4p clone of the same plus4_state
-                    #   driver, PAL sibling of plus4. Split-set clone of the c264
-                    #   prototype — unique PAL r5 kernal from plus4p.zip
-                    #   (318004-05.u24, part 318004 vs the NTSC plus4's 318005),
-                    #   basic and the two 3-PLUS-1 function ROMs also from
-                    #   plus4p.zip (318006-01.u23, 317053-01.u25, 317054-01.u26),
-                    #   shared PLA from the parent c264.zip (251641-02.u19)
+    ├── plus4p.zip # Plus/4 (PAL): the plus4p clone of the same plus4_state
+    │               #   driver, PAL sibling of plus4. Split-set clone of the c264
+    │               #   prototype — unique PAL r5 kernal from plus4p.zip
+    │               #   (318004-05.u24, part 318004 vs the NTSC plus4's 318005),
+    │               #   basic and the two 3-PLUS-1 function ROMs also from
+    │               #   plus4p.zip (318006-01.u23, 317053-01.u25, 317054-01.u26),
+    │               #   shared PLA from the parent c264.zip (251641-02.u19)
+    └── c16.zip    # Commodore 16 (NTSC): the cut-down 16K sibling on the same
+                    #   plus4.cpp TED/264 driver (c16_state). Split-set clone of
+                    #   the c264 prototype, and a subset of plus4 — the r5 kernal
+                    #   and basic (byte-identical to plus4's) from plus4.zip
+                    #   (318005-05.u24, 318006-01.u23), shared PLA from the parent
+                    #   c264.zip (251641-02.u19). No 3-PLUS-1 function ROMs — the
+                    #   C16 has none (12277 bytes free vs the Plus/4's 60671)
 ```
 
 Only supplying some assets is fine: machines without their ROMs simply
