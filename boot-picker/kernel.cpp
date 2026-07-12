@@ -23,6 +23,8 @@ static const unsigned char HidKeyKpEnter = 0x58;
 // Digits 1..9 are contiguous usage codes 0x1E..0x26.
 static const unsigned char HidKeyDigit1	= 0x1E;
 static const unsigned char HidKeyDigit9	= 0x26;
+static const unsigned char HidKeyPageUp	= 0x4B;
+static const unsigned char HidKeyPageDown = 0x4E;
 
 CKernel *CKernel::s_pThis = 0;
 
@@ -35,8 +37,10 @@ CKernel::CKernel (void)
 	m_pKeyboard (0),
 	m_pImageBuffer (0),
 	m_nCursor (0),
+	m_nTopVisible (0),
 	m_nMoveAccum (0),
 	m_nJumpTo (-1),
+	m_nPageAccum (0),
 	m_bSelectPending (FALSE)
 {
 	s_pThis = this;
@@ -132,15 +136,56 @@ void CKernel::Fatal (const char *pMessage)
 	}
 }
 
+unsigned CKernel::VisibleRows (void) const
+{
+	// The screen's text rows, less the 4-line header and a 2-line footer
+	// (blank + status). Computed from the real grid so it adapts to whatever
+	// geometry cmdline.txt gave this card. Always leave room for one entry.
+	unsigned nRows = m_Screen.GetRows ();
+	return nRows > 6 ? nRows - 6 : 1;
+}
+
 void CKernel::DrawMenu (void)
 {
+	const unsigned nCount = m_Menu.GetCount ();
+	const unsigned nPage  = VisibleRows ();
+
+	// Scroll the window the least amount that keeps the cursor visible: the
+	// list feels anchored, only its edges move. A long menu (the Commodore
+	// card is 29 machines) shows one screen-page at a time instead of spilling
+	// off the bottom.
+	if (m_nCursor < m_nTopVisible)
+	{
+		m_nTopVisible = m_nCursor;
+	}
+	else if (m_nCursor >= m_nTopVisible + nPage)
+	{
+		m_nTopVisible = m_nCursor - nPage + 1;
+	}
+	// Never scroll past the end into blank rows: the last page is full and
+	// top-aligned to the final nPage entries.
+	if (nCount > nPage && m_nTopVisible > nCount - nPage)
+	{
+		m_nTopVisible = nCount - nPage;
+	}
+	if (nCount <= nPage)
+	{
+		m_nTopVisible = 0;
+	}
+
+	unsigned nEnd = m_nTopVisible + nPage;
+	if (nEnd > nCount)
+	{
+		nEnd = nCount;
+	}
+
 	// Home the cursor and clear to end of display, then redraw.
 	WriteString ("\x1b[H\x1b[J");
 	WriteString ("pi-mame boot picker\n");
 	WriteString ("select a machine, then press Enter\n");
-	WriteString ("(up/down to move, 1-9 to jump)\n\n");
+	WriteString ("(up/down move, PgUp/PgDn page, 1-9 jump)\n\n");
 
-	for (unsigned i = 0; i < m_Menu.GetCount (); i++)
+	for (unsigned i = m_nTopVisible; i < nEnd; i++)
 	{
 		CString Line;
 		if (i == m_nCursor)
@@ -154,6 +199,19 @@ void CKernel::DrawMenu (void)
 			Line.Format ("  %u. %s\n", i + 1, m_Menu.GetLabel (i));
 		}
 		WriteString (Line);
+	}
+
+	// Footer only when the list needs paging: a short menu keeps its clean,
+	// indicator-free look. No trailing newline — writing one on the bottom
+	// row would scroll the whole page and corrupt it.
+	if (nCount > nPage)
+	{
+		CString Foot;
+		Foot.Format ("\n  [ %u-%u of %u ]   %s%s",
+			     m_nTopVisible + 1, nEnd, nCount,
+			     m_nTopVisible > 0 ? "^PgUp " : "",
+			     nEnd < nCount ? "vPgDn" : "");
+		WriteString (Foot);
 	}
 }
 
@@ -375,6 +433,24 @@ TShutdownMode CKernel::Run (void)
 			m_pKeyboard->UpdateLEDs ();
 		}
 
+		// Debug UART key injection. The boot world is always serial-enabled
+		// (no appliance surface, no performance concern), so bytes arriving on
+		// the serial RX set the very same intents the USB keyboard does — a
+		// serial console can script the menu. One ASCII byte per action:
+		//   j down   k up   f page-down   b page-up   Enter select   1-9 jump
+		char InjBuf[32];
+		int nInj = m_Serial.Read (InjBuf, sizeof InjBuf);
+		for (int i = 0; i < nInj; i++)
+		{
+			char c = InjBuf[i];
+			if	(c == 'j')		m_nMoveAccum++;
+			else if (c == 'k')		m_nMoveAccum--;
+			else if (c == 'f')		m_nPageAccum++;
+			else if (c == 'b')		m_nPageAccum--;
+			else if (c == '\r' || c == '\n')m_bSelectPending = TRUE;
+			else if (c >= '1' && c <= '9')	m_nJumpTo = c - '1';
+		}
+
 		// Drain keyboard intents recorded by the interrupt handler.
 		boolean bRedraw = FALSE;
 
@@ -394,6 +470,34 @@ TShutdownMode CKernel::Run (void)
 			if ((unsigned) nPos != m_nCursor)
 			{
 				m_nCursor = (unsigned) nPos;
+				bRedraw = TRUE;
+			}
+		}
+
+		int nPage = m_nPageAccum;
+		if (nPage != 0)
+		{
+			m_nPageAccum = 0;
+			// PgUp/PgDn flip the window a whole page at a time and land the
+			// cursor at the top of the new page — true paging, not a
+			// cursor nudge that scrolls the view by a single line.
+			const int nStep  = (int) VisibleRows ();
+			const int nCount = (int) m_Menu.GetCount ();
+			const int nMaxTop = nCount > nStep ? nCount - nStep : 0;
+			int nTop = (int) m_nTopVisible + nPage * nStep;
+			if (nTop < 0)
+			{
+				nTop = 0;
+			}
+			if (nTop > nMaxTop)
+			{
+				nTop = nMaxTop;
+			}
+			if ((unsigned) nTop != m_nTopVisible
+			    || m_nCursor != (unsigned) nTop)
+			{
+				m_nTopVisible = (unsigned) nTop;
+				m_nCursor = (unsigned) nTop;
 				bRedraw = TRUE;
 			}
 		}
@@ -475,6 +579,14 @@ void CKernel::KeyStatusHandlerRaw (unsigned char /*ucModifiers*/,
 		else if (nKey == HidKeyEnter || nKey == HidKeyKpEnter)
 		{
 			s_pThis->m_bSelectPending = TRUE;
+		}
+		else if (nKey == HidKeyPageUp)
+		{
+			s_pThis->m_nPageAccum--;
+		}
+		else if (nKey == HidKeyPageDown)
+		{
+			s_pThis->m_nPageAccum++;
 		}
 		else if (nKey >= HidKeyDigit1 && nKey <= HidKeyDigit9)
 		{

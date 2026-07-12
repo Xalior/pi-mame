@@ -58,9 +58,15 @@ public:
 	TShutdownMode Run (void);
 
 private:
-	// Draw the whole menu (clears the screen). Highlights the cursor line.
+	// Draw the menu (clears the screen). Highlights the cursor line and shows
+	// only a window of entries when the list is longer than one screen page,
+	// scrolling that window to keep the cursor visible.
 	void DrawMenu (void);
 	void WriteString (const char *pString);
+
+	// Entries that fit in one page: the screen's text rows less the header and
+	// footer. Sizes the scrolling window; always at least one.
+	unsigned VisibleRows (void) const;
 
 	// Load PLATFORM_KERNEL_PATH into the staging buffer, patch the chosen
 	// defaults-string at 0x800, and arm chain-boot. A kernel that cannot be
@@ -102,11 +108,13 @@ private:
 	u8 *			m_pImageBuffer;		// staging, lazily allocated
 
 	unsigned		m_nCursor;		// highlighted entry
+	unsigned		m_nTopVisible;		// first entry drawn (window top)
 
 	// Edge-triggered keyboard intents, produced in interrupt context and
 	// drained by the main loop.
 	volatile int		m_nMoveAccum;		// +down / -up, accumulated
 	volatile int		m_nJumpTo;		// digit jump, -1 = none
+	volatile int		m_nPageAccum;		// +pgdn / -pgup, accumulated
 	volatile boolean	m_bSelectPending;	// Enter pressed
 
 	// Previous raw report, for newly-pressed edge detection.
