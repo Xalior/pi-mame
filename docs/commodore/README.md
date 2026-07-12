@@ -23,6 +23,7 @@ below bakes one machine into its own `kernel8-<name>.img` — see the
 | `MACHINE=c64gs` | Commodore 64 Games System | 1990 | `c64gs.zip` | — | PAL | [details](c64gs.md) |
 | `MACHINE=sx64` | SX-64 / Executive 64 (NTSC) | 1984 | `sx64.zip` | — | NTSC | [details](sx64.md) |
 | `MACHINE=sx64p` | SX-64 / Executive 64 (PAL) | 1984 | `sx64p.zip` | — | PAL | [details](sx64p.md) |
+| `MACHINE=dx64` | DX-64 (NTSC, twin-drive prototype) | 1984 | `dx64.zip` | — | NTSC | [details](dx64.md) |
 
 Click through to a machine's details page for its exact romset (CRC32 per
 ROM) and what appears on the glass at power-on.
@@ -57,8 +58,11 @@ my-assets/
     ├── sx64.zip   # SX-64 / Executive 64 (NTSC): own SX boot KERNAL
     │               #   (251104-04.ud3) + shared basic, chargen and PLA
     │               #   (901226-01.ud4, 901225-01.ud1, 906114-01.ue4)
-    └── sx64p.zip  # SX-64 / Executive 64 (PAL): same four ROMs as sx64.zip
-                    #   (rom_sx64p == rom_sx64; only the timing is PAL)
+    ├── sx64p.zip  # SX-64 / Executive 64 (PAL): same four ROMs as sx64.zip
+    │               #   (rom_sx64p == rom_sx64; only the timing is PAL)
+    └── dx64.zip   # DX-64 (NTSC, twin-drive prototype): same four ROMs as
+                    #   sx64.zip (rom_dx64 == rom_sx64; ntsc_dx just adds a
+                    #   second built-in drive on iec9)
 ```
 
 Only supplying some assets is fine: machines without their ROMs simply
