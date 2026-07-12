@@ -518,6 +518,22 @@ mem|edu64|901227-03.u4|dbe3e7c7|1d503e56df85a62fee696e7618dc5b4e781df1bb|-
 mem|edu64|901225-01.u5|ec4272ee|adc7c31e18c7c7413d54802ef2f4193da14711aa|-
 mem|edu64|906114-01.u17|54c89351|efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b|-
 
+# vic20 (VIC-20, NTSC) — the first non-c64.cpp machine on the commodore
+# platform (driver src/mame/commodore/vic20.cpp). Default kernal is BIOS 0
+# "cbm". vic20 is a CLONE of vic1001 (the parent) under MAME's split-set
+# convention, so its members span two source zips: the unique kernal + charom
+# live in vic20.zip, while the basic ROM is byte-identical to the parent's
+# (CRC db4c43c1) and is packed only in vic1001.zip. Two src lines: obtain_member
+# tries each in order and locates every member by CRC32, renaming it to the
+# ROM_START( vic20 ) name (901486-01.ue11 comes from the parent's "901486-01").
+# The JiffyDOS alternate kernal (ROMX_LOAD BIOS 1) is optional, not packed.
+asset|vic20|public|zip|roms/vic20.zip
+src|vic20|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/vic20.zip
+src|vic20|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/vic1001.zip
+mem|vic20|901486-01.ue11|db4c43c1|587d1e90950675ab6b12d91248a3f0d640d02e8d|-
+mem|vic20|901486-06.ue12|e5e7c174|06de7ec017a5e78bd6746d89c2ecebb646efeb19|-
+mem|vic20|901460-03.ud7|83e032a6|4fd85ab6647ee2ac7ba40f729323f2472d35b9b4|-
+
 # +3 shares the +2A romset (identical members); source that set, repack.
 asset|specpls3|public|zip|roms/specpls3.zip
 src|specpls3|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/specpl2a.zip

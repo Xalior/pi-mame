@@ -28,6 +28,7 @@ below bakes one machine into its own `kernel8-<name>.img` — see the
 | `MACHINE=tesa6240` | Tesa Etikett Etikettendrucker 6240 | 1984 | `tesa6240.zip` | — | PAL | [details](tesa6240.md) |
 | `MACHINE=pet64` | PET 64 / CBM 4064 (NTSC) | 1983 | `pet64.zip` | — | NTSC | [details](pet64.md) |
 | `MACHINE=edu64` | Educator 64 (NTSC) | 1983 | `edu64.zip` | — | NTSC | [details](edu64.md) |
+| `MACHINE=vic20` | VIC-20 (NTSC) | 1981 | `vic20.zip` | — | NTSC | [details](vic20.md) |
 
 Click through to a machine's details page for its exact romset (CRC32 per
 ROM) and what appears on the glass at power-on.
@@ -78,10 +79,14 @@ my-assets/
     │               #   own rev.1 KERNAL (901246-01.u4) + shared basic,
     │               #   chargen and PLA (901226-01.u3, 901225-01.u5,
     │               #   906114-01.u17)
-    └── edu64.zip  # Educator 64 (NTSC, PET-cased education C64): #define
-                    #   rom_edu64 rom_c64 — byte-identical c64 romset (basic,
-                    #   kernal r3, chargen, PLA: 901226-01.u3, 901227-03.u4,
-                    #   901225-01.u5, 906114-01.u17)
+    ├── edu64.zip  # Educator 64 (NTSC, PET-cased education C64): #define
+    │               #   rom_edu64 rom_c64 — byte-identical c64 romset (basic,
+    │               #   kernal r3, chargen, PLA: 901226-01.u3, 901227-03.u4,
+    │               #   901225-01.u5, 906114-01.u17)
+    └── vic20.zip  # VIC-20 (NTSC): the first non-c64.cpp Commodore machine.
+                    #   Split-set clone of vic1001 — unique kernal + chargen
+                    #   from vic20.zip (901486-06.ue12, 901460-03.ud7), shared
+                    #   basic from the parent vic1001.zip (901486-01.ue11)
 ```
 
 Only supplying some assets is fine: machines without their ROMs simply
