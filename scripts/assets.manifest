@@ -400,6 +400,25 @@ mem|c64gs|390852-01.u4|b0a9c2da|21940ef5f1bfe67d7537164f7ca130a1095b067a|-
 mem|c64gs|901225-01.u5|ec4272ee|adc7c31e18c7c7413d54802ef2f4193da14711aa|-
 mem|c64gs|252535-01.u8|54c89351|efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b|-
 
+# sx64 (SX-64 / Executive 64, NTSC) is a distinct romset (NOT a #define alias):
+# the portable C64 carries its OWN unique KERNAL (251104-04.ud3, the SX boot
+# ROM with the SX sign-on colour scheme — default BIOS "cbm", the first of four
+# ROM_SYSTEM_BIOS choices). Its BASIC (901226-01.ud4), character generator
+# (901225-01.ud1) and PLA (906114-01.ue4) are byte-identical in content to
+# c64's members, located by CRC32 in the parent c64.zip and repacked under the
+# ud4/ud1/ue4 board-position names sx64 expects. As a split-set clone, the
+# sx64 source zip carries ONLY its one unique member (the SX kernal); the shared
+# basic, chargen and PLA come from c64.zip. The mixed-provenance c64gs
+# precedent. The built-in 1541 drive (ntsc_sx replaces the iec8 default with
+# sx1541) is baked empty via -iec8 "" — no drive romset required to reach BASIC.
+asset|sx64|public|zip|roms/sx64.zip
+src|sx64|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/sx64.zip
+src|sx64|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/c64.zip
+mem|sx64|901226-01.ud4|f833d117|79015323128650c742a3694c9429aa91f355905e|-
+mem|sx64|251104-04.ud3|2c5965d4|aa136e91ecf3c5ac64f696b3dbcbfc5ba0871c98|-
+mem|sx64|901225-01.ud1|ec4272ee|adc7c31e18c7c7413d54802ef2f4193da14711aa|-
+mem|sx64|906114-01.ue4|54c89351|efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b|-
+
 # +3 shares the +2A romset (identical members); source that set, repack.
 asset|specpls3|public|zip|roms/specpls3.zip
 src|specpls3|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/specpl2a.zip

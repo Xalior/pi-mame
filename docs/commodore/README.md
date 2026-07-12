@@ -21,6 +21,7 @@ below bakes one machine into its own `kernel8-<name>.img` — see the
 | `MACHINE=c64c_es` | Commodore 64C (Spain) | 1988 | `c64c_es.zip` | — | PAL | [details](c64c_es.md) |
 | `MACHINE=c64c_se` | Commodore 64C (Sweden/Finland) | 1986 | `c64c_se.zip` | — | PAL | [details](c64c_se.md) |
 | `MACHINE=c64gs` | Commodore 64 Games System | 1990 | `c64gs.zip` | — | PAL | [details](c64gs.md) |
+| `MACHINE=sx64` | SX-64 / Executive 64 (NTSC) | 1984 | `sx64.zip` | — | NTSC | [details](sx64.md) |
 
 Click through to a machine's details page for its exact romset (CRC32 per
 ROM) and what appears on the glass at power-on.
@@ -49,9 +50,12 @@ my-assets/
     ├── c64c_se.zip # Commodore 64C (Sweden/Finland): own Swedish/Finnish
     │               #   KERNAL (325182-01.u4) + Scandinavian chargen
     │               #   ("cbm 64 skand.gen.u5") + shared PLA
-    └── c64gs.zip  # Commodore 64 Games System: own GS boot KERNAL
-                    #   (390852-01.u4) + shared C64/C64C chargen
-                    #   (901225-01.u5) + shared PLA
+    ├── c64gs.zip  # Commodore 64 Games System: own GS boot KERNAL
+    │               #   (390852-01.u4) + shared C64/C64C chargen
+    │               #   (901225-01.u5) + shared PLA
+    └── sx64.zip   # SX-64 / Executive 64 (NTSC): own SX boot KERNAL
+                    #   (251104-04.ud3) + shared basic, chargen and PLA
+                    #   (901226-01.ud4, 901225-01.ud1, 906114-01.ue4)
 ```
 
 Only supplying some assets is fine: machines without their ROMs simply
