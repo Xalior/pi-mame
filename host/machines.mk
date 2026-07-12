@@ -52,7 +52,7 @@ PLATFORM_MACHINES_amstrad = cpc464 cpc664 cpc6128 cpc464p cpc6128p gx4000 \
 
 PLATFORM_MACHINES_commodore = c64 c64p c64_jp c64_se c64c c64cp c64g c64c_es \
 	c64c_se c64gs sx64 sx64p dx64 vip64 tesa6240 pet64 edu64 vic20 vic20p \
-	vic20_se vic1001 c264 plus4 plus4p c16 c16p c116
+	vic20_se vic1001 c264 plus4 plus4p c16 c16p c116 c232
 
 # All machines, every platform — the roster `make kernels` bakes and CI verifies.
 MACHINES = $(foreach p,$(PLATFORMS),$(PLATFORM_MACHINES_$(p)))
@@ -274,6 +274,17 @@ MACHINE_STRING_c16p         = c16p -iec8 ""
 # 251641-02.u101 vs c16p's .u16). Like the C16 it omits the 3-PLUS-1 function ROMs,
 # so it boots to BASIC V3.5 with 12277 BYTES FREE on the PAL canvas.
 MACHINE_STRING_c116         = c116 -iec8 ""
+# The Commodore 232 (PAL, prototype): a pre-production 264-line prototype on the
+# same TED/264 driver (src/mame/commodore/plus4.cpp, c16_state, machine config
+# c232 — c16p with the RAM default raised to 32K). A clone of the c264 prototype
+# parent; the config chain c232 -> c16p -> plus4p makes it a PAL machine. It
+# keeps the same cbm_iec serial bus (a C1541 defaulted at device 8), so the same
+# -iec8 "" empties device 8 and reaches BASIC with no drive romset required. Its
+# kernal 318004-01 (CRC dbdc3319) is UNIQUE to c232; basic 318006-01 and PLA
+# 251641-02 are byte-identical to the rest of the 264 line. Like the C16 it omits
+# the 3-PLUS-1 function ROMs, but with 32K RAM (vs the C16's 16K) it boots to
+# BASIC V3.5 with 28661 BYTES FREE on the PAL canvas.
+MACHINE_STRING_c232         = c232 -iec8 ""
 
 # --- Sinclair asset dependencies (manifest asset names) ---
 MACHINE_ASSETS_spectrum     = spectrum
@@ -340,6 +351,7 @@ MACHINE_ASSETS_plus4p       = plus4p
 MACHINE_ASSETS_c16          = c16
 MACHINE_ASSETS_c16p         = c16p
 MACHINE_ASSETS_c116         = c116
+MACHINE_ASSETS_c232         = c232
 
 # Query helper: `make -f machines.mk -s print-MACHINE_STRING_spectrum`.
 # Lets scripts read these facts without pulling in the Circle build.

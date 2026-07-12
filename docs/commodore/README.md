@@ -38,6 +38,7 @@ below bakes one machine into its own `kernel8-<name>.img` — see the
 | `MACHINE=c16` | Commodore 16 (NTSC) | 1984 | `c16.zip` | — | NTSC | [details](c16.md) |
 | `MACHINE=c16p` | Commodore 16 (PAL) | 1984 | `c16p.zip` | — | PAL | [details](c16p.md) |
 | `MACHINE=c116` | Commodore 116 | 1984 | `c116.zip` | — | PAL | [details](c116.md) |
+| `MACHINE=c232` | Commodore 232 (PAL, prototype) | 1984 | `c232.zip` | — | PAL | [details](c232.md) |
 
 Click through to a machine's details page for its exact romset (CRC32 per
 ROM) and what appears on the glass at power-on.
@@ -142,13 +143,20 @@ my-assets/
     │               #   318004 vs the NTSC c16's 318005, 318006-01.u3), shared PLA
     │               #   from the parent c264.zip (251641-02.u16). No 3-PLUS-1
     │               #   function ROMs — the C16 has none (12277 bytes free)
-    └── c116.zip   # Commodore 116: the cost-reduced, rubber-key sibling of the C16
-                    #   on the same plus4.cpp TED/264 driver (c16_state, config
-                    #   c16p). ROM_START( c116 ) is byte-identical to c16p by
-                    #   checksum — same PAL r5 kernal, basic and PLA — differing
-                    #   only in the PLA member name (251641-02.u101 vs c16p's .u16).
-                    #   No 3-PLUS-1 function ROMs — the C116 has none (12277 bytes
-                    #   free)
+    ├── c116.zip   # Commodore 116: the cost-reduced, rubber-key sibling of the C16
+    │               #   on the same plus4.cpp TED/264 driver (c16_state, config
+    │               #   c16p). ROM_START( c116 ) is byte-identical to c16p by
+    │               #   checksum — same PAL r5 kernal, basic and PLA — differing
+    │               #   only in the PLA member name (251641-02.u101 vs c16p's .u16).
+    │               #   No 3-PLUS-1 function ROMs — the C116 has none (12277 bytes
+    │               #   free)
+    └── c232.zip   # Commodore 232 (PAL, prototype): a pre-production 264-line
+                    #   prototype on the same plus4.cpp TED/264 driver (c16_state,
+                    #   config c232 = c16p with RAM raised to 32K). Split-set clone
+                    #   of the c264 prototype — its UNIQUE kernal 318004-01.u5
+                    #   (dbdc3319) and shared basic 318006-01.u4 come from c232.zip,
+                    #   the shared PLA from the parent c264.zip (251641-02.u7). No
+                    #   3-PLUS-1 function ROMs, but 32K RAM (28661 bytes free)
 ```
 
 Only supplying some assets is fine: machines without their ROMs simply
