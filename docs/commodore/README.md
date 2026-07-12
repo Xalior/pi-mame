@@ -12,6 +12,7 @@ below bakes one machine into its own `kernel8-<name>.img` — see the
 | `make` | System | Year | Romset | Extra assets | TV | |
 |---|---|---|---|---|---|---|
 | `MACHINE=c64` | Commodore 64 (NTSC) | 1982 | `c64.zip` | — | NTSC | [details](c64.md) |
+| `MACHINE=c64p` | Commodore 64 (PAL) | 1982 | `c64p.zip` | — | PAL | [details](c64p.md) |
 
 Click through to a machine's details page for its exact romset (CRC32 per
 ROM) and what appears on the glass at power-on.
@@ -21,8 +22,10 @@ ROM) and what appears on the glass at power-on.
 ```
 my-assets/
 └── roms/
-    └── c64.zip    # Commodore 64: basic + kernal r3 + chargen + PLA
-                    #   (901226-01.u3, 901227-03.u4, 901225-01.u5, 906114-01.u17)
+    ├── c64.zip    # Commodore 64 (NTSC): basic + kernal r3 + chargen + PLA
+    │               #   (901226-01.u3, 901227-03.u4, 901225-01.u5, 906114-01.u17)
+    └── c64p.zip   # Commodore 64 (PAL): same four ROMs as c64.zip
+                    #   (rom_c64p == rom_c64; only the timing is PAL)
 ```
 
 Only supplying some assets is fine: machines without their ROMs simply
