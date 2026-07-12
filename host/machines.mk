@@ -51,7 +51,7 @@ PLATFORM_MACHINES_amstrad = cpc464 cpc664 cpc6128 cpc464p cpc6128p gx4000 \
 	kccomp nc100 nc200 pc1512
 
 PLATFORM_MACHINES_commodore = c64 c64p c64_jp c64_se c64c c64cp c64g c64c_es \
-	c64c_se c64gs sx64 sx64p dx64 vip64 tesa6240 pet64 edu64 vic20
+	c64c_se c64gs sx64 sx64p dx64 vip64 tesa6240 pet64 edu64 vic20 vic20p
 
 # All machines, every platform — the roster `make kernels` bakes and CI verifies.
 MACHINES = $(foreach p,$(PLATFORMS),$(PLATFORM_MACHINES_$(p)))
@@ -190,6 +190,12 @@ MACHINE_STRING_edu64        = edu64 -iec8 ""
 # defaults a C1541 drive at device 8 — so the same -iec8 "" empties device 8 and
 # reaches BASIC with no drive romset required. Default kernal is BIOS 0 "cbm".
 MACHINE_STRING_vic20        = vic20 -iec8 ""
+# The VIC-20 / VC-20 (PAL): the vic20p clone of the same vic20_state driver
+# (src/mame/commodore/vic20.cpp), PAL sibling of the NTSC vic20. Same cbm_iec
+# serial bus with a C1541 defaulted at device 8, so the same -iec8 "" empties
+# device 8 and reaches BASIC with no drive romset required. Default kernal is
+# BIOS 0 "cbm" — the PAL kernal 901486-07 (vs NTSC's 901486-06).
+MACHINE_STRING_vic20p       = vic20p -iec8 ""
 
 # --- Sinclair asset dependencies (manifest asset names) ---
 MACHINE_ASSETS_spectrum     = spectrum
@@ -247,6 +253,7 @@ MACHINE_ASSETS_tesa6240     = tesa6240
 MACHINE_ASSETS_pet64        = pet64
 MACHINE_ASSETS_edu64        = edu64
 MACHINE_ASSETS_vic20        = vic20
+MACHINE_ASSETS_vic20p       = vic20p
 
 # Query helper: `make -f machines.mk -s print-MACHINE_STRING_spectrum`.
 # Lets scripts read these facts without pulling in the Circle build.

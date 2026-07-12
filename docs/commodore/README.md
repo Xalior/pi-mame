@@ -29,6 +29,7 @@ below bakes one machine into its own `kernel8-<name>.img` — see the
 | `MACHINE=pet64` | PET 64 / CBM 4064 (NTSC) | 1983 | `pet64.zip` | — | NTSC | [details](pet64.md) |
 | `MACHINE=edu64` | Educator 64 (NTSC) | 1983 | `edu64.zip` | — | NTSC | [details](edu64.md) |
 | `MACHINE=vic20` | VIC-20 (NTSC) | 1981 | `vic20.zip` | — | NTSC | [details](vic20.md) |
+| `MACHINE=vic20p` | VIC-20 / VC-20 (PAL) | 1981 | `vic20p.zip` | — | PAL | [details](vic20p.md) |
 
 Click through to a machine's details page for its exact romset (CRC32 per
 ROM) and what appears on the glass at power-on.
@@ -83,10 +84,14 @@ my-assets/
     │               #   rom_edu64 rom_c64 — byte-identical c64 romset (basic,
     │               #   kernal r3, chargen, PLA: 901226-01.u3, 901227-03.u4,
     │               #   901225-01.u5, 906114-01.u17)
-    └── vic20.zip  # VIC-20 (NTSC): the first non-c64.cpp Commodore machine.
-                    #   Split-set clone of vic1001 — unique kernal + chargen
-                    #   from vic20.zip (901486-06.ue12, 901460-03.ud7), shared
-                    #   basic from the parent vic1001.zip (901486-01.ue11)
+    ├── vic20.zip  # VIC-20 (NTSC): the first non-c64.cpp Commodore machine.
+    │               #   Split-set clone of vic1001 — unique kernal + chargen
+    │               #   from vic20.zip (901486-06.ue12, 901460-03.ud7), shared
+    │               #   basic from the parent vic1001.zip (901486-01.ue11)
+    └── vic20p.zip # VIC-20 / VC-20 (PAL): the vic20p clone of the same driver.
+                    #   Unique PAL kernal from vic20p.zip (901486-07.ue12, -07
+                    #   vs NTSC's -06), chargen shared with vic20 (901460-03.ud7),
+                    #   shared basic from the parent vic1001.zip (901486-01.ue11)
 ```
 
 Only supplying some assets is fine: machines without their ROMs simply

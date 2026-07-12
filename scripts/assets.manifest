@@ -534,6 +534,24 @@ mem|vic20|901486-01.ue11|db4c43c1|587d1e90950675ab6b12d91248a3f0d640d02e8d|-
 mem|vic20|901486-06.ue12|e5e7c174|06de7ec017a5e78bd6746d89c2ecebb646efeb19|-
 mem|vic20|901460-03.ud7|83e032a6|4fd85ab6647ee2ac7ba40f729323f2472d35b9b4|-
 
+# vic20p (VIC-20 / VC-20, PAL) — the vic20p clone of the same vic20_state driver
+# (src/mame/commodore/vic20.cpp), PAL sibling of the NTSC vic20. Default kernal
+# is BIOS 0 "cbm". Under MAME's split-set convention the members span source
+# zips: the unique PAL kernal 901486-07 (CRC 4be07cb4, -07 vs NTSC's -06) and
+# the charom live in vic20p.zip, while the basic ROM is byte-identical to the
+# parent vic1001's (CRC db4c43c1) and is packed only in vic1001.zip. Three src
+# lines: obtain_member tries each in order and locates every member by CRC32,
+# renaming it to the ROM_START( vic20p ) name (901486-01.ue11 comes from the
+# parent's "901486-01"). The JiffyDOS PAL alternate kernal (ROMX_LOAD BIOS 1) is
+# optional, not packed.
+asset|vic20p|public|zip|roms/vic20p.zip
+src|vic20p|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/vic20p.zip
+src|vic20p|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/vic20.zip
+src|vic20p|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/vic1001.zip
+mem|vic20p|901486-01.ue11|db4c43c1|587d1e90950675ab6b12d91248a3f0d640d02e8d|-
+mem|vic20p|901486-07.ue12|4be07cb4|ce0137ed69f003a299f43538fa9eee27898e621e|-
+mem|vic20p|901460-03.ud7|83e032a6|4fd85ab6647ee2ac7ba40f729323f2472d35b9b4|-
+
 # +3 shares the +2A romset (identical members); source that set, repack.
 asset|specpls3|public|zip|roms/specpls3.zip
 src|specpls3|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/specpl2a.zip
