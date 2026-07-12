@@ -20,4 +20,12 @@ ZX Spectrum +3 startup menu (Loader, +3 BASIC, Calculator, 48 BASIC; drives A: a
   | `40092.ic7` | `9bc85686` |
   | `40093.ic8` | `db551783` |
 
+## Booting media
+
+![ZX Spectrum +3 running Janosik](images/specpls3-janosik.jpg)
+
+Janosik (Rafal Miazga / Alex Heather, 2013, freeware) loaded from a `.dsk`
+floppy via the +3 Loader, showing its title screen — its credit line
+still reads the game's original Atari XL release (R.M., 2013, Mirage).
+
 [← back to Sinclair](README.md)
