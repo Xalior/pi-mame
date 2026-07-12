@@ -308,6 +308,21 @@ mem|c64_se|kernel.u4|f10c2c25|e4f52d9b36c030eb94524eb49f6f0774c1d02e5e|-
 mem|c64_se|charswe.u5|bee9b3fd|446ae58f7110d74d434301491209299f66798d8a|-
 mem|c64_se|906114-01.u17|54c89351|efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b|-
 
+# c64c (64C, NTSC) is a distinct romset (NOT a #define alias): the cost-reduced
+# 64C merges BASIC and the KERNAL into one 16 KB part (251913-01.u4). Its kernal
+# region has ROM_SYSTEM_BIOS choices — ROM_DEFAULT_BIOS("cbm") pins bios 0
+# (251913-01.u4); the alt "pdc" member (pdc.u4) is not shipped. The chargen
+# (901225-01.u5) is byte-identical to c64's, and the PLA content (54c89351) is
+# c64's 906114-01.u17 repacked under the 252715-01.u8 name c64c expects — both
+# located by CRC32 in the parent c64.zip. As a split-set clone, the c64c source
+# zip carries ONLY its unique member (the combined ROM).
+asset|c64c|public|zip|roms/c64c.zip
+src|c64c|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/c64c.zip
+src|c64c|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/c64.zip
+mem|c64c|251913-01.u4|0010ec31|765372a0e16cbb0adf23a07b80f6b682b39fbf88|-
+mem|c64c|901225-01.u5|ec4272ee|adc7c31e18c7c7413d54802ef2f4193da14711aa|-
+mem|c64c|252715-01.u8|54c89351|efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b|-
+
 # +3 shares the +2A romset (identical members); source that set, repack.
 asset|specpls3|public|zip|roms/specpls3.zip
 src|specpls3|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/specpl2a.zip
