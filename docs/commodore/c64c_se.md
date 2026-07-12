@@ -2,7 +2,7 @@
 
 ![Commodore 64C (Sweden/Finland) at power-on](images/c64c_se.jpg)
 
-- **`make MACHINE=c64c_se`** — Commodore Business Machines
+- **`make kernel MACHINE=c64c_se`** — Commodore Business Machines
 - **Year**: 1986
 - **Manufacturer**: Commodore Business Machines
 - **Television**: PAL

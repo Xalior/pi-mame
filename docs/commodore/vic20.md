@@ -2,7 +2,7 @@
 
 ![VIC-20 at power-on](images/vic20.jpg)
 
-- **`make MACHINE=vic20`** — Commodore Business Machines
+- **`make kernel MACHINE=vic20`** — Commodore Business Machines
 - **Year**: 1981
 - **Manufacturer**: Commodore Business Machines
 - **Television**: NTSC

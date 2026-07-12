@@ -2,7 +2,7 @@
 
 ![48K ZX Spectrum at power-on](images/spectrum.jpg)
 
-- **`make MACHINE=spectrum`** — Sinclair
+- **`make kernel MACHINE=spectrum`** — Sinclair
 - **Year**: 1982
 - **Manufacturer**: Sinclair Research Ltd
 - **Television**: PAL

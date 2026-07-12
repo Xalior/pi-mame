@@ -2,7 +2,7 @@
 
 ![Commodore 64C (Spain) at power-on](images/c64c_es.jpg)
 
-- **`make MACHINE=c64c_es`** — Commodore Business Machines
+- **`make kernel MACHINE=c64c_es`** — Commodore Business Machines
 - **Year**: 1988
 - **Manufacturer**: Commodore Business Machines
 - **Television**: PAL

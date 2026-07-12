@@ -2,7 +2,7 @@
 
 ![VIC-20 (Sweden/Finland) at power-on](images/vic20_se.jpg)
 
-- **`make MACHINE=vic20_se`** — Commodore Business Machines
+- **`make kernel MACHINE=vic20_se`** — Commodore Business Machines
 - **Year**: 1981
 - **Manufacturer**: Commodore Business Machines
 - **Television**: PAL

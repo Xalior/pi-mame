@@ -2,7 +2,7 @@
 
 ![VIC-20 (PAL) at power-on](images/vic20p.jpg)
 
-- **`make MACHINE=vic20p`** — Commodore Business Machines
+- **`make kernel MACHINE=vic20p`** — Commodore Business Machines
 - **Year**: 1981
 - **Manufacturer**: Commodore Business Machines
 - **Television**: PAL

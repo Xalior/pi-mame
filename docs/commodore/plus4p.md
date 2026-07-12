@@ -2,7 +2,7 @@
 
 ![Plus/4 (PAL) at power-on](images/plus4p.jpg)
 
-- **`make MACHINE=plus4p`** — Commodore Business Machines
+- **`make kernel MACHINE=plus4p`** — Commodore Business Machines
 - **Year**: 1984
 - **Manufacturer**: Commodore Business Machines
 - **Television**: PAL

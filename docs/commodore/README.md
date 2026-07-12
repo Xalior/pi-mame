@@ -3,13 +3,13 @@
 The Commodore 8-bit line — PET/CBM, VIC-20, C64, Plus/4, C128, and the
 CBM-II business range — built on 6502-family CPUs. Public-tier only: no
 free (properly-blessed-redistribution) ROM source exists for this line,
-unlike Sinclair's Fuse/proteanthread permission. Each `make MACHINE=<name>`
+unlike Sinclair's Fuse/proteanthread permission. Each `make kernel MACHINE=<name>`
 below bakes one machine into its own `kernel8-<name>.img` — see the
 [top-level README](../../README.md) for the build and the regional canvas.
 
 ## Machines
 
-| `make` | System | Year | Romset | Extra assets | TV | |
+| `make kernel` | System | Year | Romset | Extra assets | TV | |
 |---|---|---|---|---|---|---|
 | `MACHINE=c64` | Commodore 64 (NTSC) | 1982 | `c64.zip` | — | NTSC | [details](c64.md) |
 | `MACHINE=c64p` | Commodore 64 (PAL) | 1982 | `c64p.zip` | — | PAL | [details](c64p.md) |

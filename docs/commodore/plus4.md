@@ -2,7 +2,7 @@
 
 ![Plus/4 at power-on](images/plus4.jpg)
 
-- **`make MACHINE=plus4`** — Commodore Business Machines
+- **`make kernel MACHINE=plus4`** — Commodore Business Machines
 - **Year**: 1984
 - **Manufacturer**: Commodore Business Machines
 - **Television**: NTSC

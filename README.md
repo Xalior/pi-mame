@@ -118,7 +118,7 @@ Every machine belongs to one of three platforms:
 | Amstrad — the CPC family, the NC notepads, and the PC1512 | [docs/amstrad/README.md](docs/amstrad/README.md) | [`docs/amstrad/`](docs/amstrad/) |
 | Commodore — the C64 line, the VIC-20s, and the TED machines | [docs/commodore/README.md](docs/commodore/README.md) | [`docs/commodore/`](docs/commodore/) |
 
-Each platform page carries its own machine table (`make MACHINE=` target,
+Each platform page carries its own machine table (`make kernel MACHINE=` target,
 system, year, romset, TV region) and a details page per machine covering
 exactly what appears on the glass at power-on and exactly which assets it
 needs. Every screenshot in those pages is an HDMI capture from a real

@@ -3,7 +3,7 @@
 The ZX Spectrum family: Sinclair's own machines, the Amstrad-era +2/+2a/+3,
 the Kickstarter-era ZX Spectrum Next boards, the Timex NTSC variants, and
 the Eastern Bloc clones (Russian, Polish) that grew their own firmware
-around the same hardware. Each `make MACHINE=<name>` below bakes one
+around the same hardware. Each `make kernel MACHINE=<name>` below bakes one
 machine into its own `kernel8-<name>.img` — see the [top-level
 README](../../README.md) for the build and the regional canvas.
 
@@ -16,7 +16,7 @@ per machine.
 
 ## Machines
 
-| `make` | System | Year | Romset | Extra assets | TV | |
+| `make kernel` | System | Year | Romset | Extra assets | TV | |
 |---|---|---|---|---|---|---|
 | `MACHINE=spectrum` | 48K ZX Spectrum | 1982 | `spectrum.zip` | — | PAL | [details](spectrum.md) |
 | `MACHINE=spec128` | ZX Spectrum 128 | 1986 | `spec128.zip` | — | PAL | [details](spec128.md) |

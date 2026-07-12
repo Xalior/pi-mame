@@ -2,7 +2,7 @@
 
 ![MicroART ATM-Turbo 2 at power-on](images/atmtb2.jpg)
 
-- **`make MACHINE=atmtb2`** — Sinclair
+- **`make kernel MACHINE=atmtb2`** — Sinclair
 - **Year**: 1992
 - **Manufacturer**: MicroART
 - **Television**: PAL

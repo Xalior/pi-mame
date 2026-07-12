@@ -2,7 +2,7 @@
 
 ![ZX Spectrum +2 at power-on](images/specpls2.jpg)
 
-- **`make MACHINE=specpls2`** — Sinclair
+- **`make kernel MACHINE=specpls2`** — Sinclair
 - **Year**: 1986
 - **Manufacturer**: Amstrad plc
 - **Television**: PAL

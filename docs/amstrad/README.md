@@ -4,7 +4,7 @@ The Amstrad CPC family — the classic range, the cartridge-booting Plus
 range and its GX4000 console, and the East German clone — plus two other
 Amstrad-badged machines built on different hardware: the NC notepad
 organisers and the PC1512, Amstrad's 8086 IBM PC-compatible. Each
-`make MACHINE=<name>` below bakes one machine into its own
+`make kernel MACHINE=<name>` below bakes one machine into its own
 `kernel8-<name>.img` — see the [top-level README](../../README.md) for the
 build and the regional canvas.
 
@@ -17,7 +17,7 @@ per machine.
 
 ## Machines
 
-| `make` | System | Year | Romset | Extra assets | TV | |
+| `make kernel` | System | Year | Romset | Extra assets | TV | |
 |---|---|---|---|---|---|---|
 | `MACHINE=cpc464` | Amstrad CPC464 | 1984 | `cpc464.zip` | — | PAL | [details](cpc464.md) |
 | `MACHINE=cpc664` | Amstrad CPC664 | 1985 | `cpc664.zip` | — | PAL | [details](cpc664.md) |

@@ -126,7 +126,7 @@ author writes it like a shell command line, with a few fixed rules:
 - An empty defaults string boots MAME's own system-selection list instead
   of a specific machine.
 - The first token is normally the machine's short name, matching what
-  `make MACHINE=<name>` builds.
+  `make kernel MACHINE=<name>` builds.
 
 ### Real examples
 

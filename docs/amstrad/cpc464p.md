@@ -2,7 +2,7 @@
 
 ![Amstrad CPC464+ at power-on](images/cpc464p.jpg)
 
-- **`make MACHINE=cpc464p`** — Amstrad
+- **`make kernel MACHINE=cpc464p`** — Amstrad
 - **Year**: 1990
 - **Manufacturer**: Amstrad plc
 - **Television**: PAL

@@ -2,7 +2,7 @@
 
 ![Peters Plus Sprinter at power-on](images/sprinter.jpg)
 
-- **`make MACHINE=sprinter`** — Sinclair
+- **`make kernel MACHINE=sprinter`** — Sinclair
 - **Year**: 2000
 - **Manufacturer**: Peters Plus, Ivan Mak
 - **Television**: PAL

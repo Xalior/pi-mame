@@ -2,7 +2,7 @@
 
 ![Commodore 64 Games System at power-on](images/c64gs.jpg)
 
-- **`make MACHINE=c64gs`** — Commodore Business Machines
+- **`make kernel MACHINE=c64gs`** — Commodore Business Machines
 - **Year**: 1990
 - **Manufacturer**: Commodore Business Machines
 - **Television**: PAL

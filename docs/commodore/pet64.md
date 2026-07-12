@@ -2,7 +2,7 @@
 
 ![PET 64 / CBM 4064 at power-on](images/pet64.jpg)
 
-- **`make MACHINE=pet64`** — Commodore Business Machines
+- **`make kernel MACHINE=pet64`** — Commodore Business Machines
 - **Year**: 1983
 - **Manufacturer**: Commodore Business Machines
 - **Television**: NTSC

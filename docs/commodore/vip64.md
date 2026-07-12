@@ -2,7 +2,7 @@
 
 ![VIP-64 at power-on](images/vip64.jpg)
 
-- **`make MACHINE=vip64`** — Commodore Business Machines
+- **`make kernel MACHINE=vip64`** — Commodore Business Machines
 - **Year**: 1984
 - **Manufacturer**: Commodore Business Machines
 - **Television**: PAL

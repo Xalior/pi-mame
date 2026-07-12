@@ -2,7 +2,7 @@
 
 ![ZX Evolution: TS-Configuration at power-on](images/tsconf.jpg)
 
-- **`make MACHINE=tsconf`** — Sinclair
+- **`make kernel MACHINE=tsconf`** — Sinclair
 - **Year**: 2011
 - **Manufacturer**: NedoPC, TS-Labs
 - **Television**: PAL

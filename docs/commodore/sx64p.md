@@ -2,7 +2,7 @@
 
 ![SX-64 / Executive 64 at power-on](images/sx64p.jpg)
 
-- **`make MACHINE=sx64p`** — Commodore Business Machines
+- **`make kernel MACHINE=sx64p`** — Commodore Business Machines
 - **Year**: 1984
 - **Manufacturer**: Commodore Business Machines
 - **Television**: PAL

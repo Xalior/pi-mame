@@ -2,7 +2,7 @@
 
 ![Scorpion ZS-256 at power-on](images/scorpio.jpg)
 
-- **`make MACHINE=scorpio`** — Sinclair
+- **`make kernel MACHINE=scorpio`** — Sinclair
 - **Year**: 1992
 - **Manufacturer**: Scorpion, Ltd.
 - **Television**: PAL

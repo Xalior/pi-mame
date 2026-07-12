@@ -2,7 +2,7 @@
 
 ![ZX Spectrum Next, KS2 board (2023 Kickstarter) at power-on](images/specnext_ks2.jpg)
 
-- **`make MACHINE=specnext_ks2`** — Sinclair
+- **`make kernel MACHINE=specnext_ks2`** — Sinclair
 - **Year**: 2023
 - **Manufacturer**: SpecNext Ltd., Victor Trucco, Fabio Belavenuto
 - **Television**: PAL

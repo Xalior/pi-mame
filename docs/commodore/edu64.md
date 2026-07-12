@@ -2,7 +2,7 @@
 
 ![Educator 64 at power-on](images/edu64.jpg)
 
-- **`make MACHINE=edu64`** — Commodore Business Machines
+- **`make kernel MACHINE=edu64`** — Commodore Business Machines
 - **Year**: 1983
 - **Manufacturer**: Commodore Business Machines
 - **Television**: NTSC

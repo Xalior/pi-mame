@@ -2,7 +2,7 @@
 
 ![Commodore 64 (Japan) at power-on](images/c64_jp.jpg)
 
-- **`make MACHINE=c64_jp`** — Commodore Business Machines
+- **`make kernel MACHINE=c64_jp`** — Commodore Business Machines
 - **Year**: 1982
 - **Manufacturer**: Commodore Business Machines
 - **Television**: NTSC

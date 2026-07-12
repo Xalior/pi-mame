@@ -2,7 +2,7 @@
 
 ![ZX Spectrum Next at power-on](images/tbblue.jpg)
 
-- **`make MACHINE=tbblue`** — Sinclair
+- **`make kernel MACHINE=tbblue`** — Sinclair
 - **Year**: 2017
 - **Manufacturer**: SpecNext Ltd., Victor Trucco, Fabio Belavenuto
 - **Television**: PAL

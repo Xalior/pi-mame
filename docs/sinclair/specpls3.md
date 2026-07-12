@@ -2,7 +2,7 @@
 
 ![ZX Spectrum +3 at power-on](images/specpls3.jpg)
 
-- **`make MACHINE=specpls3`** — Sinclair
+- **`make kernel MACHINE=specpls3`** — Sinclair
 - **Year**: 1987
 - **Manufacturer**: Amstrad plc
 - **Television**: PAL

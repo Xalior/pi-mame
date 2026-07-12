@@ -2,7 +2,7 @@
 
 ![Commodore 64C at power-on](images/c64cp.jpg)
 
-- **`make MACHINE=c64cp`** — Commodore Business Machines
+- **`make kernel MACHINE=c64cp`** — Commodore Business Machines
 - **Year**: 1986
 - **Manufacturer**: Commodore Business Machines
 - **Television**: PAL

@@ -2,7 +2,7 @@
 
 ![Commodore 64 (Sweden) at power-on](images/c64_se.jpg)
 
-- **`make MACHINE=c64_se`** — Commodore Business Machines
+- **`make kernel MACHINE=c64_se`** — Commodore Business Machines
 - **Year**: 1982
 - **Manufacturer**: Commodore Business Machines
 - **Television**: PAL

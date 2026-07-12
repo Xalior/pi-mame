@@ -2,7 +2,7 @@
 
 ![Pentagon 128K at power-on](images/pentagon.jpg)
 
-- **`make MACHINE=pentagon`** — Sinclair
+- **`make kernel MACHINE=pentagon`** — Sinclair
 - **Year**: 1991
 - **Manufacturer**: Vladimir Drozdov
 - **Television**: PAL

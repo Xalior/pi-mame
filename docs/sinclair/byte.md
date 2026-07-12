@@ -2,7 +2,7 @@
 
 ![PEVM Byte at power-on](images/byte.jpg)
 
-- **`make MACHINE=byte`** — Sinclair
+- **`make kernel MACHINE=byte`** — Sinclair
 - **Year**: 1990
 - **Manufacturer**: BEMZ
 - **Television**: PAL
