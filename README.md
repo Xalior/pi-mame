@@ -25,7 +25,8 @@ and skip the toolchain:
 
 - **`pi-mame-<tag>-<machine>.zip`** — a complete single-machine copy-to-card
   bundle: Pi firmware, `config.txt`, the machine's regional `cmdline.txt`,
-  `kernel8-<machine>.img`, and the freely-redistributable "free-tier"
+  the machine's kernel as `pi-mame-core-rpi4.img` (the name `config.txt`
+  boots), and the freely-redistributable "free-tier"
   assets (see [Assets you must supply](#-assets-you-must-supply)). Extract
   it onto a blank **FAT32** SD card — files at the card's top level, not
   in a subfolder — put the card in the Pi, plug the display into
@@ -37,8 +38,9 @@ and skip the toolchain:
   **public** card lists the full roster (its extra entries boot but want
   their ROMs added). Both carry only free-tier assets.
 - **`kernel8-<machine>.img`** — just the kernel, for a card you've
-  already prepared from a previous bundle. Drop it in over the existing
-  image.
+  already prepared from a previous bundle. Copy it onto the card as
+  `pi-mame-core-rpi4.img` (the name `config.txt` boots), replacing the
+  one already there.
 
 Which machine? [docs/sinclair/](docs/sinclair/README.md),
 [docs/amstrad/](docs/amstrad/README.md) and
@@ -61,12 +63,13 @@ Prefer building it yourself? See
 
 Delightfully small. Let's be precise about what this actually is:
 
-- **Two platforms are proven** — Sinclair and Amstrad. Each is a family of
-  machines built on related hardware, sharing a MAME driver lineage and,
-  often, ROMs: see [docs/sinclair/](docs/sinclair/README.md),
+- **Three platforms are proven** — Sinclair, Amstrad, and Commodore. Each is
+  a family of machines built on related hardware, sharing a MAME driver
+  lineage and, often, ROMs: see [docs/sinclair/](docs/sinclair/README.md),
   [docs/amstrad/](docs/amstrad/README.md) and
   [docs/commodore/](docs/commodore/README.md) for exactly which machines and
-  what each needs.
+  what each needs — every one with an HDMI capture from a real Pi 4 on its
+  details page.
 - **One board.** 🥧 Proven on a Raspberry Pi 4 Model B (4GB). Nothing else
   has ever booted it. (The firmware files for the Pi 400 and CM4 ride
   along because Circle ships them — consider those a rumor, not a
@@ -84,7 +87,7 @@ go wild. A custom image is the same build with your choices in it. 🧪
 ## 📦 The default images
 
 There is **one binary per platform** — one per vendor-class (Sinclair,
-Amstrad), each linked from that platform's own isolated MAME build (its own
+Amstrad, Commodore), each linked from that platform's own isolated MAME build (its own
 drivers, no crossover). No machine is compiled in: the machine name and its
 media ride a fixed-size **defaults string** at offset `0x800` in the image,
 written before boot. "Which machine" is not configuration you edit at
@@ -99,7 +102,15 @@ Three shapes come out of that one binary per platform:
 | `kernel8-<platform>.img` | the platform's **no-options** kernel — unpatched, so MAME boots its own system list; machines with ROMs on the card run |
 | `kernel8-rpi4.img` (the **boot picker**, `make picker`) | a menu of the platform's machines read from `bootmenu.cfg`; a pick patches the platform binary and chain-boots it |
 
-Every machine belongs to one of two platforms:
+Those `kernel8-*.img` names are the build products (and the bare release
+downloads). On a card the firmware and picker boot two fixed names instead:
+the core — a machine image or a platform binary — is copied on as
+`pi-mame-core-rpi4.img`, and the picker as `pi-mame-boot-rpi4.img`. The
+copy-to-card bundles and `make sd` / `make card` put them there for you; do
+the same rename by hand only if you're dropping a bare kernel onto a card
+you already built.
+
+Every machine belongs to one of three platforms:
 
 | Platform | Details | Machines |
 |---|---|---|
@@ -133,6 +144,24 @@ machines. `make sd` copies the right one for the machine you
 name. The GPU outputs that geometry as the video signal; your display's own
 controller stretches it to the glass. `socmaxtemp=70` in the same file is
 load-bearing thermal configuration: don't remove it. 🌡️
+
+## 💾 It remembers — if you shut it down properly
+
+![The Amstrad NC100 warm-booting to its main menu, clock intact](docs/amstrad/images/nc100-saved.jpg)
+
+Power a machine off and its saved state waits on the card for next time.
+The Amstrad NC100 above has come back up straight to its main menu — WORD
+PROCESSOR, CALCULATOR, and DIARY / CLOCK / ADDRESS BOOK under a status bar
+showing the real date and time — with the clock it was keeping still
+running. Nothing was re-entered; it simply remembered. 🕰️
+
+There's a catch, and it's the real machine's catch, not ours: the NC100 and
+NC200 keep their clock and memory **only if you shut them down properly with
+their own On/Off key before you cut the power** — exactly like the
+battery-backed hardware they emulate. Pull the power in the middle of a
+session and the machine forgets, and comes back up to its Set-time screen
+with the clock reset, just as the real notepad did. That's MAME modelling
+the machine faithfully, right down to how it loses its memory — not a bug.
 
 ## 🧰 Prerequisites
 
