@@ -8,3 +8,5 @@ host/*.map
 host/libosd_sdl-nomain.a
 assets/
 .DS_Store
+host/libosd_sdl-nomain-*.a
+host/patch-defaults
