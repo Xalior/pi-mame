@@ -1,8 +1,61 @@
 # Changelog
 
 pi-mame doesn't version by semver yet — each cycle is a named proof-of-concept
-(PoC). This log starts with PoC1, the first released cycle, then rolls
-straight into PoC2, the cycle in progress.
+(PoC). Newest at the top: PoC2, the cycle in
+progress, then PoC1, the first released cycle.
+
+## PoC2 — in progress (unreleased)
+
+Work landed so far this cycle. Nothing here has shipped: it's unreleased,
+and the core split below is still awaiting review.
+
+- **The core split.** MAME's emulation core now runs alone on its own CPU
+  core, with all platform access (video, input, audio, file I/O) marshaled
+  through the shim to a dedicated services core, presentation moved off the
+  emulation core entirely, a hardware-threads layer for secondary-core
+  work, and a cross-core heartbeat/watchdog that detects a stalled core
+  instead of hanging silently. De-risked by a series of on-hardware
+  experiments beforehand, then proven on real hardware with the ZX Spectrum
+  Next (tbblue), which booted NextZXOS to its main menu and sustained a
+  live, animating screensaver — continuous cross-core frame delivery, not
+  just a static boot screen. This work is unpushed and pending review; it
+  has not been promoted onto the full machine table yet.
+- **The patchable-defaults factory.** A platform now builds as a single
+  kernel binary: the specific machine, and its media defaults, are patched
+  into a small fixed block in the image at boot, rather than needing a
+  separate rebuild per machine. An unpatched image still boots its baked
+  defaults unchanged, so a plain build behaves exactly as before.
+- **The boot picker.** A chainboot menu, separate from PoC1's MAME
+  system-list picker: it reads a boot-menu configuration file from the
+  card, takes a keyboard selection, and chain-boots the chosen machine
+  before MAME itself ever starts. Build-verified — compiles, links, and
+  fits comfortably under the kernel size ceiling — and this cycle, the
+  receiving side was proven on hardware too: given a selection, it
+  chain-boots the chosen machine end to end.
+- **Per-platform isolated builds.** Platform is the logical unit — a MAME
+  `src/mame/<vendor>/` directory, never mixed: each platform compiles in
+  its own MAME tree (own `SUBTARGET`, own `SOURCES`, own `BUILDDIR`) and
+  links one binary, from which every machine image is a millisecond
+  byte-patch. The patchable-defaults factory realized at scale: one link
+  per platform, 62 machine images.
+- **The Commodore platform.** The third platform: 29 machines across the
+  C64 line (including the SX-64 portables with their built-in drives and
+  their romsets), the VIC-20 family, and the TED range (Plus/4, C16,
+  C116, and the 264-series prototypes) — every one boot-proven on real
+  Pi 4 hardware, one HDMI capture per machine in
+  [docs/commodore/](docs/commodore/README.md).
+- **Multi-screen machines render.** The defaults string now carries
+  quoted, space-bearing MAME arguments (`-view "Screen 1"`), and view
+  selection puts a chosen screen full-canvas — the capability any
+  dual-display machine needs on a single fixed framebuffer.
+- **Platform cards, in two tiers.** Releases assemble one card zip per
+  platform and tier: the boot picker as the boot kernel, the platform
+  binary, a generated menu listing only the machines whose every asset
+  the tier can carry, and the tier's assets. The free tier follows the
+  license, not the mirror: Amstrad's classic CPC firmware is
+  free-tier under Amstrad's recorded distribution permission, so an
+  amstrad-free card exists alongside sinclair-free; Commodore ships
+  public-tier only, as no equivalent blessing exists.
 
 ## PoC1 — vStranger · 2026-07-11
 
@@ -63,56 +116,3 @@ the USB host stack those keyboards attach to, FatFs SD card storage, and
 CPU throttle / thermal management. The shim also implements an HDMI audio
 output path, though no shipped machine image has MAME's audio wired up to
 it yet.
-
-## PoC2 — in progress (unreleased)
-
-Work landed so far this cycle. Nothing here has shipped: it's unreleased,
-and the core split below is still awaiting review.
-
-- **The core split.** MAME's emulation core now runs alone on its own CPU
-  core, with all platform access (video, input, audio, file I/O) marshaled
-  through the shim to a dedicated services core, presentation moved off the
-  emulation core entirely, a hardware-threads layer for secondary-core
-  work, and a cross-core heartbeat/watchdog that detects a stalled core
-  instead of hanging silently. De-risked by a series of on-hardware
-  experiments beforehand, then proven on real hardware with the ZX Spectrum
-  Next (tbblue), which booted NextZXOS to its main menu and sustained a
-  live, animating screensaver — continuous cross-core frame delivery, not
-  just a static boot screen. This work is unpushed and pending review; it
-  has not been promoted onto the full machine table yet.
-- **The patchable-defaults factory.** A platform now builds as a single
-  kernel binary: the specific machine, and its media defaults, are patched
-  into a small fixed block in the image at boot, rather than needing a
-  separate rebuild per machine. An unpatched image still boots its baked
-  defaults unchanged, so a plain build behaves exactly as before.
-- **The boot picker.** A chainboot menu, separate from PoC1's MAME
-  system-list picker: it reads a boot-menu configuration file from the
-  card, takes a keyboard selection, and chain-boots the chosen machine
-  before MAME itself ever starts. Build-verified — compiles, links, and
-  fits comfortably under the kernel size ceiling — and this cycle, the
-  receiving side was proven on hardware too: given a selection, it
-  chain-boots the chosen machine end to end.
-- **Per-platform isolated builds.** Platform is the logical unit — a MAME
-  `src/mame/<vendor>/` directory, never mixed: each platform compiles in
-  its own MAME tree (own `SUBTARGET`, own `SOURCES`, own `BUILDDIR`) and
-  links one binary, from which every machine image is a millisecond
-  byte-patch. The patchable-defaults factory realized at scale: one link
-  per platform, 62 machine images.
-- **The Commodore platform.** The third platform: 29 machines across the
-  C64 line (including the SX-64 portables with their built-in drives and
-  their romsets), the VIC-20 family, and the TED range (Plus/4, C16,
-  C116, and the 264-series prototypes) — every one boot-proven on real
-  Pi 4 hardware, one HDMI capture per machine in
-  [docs/commodore/](docs/commodore/README.md).
-- **Multi-screen machines render.** The defaults string now carries
-  quoted, space-bearing MAME arguments (`-view "Screen 1"`), and view
-  selection puts a chosen screen full-canvas — the capability any
-  dual-display machine needs on a single fixed framebuffer.
-- **Platform cards, in two tiers.** Releases assemble one card zip per
-  platform and tier: the boot picker as the boot kernel, the platform
-  binary, a generated menu listing only the machines whose every asset
-  the tier can carry, and the tier's assets. The free tier follows the
-  license, not the mirror: Amstrad's classic CPC firmware is
-  free-tier under Amstrad's recorded distribution permission, so an
-  amstrad-free card exists alongside sinclair-free; Commodore ships
-  public-tier only, as no equivalent blessing exists.
