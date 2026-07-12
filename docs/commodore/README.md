@@ -18,6 +18,7 @@ below bakes one machine into its own `kernel8-<name>.img` — see the
 | `MACHINE=c64c` | Commodore 64C (NTSC) | 1986 | `c64c.zip` | — | NTSC | [details](c64c.md) |
 | `MACHINE=c64cp` | Commodore 64C (PAL) | 1986 | `c64cp.zip` | — | PAL | [details](c64cp.md) |
 | `MACHINE=c64g` | Commodore 64G (PAL) | 1986 | `c64g.zip` | — | PAL | [details](c64g.md) |
+| `MACHINE=c64c_es` | Commodore 64C (Spain) | 1988 | `c64c_es.zip` | — | PAL | [details](c64c_es.md) |
 
 Click through to a machine's details page for its exact romset (CRC32 per
 ROM) and what appears on the glass at power-on.
@@ -39,8 +40,10 @@ my-assets/
     │               #   16K part (251913-01.u4) + shared chargen + PLA
     ├── c64cp.zip  # Commodore 64C (PAL): same three ROMs as c64c.zip
     │               #   (rom_c64cp == rom_c64c; only the timing is PAL)
-    └── c64g.zip   # Commodore 64G (PAL): same three ROMs as c64c.zip
-                    #   (rom_c64g == rom_c64c; only the timing is PAL)
+    ├── c64g.zip   # Commodore 64G (PAL): same three ROMs as c64c.zip
+    │               #   (rom_c64g == rom_c64c; only the timing is PAL)
+    └── c64c_es.zip # Commodore 64C (Spain): Spanish chargen (325056-03.u5)
+                    #   + shared 64C combined ROM + PLA
 ```
 
 Only supplying some assets is fine: machines without their ROMs simply

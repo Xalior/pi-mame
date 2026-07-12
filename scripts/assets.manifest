@@ -350,6 +350,21 @@ mem|c64g|251913-01.u4|0010ec31|765372a0e16cbb0adf23a07b80f6b682b39fbf88|-
 mem|c64g|901225-01.u5|ec4272ee|adc7c31e18c7c7413d54802ef2f4193da14711aa|-
 mem|c64g|252715-01.u8|54c89351|efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b|-
 
+# c64c_es (64C, Spain, PAL) is a distinct romset (NOT a #define alias): it
+# carries the 64C combined BASIC+KERNAL ROM (251913-01.u4, shared with c64c by
+# checksum) and its own Spanish character generator (325056-03.u5). The PLA
+# content (54c89351) is byte-identical to c64's 906114-01.u17, located by CRC32
+# in the parent c64.zip and repacked under the 252715-01.u8 name c64c_es
+# expects. As a split-set clone, the c64c_es source zip carries ONLY its two
+# members that differ from the c64 parent (combined ROM + Spanish chargen); the
+# shared PLA comes from c64.zip. The mixed-provenance c64_jp precedent.
+asset|c64c_es|public|zip|roms/c64c_es.zip
+src|c64c_es|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/c64c_es.zip
+src|c64c_es|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/c64.zip
+mem|c64c_es|251913-01.u4|0010ec31|765372a0e16cbb0adf23a07b80f6b682b39fbf88|-
+mem|c64c_es|325056-03.u5|c890c175|4f57259fff9ef1963a4e87165a6f35ca23864c76|-
+mem|c64c_es|252715-01.u8|54c89351|efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b|-
+
 # +3 shares the +2A romset (identical members); source that set, repack.
 asset|specpls3|public|zip|roms/specpls3.zip
 src|specpls3|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/specpl2a.zip
