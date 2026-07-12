@@ -40,7 +40,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 360   # 6h ceiling; a cold spectrum-subtarget build lands well inside it.
+    timeout-minutes: 360   # 6h ceiling; two cold per-platform builds land well inside it.
 
     steps:
       # Recursive submodules. The mame submodule is large, so fetch it
@@ -126,77 +126,81 @@ jobs:
       - name: Build deps
         run: make deps
 
-      # mame/build is NOT cached: a full spectrum-subtarget tree is several
-      # GB and risks evicting the far more valuable (and slower to rebuild)
-      # deps cache from the 10GB repo budget. We eat the cold ~2h MAME
-      # build instead. The size is measured below so the trade can be
+      # mame/build is NOT cached: each platform's tree is several GB and risks
+      # evicting the far more valuable (and slower to rebuild) deps cache from
+      # the 10GB repo budget. We eat the cold per-platform MAME builds instead.
+      # Each platform is built in complete isolation (own SUBTARGET, own SOURCES,
+      # own BUILDDIR) so one platform's rebuild can never corrupt another's
+      # engine libraries. The sizes are measured below so the trade can be
       # revisited with data, not guesswork.
-      - name: Build MAME archives
+      - name: Build MAME archives (every platform, each isolated)
         run: make mame
 
       # TRUTH GATE #1: build-mame.sh tees through `tail` and genie's final
       # host-style link ALWAYS fails by design (it links for the build
       # host; our kernel links the archives itself). So the shell pipe
       # can exit non-fatally on a real failure too. Here we check the real
-      # success criteria: the object host/Makefile links against
-      # (mame.o) and the OSD archive. Absent => a genuine compile failure
-      # slipped through; fail RED right here, not two steps later.
+      # success criteria, PER PLATFORM: the object host/Makefile links against
+      # (mame.o), the OSD archive, and that platform's driver archive. Absent
+      # => a genuine compile failure slipped through; fail RED right here.
       - name: Verify MAME archives (the final host-link fails by design)
         run: |
-          MB=mame/build/rapi-circle
-          MAMEO="$MB/obj/Release/src/mame/mame.o"
-          OSD="$MB/bin/libosd_sdl.a"
           ok=1
-          [ -f "$MAMEO" ] || { echo "MISSING: $MAMEO"; ok=0; }
-          [ -f "$OSD" ]   || { echo "MISSING: $OSD"; ok=0; }
-          if ls "$MB"/bin/mame_spectrum/*.a >/dev/null 2>&1; then :; else
-            echo "MISSING: $MB/bin/mame_spectrum/*.a"; ok=0
-          fi
+          for p in $(make -s -f host/machines.mk print-PLATFORMS); do
+            st=$(make -s -f host/machines.mk print-PLATFORM_SUBTARGET_$p)
+            MB="mame/build/$p/rapi-circle"
+            [ -f "$MB/obj/Release/src/mame/mame.o" ] || { echo "MISSING: $MB/obj/Release/src/mame/mame.o"; ok=0; }
+            [ -f "$MB/bin/libosd_sdl.a" ]            || { echo "MISSING: $MB/bin/libosd_sdl.a"; ok=0; }
+            if ls "$MB"/bin/mame_$st/*.a >/dev/null 2>&1; then :; else
+              echo "MISSING: $MB/bin/mame_$st/*.a"; ok=0
+            fi
+            echo "platform '$p' archive tree size (for future cache decisions):"
+            du -sh "$MB" || true
+          done
           if [ "$ok" != 1 ]; then
             echo "MAME archives absent — a real compile failure hid behind"
-            echo "genie's by-design host-link failure. See build/mame-build.log."
+            echo "genie's by-design host-link failure. See build/mame-build-*.log."
             exit 1
           fi
           echo "genie's host link failed on purpose; checked — actually, it's okay after all."
-          echo "MAME archive tree size (for future cache decisions):"
-          du -sh "$MB" || true
 
       - name: Build kernels
         run: make kernels
 
       # TRUTH GATE #2 (belt and braces): make kernels is the real gate —
       # if it fails the job is already red. Additionally assert every
-      # expected image exists and each is under the 256MB ceiling.
+      # expected image exists and each is under the 256MB ceiling: every
+      # per-machine image (roster derived from machines.mk), every platform
+      # binary (kernel8-<platform>.img, the no-options kernels), and the boot
+      # picker at its real path (boot-picker/, not host/).
       - name: Verify kernel images
         run: |
-          MACHINES="spectrum spec128 specpls2 specpl2a specpls3 tbblue \
-            specnext_ks1 specnext_ks2 specnext_ks3 zx80 zx81 tc2048 ts2068 \
-            ts1000 ts1500 pentagon scorpio atmtb2 pentevo tsconf elwro800 \
-            byte cpc464 cpc664 cpc6128 cpc464p cpc6128p kccomp nc100 nc200 \
-            sprinter pc1512 gx4000 picker"
           CEIL=268435456   # 256 MiB
           fail=0
-          for m in $MACHINES; do
-            img="host/kernel8-$m.img"
-            if [ ! -f "$img" ]; then
-              echo "MISSING: $img"; fail=1; continue
-            fi
-            sz=$(stat -c%s "$img")
-            if [ "$sz" -ge "$CEIL" ]; then
-              echo "OVERSIZE: $img is $sz bytes (>= $CEIL)"; fail=1; continue
-            fi
-            echo "OK: $img ($sz bytes)"
+          check() {   # <path>
+            if [ ! -f "$1" ]; then echo "MISSING: $1"; fail=1; return; fi
+            sz=$(stat -c%s "$1")
+            if [ "$sz" -ge "$CEIL" ]; then echo "OVERSIZE: $1 is $sz bytes (>= $CEIL)"; fail=1; return; fi
+            echo "OK: $1 ($sz bytes)"
+          }
+          for m in $(make -s -f host/machines.mk print-MACHINES); do
+            check "host/kernel8-$m.img"
           done
+          for p in $(make -s -f host/machines.mk print-PLATFORMS); do
+            check "host/kernel8-$p.img"
+          done
+          check "boot-picker/kernel8-rpi4.img"
           [ "$fail" = 0 ] || { echo "kernel image verification failed"; exit 1; }
 
-      # A copy-to-card zip per machine (plus the picker): firmware, boot
-      # config, the machine's kernel, and the FREE-tier assets — only the
-      # properly-redistributable ones ever ship in a release. Machines
-      # whose ROMs are public-tier (see scripts/assets.manifest) get a
-      # bundle that boots but wants its ROMs added. The 2GB Next SD image
-      # rides only where the kernel actually mounts it (MAME_HARDDISK) —
-      # and in the picker's bundle, which can run those machines too.
-      # Each zip root is the FAT root: extract onto a blank card and boot.
+      # A copy-to-card zip per machine: firmware, boot config, the machine's
+      # single-purpose kernel, and the FREE-tier assets — only the properly-
+      # redistributable ones ever ship in a release. Machines whose ROMs are
+      # public-tier (see scripts/assets.manifest) get a bundle that boots but
+      # wants its ROMs added. The 2GB Next SD image rides only where the kernel
+      # actually mounts it — machines whose asset list includes `next`. The
+      # roster comes from machines.mk (never the kernel8-*.img glob, which now
+      # also holds the platform binaries). Each zip root is the FAT root:
+      # extract onto a blank card and boot.
       - name: Assemble per-machine SD card zips
         run: |
           make assets-free ASSETS=./free-assets
@@ -204,16 +208,37 @@ jobs:
           for d in roms carts; do
             if [ -d "free-assets/$d" ]; then cp -R "free-assets/$d" free-assets-lite/; fi
           done
-          for img in host/kernel8-*.img; do
-            m=${img#host/kernel8-}; m=${m%.img}
-            if [ "$m" = picker ] || \
-               grep -Eq "^MACHINE_DEFS_$m[[:space:]]*=.*MAME_HARDDISK" host/Makefile; then
+          for m in $(make -s -f host/machines.mk print-MACHINES); do
+            # Ship the big next.img only to the machines that actually mount it.
+            if make -s -f host/machines.mk print-MACHINE_ASSETS_$m | grep -qw next; then
               assets=./free-assets
             else
               assets=./free-assets-lite
             fi
             make sd MACHINE="$m" ASSETS="$assets"
             (cd build/sd && zip -qr "../../dist/pi-mame-${GITHUB_REF_NAME}-$m.zip" .)
+          done
+          ls -lh dist/
+
+      # A platform card zip per (platform, tier): the picker as the boot kernel,
+      # the platform binary as pi-mame-rpi4.img, a generated bootmenu.cfg, and
+      # the FREE-tier assets (public ROMs never ship — the public card's extra
+      # menu entries boot but want their ROMs added). The free and public card
+      # share the one platform binary; only the menu and the asset set differ.
+      # A tier whose menu is empty (e.g. amstrad-free — every amstrad romset is
+      # public) ships no card: an empty menu is nothing to boot.
+      - name: Assemble per-platform card zips
+        run: |
+          for p in $(make -s -f host/machines.mk print-PLATFORMS); do
+            for tier in free public; do
+              # Skip a tier with no bootable machines (comment lines start '#').
+              if ! scripts/gen-bootmenu.sh "$p" "$tier" | grep -qv '^#'; then
+                echo "skip: $p-$tier menu is empty"; continue
+              fi
+              make card PLATFORM="$p" TIER="$tier" ASSETS=./free-assets
+              (cd "build/card-$p-$tier" && \
+                zip -qr "../../dist/pi-mame-${GITHUB_REF_NAME}-$p-$tier.zip" .)
+            done
           done
           ls -lh dist/
 
@@ -252,14 +277,26 @@ jobs:
             [Sinclair](https://github.com/Xalior/pi-mame/blob/${{ github.ref_name }}/docs/sinclair/README.md)
             and [Amstrad](https://github.com/Xalior/pi-mame/blob/${{ github.ref_name }}/docs/amstrad/README.md).
 
-            Each `kernel8-<machine>.img` bakes one machine. Flash a FAT32 SD
-            card as the README describes, drop the image on it, and boot.
+            **Two shapes ship.** Each `kernel8-<machine>.img` is a
+            single-purpose image for one machine — flash a FAT32 card as the
+            README describes, drop the image on it, and boot. Each
+            `kernel8-<platform>.img` (one per vendor-class) is the platform's
+            no-options kernel: booted directly it brings up MAME's own
+            system-selection list.
 
-            The `pi-mame-<tag>-<machine>.zip` assets are complete
-            copy-to-card bundles: firmware, boot config, the machine's
-            kernel, and the **free-tier** assets — only the
-            properly-redistributable ones ever ship here. Machines whose
-            ROMs are public-tier (see `scripts/assets.manifest`) boot from
-            their bundle but need those ROMs added to the card's `roms/`
-            (and `carts/` for the CPC+ range) yourself. Extract a bundle
+            The `pi-mame-<tag>-<machine>.zip` assets are complete copy-to-card
+            bundles: firmware, boot config, the machine's kernel, and the
+            **free-tier** assets — only the properly-redistributable ones ever
+            ship here.
+
+            The `pi-mame-<tag>-<platform>-<free|public>.zip` assets are
+            platform cards: the boot picker as the front door, the platform
+            binary, and a menu of that platform's machines — the **free** card
+            lists only machines whose ROMs are all free-tier; the **public**
+            card lists the full roster. Both carry the same binary and only
+            free-tier assets.
+
+            Machines whose ROMs are public-tier (see `scripts/assets.manifest`)
+            boot from their bundle but need those ROMs added to the card's
+            `roms/` (and `carts/` for the CPC+ range) yourself. Extract a bundle
             onto a blank FAT32 card and boot.

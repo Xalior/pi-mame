@@ -260,6 +260,16 @@ asset|cpc464|public|zip|roms/cpc464.zip
 src|cpc464|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/cpc464.zip
 mem|cpc464|cpc464.rom|40852f25|56d39c463da60968d93e58b4ba0e675829412a20|-
 
+# c64: the four required ROM_START(c64) members only (basic, kernal r3,
+# chargen, PLA). The source zip also carries every alternate kernal
+# (JiffyDOS, SpeedDOS, …) — ROMX_LOAD alternates, optional, not packed.
+asset|c64|public|zip|roms/c64.zip
+src|c64|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/c64.zip
+mem|c64|901226-01.u3|f833d117|79015323128650c742a3694c9429aa91f355905e|-
+mem|c64|901227-03.u4|dbe3e7c7|1d503e56df85a62fee696e7618dc5b4e781df1bb|-
+mem|c64|901225-01.u5|ec4272ee|adc7c31e18c7c7413d54802ef2f4193da14711aa|-
+mem|c64|906114-01.u17|54c89351|efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b|-
+
 # +3 shares the +2A romset (identical members); source that set, repack.
 asset|specpls3|public|zip|roms/specpls3.zip
 src|specpls3|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/specpl2a.zip

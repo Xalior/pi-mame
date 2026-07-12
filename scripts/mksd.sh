@@ -1,7 +1,10 @@
 #!/bin/sh
 # mksd.sh — assemble a copy-to-card SD tree in build/sd/.
 #
-# Usage: scripts/mksd.sh <spectrum|tbblue|picker> [assets-dir]
+# Usage: scripts/mksd.sh <machine> [assets-dir]
+#
+# One machine's single-purpose card. For a platform card (the boot picker plus
+# a menu of a platform's machines) use scripts/mkcard.sh instead.
 #
 # The tree is a complete FAT-root layout: Raspberry Pi firmware (fetched at
 # the revision pinned by circle/boot/Makefile, using Circle's own download
@@ -12,7 +15,7 @@
 
 set -e
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-MACHINE="${1:?usage: mksd.sh <spectrum|tbblue|picker> [assets-dir]}"
+MACHINE="${1:?usage: mksd.sh <machine> [assets-dir]}"
 ASSETS="$2"
 SD="$ROOT/build/sd"
 IMG="$ROOT/host/kernel8-$MACHINE.img"
