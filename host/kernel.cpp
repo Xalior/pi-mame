@@ -48,6 +48,15 @@ static const char *MameArgv[] = {
     // configuration, not user-facing config surface.
     "-cart", MAME_CART,
 #endif
+#ifdef MAME_NO_IEC
+    // Machines with an IEC serial bus default to a plugged-in disk drive
+    // at device address 8 (cbm_iec_slot_device::add's _default_drive);
+    // its own ROM is then required to boot at all. A real machine with
+    // nothing plugged into that port is a completely valid (and far more
+    // common) configuration, so the appliance bakes device 8 empty
+    // rather than bundling a drive's romset.
+    "-iec8", "",
+#endif
     "-video", "soft",
     // keepaspect is desktop application surface; the appliance bakes it
     // off. The framebuffer IS the driver's raster (boot-config width=/
