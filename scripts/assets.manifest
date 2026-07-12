@@ -506,6 +506,18 @@ mem|pet64|901226-01.u3|f833d117|79015323128650c742a3694c9429aa91f355905e|-
 mem|pet64|901225-01.u5|ec4272ee|adc7c31e18c7c7413d54802ef2f4193da14711aa|-
 mem|pet64|906114-01.u17|54c89351|efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b|-
 
+# edu64 (Educator 64, NTSC) is a merged-into-parent clone: #define rom_edu64
+# rom_c64, so its romset is byte-identical to c64's. A c64_state machine in a
+# PET-style case sharing the pet64 config (monochrome monitor, MACHINE_WRONG_
+# COLORS). The four required members are located by CRC32 in the parent c64.zip
+# and repacked into edu64.zip (the c64p == rom_c64 precedent).
+asset|edu64|public|zip|roms/edu64.zip
+src|edu64|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/c64.zip
+mem|edu64|901226-01.u3|f833d117|79015323128650c742a3694c9429aa91f355905e|-
+mem|edu64|901227-03.u4|dbe3e7c7|1d503e56df85a62fee696e7618dc5b4e781df1bb|-
+mem|edu64|901225-01.u5|ec4272ee|adc7c31e18c7c7413d54802ef2f4193da14711aa|-
+mem|edu64|906114-01.u17|54c89351|efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b|-
+
 # +3 shares the +2A romset (identical members); source that set, repack.
 asset|specpls3|public|zip|roms/specpls3.zip
 src|specpls3|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/specpl2a.zip

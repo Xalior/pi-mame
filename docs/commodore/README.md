@@ -27,6 +27,7 @@ below bakes one machine into its own `kernel8-<name>.img` — see the
 | `MACHINE=vip64` | VIP-64 (Sweden/Finland SX-64) | 1984 | `vip64.zip` | — | PAL | [details](vip64.md) |
 | `MACHINE=tesa6240` | Tesa Etikett Etikettendrucker 6240 | 1984 | `tesa6240.zip` | — | PAL | [details](tesa6240.md) |
 | `MACHINE=pet64` | PET 64 / CBM 4064 (NTSC) | 1983 | `pet64.zip` | — | NTSC | [details](pet64.md) |
+| `MACHINE=edu64` | Educator 64 (NTSC) | 1983 | `edu64.zip` | — | NTSC | [details](edu64.md) |
 
 Click through to a machine's details page for its exact romset (CRC32 per
 ROM) and what appears on the glass at power-on.
@@ -73,10 +74,14 @@ my-assets/
     │               #   own bespoke basic + kernal + chargen (tesa-basic.ud4,
     │               #   tesa-kernal.ud3, tesa-char.ud1) + shared PLA
     │               #   (906114-01.ue4)
-    └── pet64.zip  # PET 64 / CBM 4064 (NTSC, green-screen education C64):
-                    #   own rev.1 KERNAL (901246-01.u4) + shared basic,
-                    #   chargen and PLA (901226-01.u3, 901225-01.u5,
-                    #   906114-01.u17)
+    ├── pet64.zip  # PET 64 / CBM 4064 (NTSC, green-screen education C64):
+    │               #   own rev.1 KERNAL (901246-01.u4) + shared basic,
+    │               #   chargen and PLA (901226-01.u3, 901225-01.u5,
+    │               #   906114-01.u17)
+    └── edu64.zip  # Educator 64 (NTSC, PET-cased education C64): #define
+                    #   rom_edu64 rom_c64 — byte-identical c64 romset (basic,
+                    #   kernal r3, chargen, PLA: 901226-01.u3, 901227-03.u4,
+                    #   901225-01.u5, 906114-01.u17)
 ```
 
 Only supplying some assets is fine: machines without their ROMs simply
