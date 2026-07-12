@@ -17,6 +17,7 @@ below bakes one machine into its own `kernel8-<name>.img` — see the
 | `MACHINE=c64_se` | Commodore 64 (Sweden) | 1982 | `c64_se.zip` | — | PAL | [details](c64_se.md) |
 | `MACHINE=c64c` | Commodore 64C (NTSC) | 1986 | `c64c.zip` | — | NTSC | [details](c64c.md) |
 | `MACHINE=c64cp` | Commodore 64C (PAL) | 1986 | `c64cp.zip` | — | PAL | [details](c64cp.md) |
+| `MACHINE=c64g` | Commodore 64G (PAL) | 1986 | `c64g.zip` | — | PAL | [details](c64g.md) |
 
 Click through to a machine's details page for its exact romset (CRC32 per
 ROM) and what appears on the glass at power-on.
@@ -36,8 +37,10 @@ my-assets/
     │               #   (kernel.u4, charswe.u5) + shared basic + PLA
     ├── c64c.zip   # Commodore 64C (NTSC): combined basic+kernal in one
     │               #   16K part (251913-01.u4) + shared chargen + PLA
-    └── c64cp.zip  # Commodore 64C (PAL): same three ROMs as c64c.zip
-                    #   (rom_c64cp == rom_c64c; only the timing is PAL)
+    ├── c64cp.zip  # Commodore 64C (PAL): same three ROMs as c64c.zip
+    │               #   (rom_c64cp == rom_c64c; only the timing is PAL)
+    └── c64g.zip   # Commodore 64G (PAL): same three ROMs as c64c.zip
+                    #   (rom_c64g == rom_c64c; only the timing is PAL)
 ```
 
 Only supplying some assets is fine: machines without their ROMs simply
