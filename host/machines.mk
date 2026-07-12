@@ -51,7 +51,7 @@ PLATFORM_MACHINES_amstrad = cpc464 cpc664 cpc6128 cpc464p cpc6128p gx4000 \
 	kccomp nc100 nc200 pc1512
 
 PLATFORM_MACHINES_commodore = c64 c64p c64_jp c64_se c64c c64cp c64g c64c_es \
-	c64c_se
+	c64c_se c64gs
 
 # All machines, every platform — the roster `make kernels` bakes and CI verifies.
 MACHINES = $(foreach p,$(PLATFORMS),$(PLATFORM_MACHINES_$(p)))
@@ -145,6 +145,7 @@ MACHINE_STRING_c64cp        = c64cp -iec8 ""
 MACHINE_STRING_c64g         = c64g -iec8 ""
 MACHINE_STRING_c64c_es      = c64c_es -iec8 ""
 MACHINE_STRING_c64c_se      = c64c_se -iec8 ""
+MACHINE_STRING_c64gs        = c64gs -iec8 ""
 
 # --- Sinclair asset dependencies (manifest asset names) ---
 MACHINE_ASSETS_spectrum     = spectrum
@@ -193,6 +194,7 @@ MACHINE_ASSETS_c64cp        = c64cp
 MACHINE_ASSETS_c64g         = c64g
 MACHINE_ASSETS_c64c_es      = c64c_es
 MACHINE_ASSETS_c64c_se      = c64c_se
+MACHINE_ASSETS_c64gs        = c64gs
 
 # Query helper: `make -f machines.mk -s print-MACHINE_STRING_spectrum`.
 # Lets scripts read these facts without pulling in the Circle build.

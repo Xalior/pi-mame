@@ -20,6 +20,7 @@ below bakes one machine into its own `kernel8-<name>.img` — see the
 | `MACHINE=c64g` | Commodore 64G (PAL) | 1986 | `c64g.zip` | — | PAL | [details](c64g.md) |
 | `MACHINE=c64c_es` | Commodore 64C (Spain) | 1988 | `c64c_es.zip` | — | PAL | [details](c64c_es.md) |
 | `MACHINE=c64c_se` | Commodore 64C (Sweden/Finland) | 1986 | `c64c_se.zip` | — | PAL | [details](c64c_se.md) |
+| `MACHINE=c64gs` | Commodore 64 Games System | 1990 | `c64gs.zip` | — | PAL | [details](c64gs.md) |
 
 Click through to a machine's details page for its exact romset (CRC32 per
 ROM) and what appears on the glass at power-on.
@@ -45,9 +46,12 @@ my-assets/
     │               #   (rom_c64g == rom_c64c; only the timing is PAL)
     ├── c64c_es.zip # Commodore 64C (Spain): Spanish chargen (325056-03.u5)
     │               #   + shared 64C combined ROM + PLA
-    └── c64c_se.zip # Commodore 64C (Sweden/Finland): own Swedish/Finnish
-                    #   KERNAL (325182-01.u4) + Scandinavian chargen
-                    #   ("cbm 64 skand.gen.u5") + shared PLA
+    ├── c64c_se.zip # Commodore 64C (Sweden/Finland): own Swedish/Finnish
+    │               #   KERNAL (325182-01.u4) + Scandinavian chargen
+    │               #   ("cbm 64 skand.gen.u5") + shared PLA
+    └── c64gs.zip  # Commodore 64 Games System: own GS boot KERNAL
+                    #   (390852-01.u4) + shared C64/C64C chargen
+                    #   (901225-01.u5) + shared PLA
 ```
 
 Only supplying some assets is fine: machines without their ROMs simply
