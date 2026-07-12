@@ -452,6 +452,24 @@ mem|dx64|251104-04.ud3|2c5965d4|aa136e91ecf3c5ac64f696b3dbcbfc5ba0871c98|-
 mem|dx64|901225-01.ud1|ec4272ee|adc7c31e18c7c7413d54802ef2f4193da14711aa|-
 mem|dx64|906114-01.ue4|54c89351|efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b|-
 
+# vip64 (VIP-64, Sweden/Finland SX-64, PAL) is a distinct romset (NOT a #define
+# alias): the Swedish-market portable C64 carries its OWN unique Swedish SX
+# KERNAL (kernelsx.ud3, CRC 7858d3d7) and the Swedish character generator
+# (charswe.ud1, bee9b3fd — byte-identical to c64_se's charswe.u5). Both are
+# carried by the split-set vip64.zip. Its BASIC (901226-01.ud4) and PLA
+# (906114-01.ue4) are byte-identical in content to c64's members, located by
+# CRC32 in the parent c64.zip and repacked under the board-position names vip64
+# expects. The mixed-provenance c64gs / sx64 precedent. pal_sx replaces the iec8
+# default with the built-in sx1541 drive, baked empty via -iec8 "" — no drive
+# romset required to reach the Swedish SX kernal's BASIC sign-on.
+asset|vip64|public|zip|roms/vip64.zip
+src|vip64|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/vip64.zip
+src|vip64|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/c64.zip
+mem|vip64|901226-01.ud4|f833d117|79015323128650c742a3694c9429aa91f355905e|-
+mem|vip64|kernelsx.ud3|7858d3d7|097cda60469492a8916c2677b7cce4e12a944bc0|-
+mem|vip64|charswe.ud1|bee9b3fd|446ae58f7110d74d434301491209299f66798d8a|-
+mem|vip64|906114-01.ue4|54c89351|efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b|-
+
 # +3 shares the +2A romset (identical members); source that set, repack.
 asset|specpls3|public|zip|roms/specpls3.zip
 src|specpls3|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/specpl2a.zip

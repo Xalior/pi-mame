@@ -51,7 +51,7 @@ PLATFORM_MACHINES_amstrad = cpc464 cpc664 cpc6128 cpc464p cpc6128p gx4000 \
 	kccomp nc100 nc200 pc1512
 
 PLATFORM_MACHINES_commodore = c64 c64p c64_jp c64_se c64c c64cp c64g c64c_es \
-	c64c_se c64gs sx64 sx64p dx64
+	c64c_se c64gs sx64 sx64p dx64 vip64
 
 # All machines, every platform — the roster `make kernels` bakes and CI verifies.
 MACHINES = $(foreach p,$(PLATFORMS),$(PLATFORM_MACHINES_$(p)))
@@ -163,6 +163,11 @@ MACHINE_STRING_sx64p        = sx64p -iec8 ""
 # sign-on. The empty-argv "" token is the same proven ABI as the sx64 pair;
 # this is the first defaults string carrying two of them.
 MACHINE_STRING_dx64         = dx64 -iec8 "" -iec9 ""
+# The VIP-64 (Swedish/Finnish SX-64): a distinct romset carrying its own unique
+# Swedish SX kernal and Swedish chargen. pal_sx replaces the iec8 slot's default
+# with the built-in sx1541 drive, emptied identically via -iec8 "" — device 8
+# baked empty, no drive romset required to reach the Swedish SX kernal's sign-on.
+MACHINE_STRING_vip64        = vip64 -iec8 ""
 
 # --- Sinclair asset dependencies (manifest asset names) ---
 MACHINE_ASSETS_spectrum     = spectrum
@@ -215,6 +220,7 @@ MACHINE_ASSETS_c64gs        = c64gs
 MACHINE_ASSETS_sx64         = sx64
 MACHINE_ASSETS_sx64p        = sx64p
 MACHINE_ASSETS_dx64         = dx64
+MACHINE_ASSETS_vip64        = vip64
 
 # Query helper: `make -f machines.mk -s print-MACHINE_STRING_spectrum`.
 # Lets scripts read these facts without pulling in the Circle build.
