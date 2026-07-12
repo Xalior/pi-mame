@@ -719,6 +719,28 @@ mem|c232|318006-01.u4|74eaae87|161c96b4ad20f3a4f2321808e37a5ded26a135dd|-
 mem|c232|318004-01.u5|dbdc3319|3c77caf72914c1c0a0875b3a7f6935cd30c54201|-
 mem|c232|251641-02.u7|83be2076|a89b18b2261233443c933c8b4663b108e7630924|-
 
+# v364 (Commodore V364, NTSC, prototype) — the LAST machine of the TED/264 driver
+# (src/mame/commodore/plus4.cpp, c16_state, machine config v364). v364 is a CLONE
+# of c264 (the Commodore 264 prototype parent); its config calls plus4n (the NTSC
+# Plus/4 config) then adds the T6721A speech synthesiser — the V364 is the
+# speaking 264-line prototype. v364 has no ROM_SYSTEM_BIOS alternates — a
+# self-contained romset. Its kernal kern364p (84fd4f7a) and speech ROM
+# spk3cc4.bin (5227c2ee) are UNIQUE to v364 and, with the basic 318006-01
+# (74eaae87) and the full Plus/4 3-PLUS-1 function pair 317053-01/317054-01
+# (4fd1d8cb/109de2fc), are packed under the exact ROM_START( v364 ) names (no
+# .uXX suffix) in the split-set clone zip v364.zip; the 251641-02 PLA (83be2076)
+# is byte-identical to the parent's and merges from c264.zip. Two src lines,
+# obtain_member locates each member by CRC32.
+asset|v364|public|zip|roms/v364.zip
+src|v364|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/v364.zip
+src|v364|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/c264.zip
+mem|v364|318006-01|74eaae87|161c96b4ad20f3a4f2321808e37a5ded26a135dd|-
+mem|v364|kern364p|84fd4f7a|b9a5b5dacd57ca117ef0b3af29e91998bf4d7e5f|-
+mem|v364|317053-01|4fd1d8cb|3b69f6e7cb4c18bb08e203fb18b7dabfa853390f|-
+mem|v364|317054-01|109de2fc|0ad7ac2db7da692d972e586ca0dfd747d82c7693|-
+mem|v364|spk3cc4.bin|5227c2ee|59af401cbb2194f689898271c6e8aafa28a7af11|-
+mem|v364|251641-02|83be2076|a89b18b2261233443c933c8b4663b108e7630924|-
+
 # +3 shares the +2A romset (identical members); source that set, repack.
 asset|specpls3|public|zip|roms/specpls3.zip
 src|specpls3|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/specpl2a.zip

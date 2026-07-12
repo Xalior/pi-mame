@@ -52,7 +52,7 @@ PLATFORM_MACHINES_amstrad = cpc464 cpc664 cpc6128 cpc464p cpc6128p gx4000 \
 
 PLATFORM_MACHINES_commodore = c64 c64p c64_jp c64_se c64c c64cp c64g c64c_es \
 	c64c_se c64gs sx64 sx64p dx64 vip64 tesa6240 pet64 edu64 vic20 vic20p \
-	vic20_se vic1001 c264 plus4 plus4p c16 c16p c116 c232
+	vic20_se vic1001 c264 plus4 plus4p c16 c16p c116 c232 v364
 
 # All machines, every platform — the roster `make kernels` bakes and CI verifies.
 MACHINES = $(foreach p,$(PLATFORMS),$(PLATFORM_MACHINES_$(p)))
@@ -285,6 +285,19 @@ MACHINE_STRING_c116         = c116 -iec8 ""
 # the 3-PLUS-1 function ROMs, but with 32K RAM (vs the C16's 16K) it boots to
 # BASIC V3.5 with 28661 BYTES FREE on the PAL canvas.
 MACHINE_STRING_c232         = c232 -iec8 ""
+# The Commodore V364 (NTSC, prototype): the LAST machine of the TED/264 driver
+# (src/mame/commodore/plus4.cpp, c16_state, machine config v364). A clone of the
+# c264 prototype parent; the v364 config calls plus4n (the NTSC Plus/4 config),
+# then adds the T6721A speech synthesiser and MOS8706 speech/voice LSI — the
+# V364 is the speaking prototype of the 264 line. It keeps the same cbm_iec
+# serial bus (a C1541 defaulted at device 8), so the same -iec8 "" empties device
+# 8 and reaches BASIC with no drive romset required. Unlike the cut-down
+# C16/232/116 it carries the full Plus/4 3-PLUS-1 function ROMs (317053-01 +
+# 317054-01), so it boots to BASIC V3.5 with the 3-PLUS-1 line. Its kernal
+# kern364p (CRC 84fd4f7a) and speech ROM spk3cc4.bin (5227c2ee) are UNIQUE to
+# v364; basic 318006-01, the function pair and PLA 251641-02 are byte-identical
+# to the rest of the 264 line. NTSC canvas.
+MACHINE_STRING_v364         = v364 -iec8 ""
 
 # --- Sinclair asset dependencies (manifest asset names) ---
 MACHINE_ASSETS_spectrum     = spectrum
@@ -352,6 +365,7 @@ MACHINE_ASSETS_c16          = c16
 MACHINE_ASSETS_c16p         = c16p
 MACHINE_ASSETS_c116         = c116
 MACHINE_ASSETS_c232         = c232
+MACHINE_ASSETS_v364         = v364
 
 # Query helper: `make -f machines.mk -s print-MACHINE_STRING_spectrum`.
 # Lets scripts read these facts without pulling in the Circle build.

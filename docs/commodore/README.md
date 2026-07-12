@@ -39,6 +39,7 @@ below bakes one machine into its own `kernel8-<name>.img` — see the
 | `MACHINE=c16p` | Commodore 16 (PAL) | 1984 | `c16p.zip` | — | PAL | [details](c16p.md) |
 | `MACHINE=c116` | Commodore 116 | 1984 | `c116.zip` | — | PAL | [details](c116.md) |
 | `MACHINE=c232` | Commodore 232 (PAL, prototype) | 1984 | `c232.zip` | — | PAL | [details](c232.md) |
+| `MACHINE=v364` | Commodore V364 (NTSC, prototype) | 1984 | `v364.zip` | — | NTSC | [details](v364.md) |
 
 Click through to a machine's details page for its exact romset (CRC32 per
 ROM) and what appears on the glass at power-on.
@@ -150,13 +151,22 @@ my-assets/
     │               #   only in the PLA member name (251641-02.u101 vs c16p's .u16).
     │               #   No 3-PLUS-1 function ROMs — the C116 has none (12277 bytes
     │               #   free)
-    └── c232.zip   # Commodore 232 (PAL, prototype): a pre-production 264-line
-                    #   prototype on the same plus4.cpp TED/264 driver (c16_state,
-                    #   config c232 = c16p with RAM raised to 32K). Split-set clone
-                    #   of the c264 prototype — its UNIQUE kernal 318004-01.u5
-                    #   (dbdc3319) and shared basic 318006-01.u4 come from c232.zip,
-                    #   the shared PLA from the parent c264.zip (251641-02.u7). No
-                    #   3-PLUS-1 function ROMs, but 32K RAM (28661 bytes free)
+    ├── c232.zip   # Commodore 232 (PAL, prototype): a pre-production 264-line
+    │               #   prototype on the same plus4.cpp TED/264 driver (c16_state,
+    │               #   config c232 = c16p with RAM raised to 32K). Split-set clone
+    │               #   of the c264 prototype — its UNIQUE kernal 318004-01.u5
+    │               #   (dbdc3319) and shared basic 318006-01.u4 come from c232.zip,
+    │               #   the shared PLA from the parent c264.zip (251641-02.u7). No
+    │               #   3-PLUS-1 function ROMs, but 32K RAM (28661 bytes free)
+    └── v364.zip   # Commodore V364 (NTSC, prototype): the LAST machine of the
+                    #   plus4.cpp TED/264 driver (c16_state, config v364 = the NTSC
+                    #   plus4n config plus a T6721A speech synthesiser). Split-set
+                    #   clone of the c264 prototype — its UNIQUE kernal kern364p
+                    #   (84fd4f7a) and UNIQUE speech ROM spk3cc4.bin (5227c2ee), with
+                    #   the shared basic 318006-01 and the full Plus/4 3-PLUS-1
+                    #   function pair 317053-01/317054-01, come from v364.zip; the
+                    #   shared PLA from the parent c264.zip (251641-02). Full 64K
+                    #   (60671 bytes free), with the 3-PLUS-1 suite
 ```
 
 Only supplying some assets is fine: machines without their ROMs simply
