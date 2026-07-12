@@ -293,6 +293,21 @@ mem|c64_jp|906145-02.u4|3a9ef6f1|4ff0f11e80f4b57430d8f0c3799ed0f0e0f4565d|-
 mem|c64_jp|906143-02.u5|1604f6c1|0fad19dbcdb12461c99657b2979dbb5c2e47b527|-
 mem|c64_jp|906114-01.u17|54c89351|efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b|-
 
+# c64_se (Sweden/Finland, PAL) is a distinct romset (NOT a #define alias): it
+# carries its own Swedish kernal (kernel.u4) and character generator. The charom
+# region has ROM_SYSTEM_BIOS choices — the DEFAULT bios (charswe.u5) is pinned;
+# the alt chargen (charswe2.u5) is not shipped. The basic (901226-01.u3) and PLA
+# (906114-01.u17) are byte-identical to c64's, located by CRC32 in the parent
+# c64.zip and repacked. As a split-set clone, the c64_se source zip carries ONLY
+# its unique members.
+asset|c64_se|public|zip|roms/c64_se.zip
+src|c64_se|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/c64_se.zip
+src|c64_se|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/c64.zip
+mem|c64_se|901226-01.u3|f833d117|79015323128650c742a3694c9429aa91f355905e|-
+mem|c64_se|kernel.u4|f10c2c25|e4f52d9b36c030eb94524eb49f6f0774c1d02e5e|-
+mem|c64_se|charswe.u5|bee9b3fd|446ae58f7110d74d434301491209299f66798d8a|-
+mem|c64_se|906114-01.u17|54c89351|efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b|-
+
 # +3 shares the +2A romset (identical members); source that set, repack.
 asset|specpls3|public|zip|roms/specpls3.zip
 src|specpls3|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/specpl2a.zip
