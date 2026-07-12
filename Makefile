@@ -68,6 +68,7 @@ kernels:
 	$(MAKE) -C host MACHINE=sprinter
 	$(MAKE) -C host MACHINE=pc1512
 	$(MAKE) -C host MACHINE=gx4000
+	$(MAKE) -C host MACHINE=c64
 	$(MAKE) -C host MACHINE=picker
 
 sd:

@@ -64,9 +64,17 @@ MACHINE_DEFS_nc100    = -DMAME_MACHINE='"nc100"'
 MACHINE_DEFS_nc200    = -DMAME_MACHINE='"nc200"'
 MACHINE_DEFS_sprinter = -DMAME_MACHINE='"sprinter"'
 MACHINE_DEFS_pc1512   = -DMAME_MACHINE='"pc1512"'
+MACHINE_DEFS_c64      = -DMAME_MACHINE='"c64"'
 MACHINE_DEFS_picker   = -DMAME_PICKER
 
 KERNEL_DEFS = $(MACHINE_DEFS_$(MACHINE))
+
+# Which MAME SUBTARGET a machine's driver was built into. Platforms never
+# share a binary (one platform, one archive, no crossover): unset defaults
+# to "spectrum" (today's sinclair+amstrad build); a new platform overrides
+# with its own SUBTARGET, built by its own scripts/build-mame-<platform>.sh.
+PLATFORM_c64 = commodore
+MACHINE_SUBTARGET = $(if $(PLATFORM_$(MACHINE)),$(PLATFORM_$(MACHINE)),spectrum)
 ifeq ($(strip $(KERNEL_DEFS)),)
 $(error unknown MACHINE '$(MACHINE)' — spectrum, spec128, specpls2, specpl2a, specpls3, tbblue, specnext_ks1, specnext_ks2, specnext_ks3, zx80, zx81, tc2048, ts2068, ts1000, ts1500, pentagon, scorpio, atmtb2, pentevo, tsconf, elwro800, byte, sprinter, pc1512, gx4000, or picker)
 endif
@@ -80,7 +88,7 @@ STANDARD = -std=gnu++23 -Wno-volatile
 # The three objects genie links directly into the final binary.
 MAME_OBJS = \
 	$(MAMEBUILD)/obj/Release/src/mame/mame.o \
-	$(MAMEBUILD)/obj/Release/generated/mame/spectrum/drivlist.o \
+	$(MAMEBUILD)/obj/Release/generated/mame/$(MACHINE_SUBTARGET)/drivlist.o \
 	$(MAMEBUILD)/obj/Release/generated/version.o
 
 # libosd_sdl.a ships sdlmain.o (MAME's own main() + sdl_entered_debugger,
@@ -92,7 +100,7 @@ LIBOSD_NOMAIN = libosd_sdl-nomain.a
 # stays in: built with USE_QTDEBUG=0 it holds only the not-supported debugger
 # module (DEBUG_QT), which osdobj_common.cpp registers unconditionally.
 MAME_ARCHIVES = \
-	$(wildcard $(MAMEBUILD)/bin/mame_spectrum/*.a) \
+	$(wildcard $(MAMEBUILD)/bin/mame_$(MACHINE_SUBTARGET)/*.a) \
 	$(filter-out %/libosd_sdl.a %/libprecompile.a, \
 		$(wildcard $(MAMEBUILD)/bin/*.a))
 
