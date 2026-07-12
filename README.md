@@ -40,8 +40,9 @@ and skip the toolchain:
   already prepared from a previous bundle. Drop it in over the existing
   image.
 
-Which machine? [docs/sinclair/](docs/sinclair/README.md) and
-[docs/amstrad/](docs/amstrad/README.md) list every one, with a details
+Which machine? [docs/sinclair/](docs/sinclair/README.md),
+[docs/amstrad/](docs/amstrad/README.md) and
+[docs/commodore/](docs/commodore/README.md) list every one, with a details
 page each.
 
 CI **compiles** every release on a clean Ubuntu runner — that's what's
@@ -62,8 +63,9 @@ Delightfully small. Let's be precise about what this actually is:
 
 - **Two platforms are proven** — Sinclair and Amstrad. Each is a family of
   machines built on related hardware, sharing a MAME driver lineage and,
-  often, ROMs: see [docs/sinclair/](docs/sinclair/README.md) and
-  [docs/amstrad/](docs/amstrad/README.md) for exactly which machines and
+  often, ROMs: see [docs/sinclair/](docs/sinclair/README.md),
+  [docs/amstrad/](docs/amstrad/README.md) and
+  [docs/commodore/](docs/commodore/README.md) for exactly which machines and
   what each needs.
 - **One board.** 🥧 Proven on a Raspberry Pi 4 Model B (4GB). Nothing else
   has ever booted it. (The firmware files for the Pi 400 and CM4 ride
@@ -103,6 +105,7 @@ Every machine belongs to one of two platforms:
 |---|---|---|
 | Sinclair — the ZX Spectrum family and its clones | [docs/sinclair/README.md](docs/sinclair/README.md) | [`docs/sinclair/`](docs/sinclair/) |
 | Amstrad — the CPC family, the NC notepads, and the PC1512 | [docs/amstrad/README.md](docs/amstrad/README.md) | [`docs/amstrad/`](docs/amstrad/) |
+| Commodore — the C64 line, the VIC-20s, and the TED machines | [docs/commodore/README.md](docs/commodore/README.md) | [`docs/commodore/`](docs/commodore/) |
 
 Each platform page carries its own machine table (`make MACHINE=` target,
 system, year, romset, TV region) and a details page per machine covering
@@ -160,7 +163,7 @@ make mame      # the MAME archives, one isolated tree per platform — the long
                # (genie's final host-style link fails by design; the
                #  archives are the product and the kernel links itself)
 make kernels   # every platform binary + every machine's kernel8-<machine>.img
-               #   + the boot picker — see docs/sinclair/ and docs/amstrad/
+               #   + the boot picker — see docs/sinclair/, docs/amstrad/ and docs/commodore/
                #   for the full list, or `make kernel MACHINE=<name>` for one
 
 make sd MACHINE=spectrum ASSETS=~/my-assets   # a single-machine card, or:
@@ -205,8 +208,9 @@ This repository contains no ROMs and no disk images. `make sd`'s `ASSETS`
 directory always has a `roms/` folder; some platforms add their own
 subfolder alongside it (the Sinclair platform's Next SD-card image lives
 in `next/`, for instance). Each platform page has the exact tree:
-[docs/sinclair/README.md](docs/sinclair/README.md#assets) and
-[docs/amstrad/README.md](docs/amstrad/README.md#assets). Only supplying
+[docs/sinclair/README.md](docs/sinclair/README.md#assets),
+[docs/amstrad/README.md](docs/amstrad/README.md#assets) and
+[docs/commodore/README.md](docs/commodore/README.md#assets). Only supplying
 some assets is fine: machines without their ROMs simply won't run.
 
 ### 🥤 Fetching them
