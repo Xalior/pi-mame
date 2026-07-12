@@ -1,9 +1,6 @@
 # Changelog
 
-## PoC2 — in progress (unreleased)
-
-Work landed so far this cycle. Nothing here has shipped: it's unreleased,
-and the core split below is still awaiting review.
+## PoC2 — unreleased
 
 - **The core split.** MAME's emulation core now runs alone on its own CPU
   core, with all platform access (video, input, audio, file I/O) marshaled
