@@ -168,13 +168,14 @@ mamemain.d: mamemain.cpp
 include ../mk/ld/circle-app.mk
 
 # ---------------------------------------------------------------------------
-# Per-machine single-purpose images: one byte-patch of the universal binary.
+# Per-machine single-purpose images: one byte-patch of the platform binary.
 # ---------------------------------------------------------------------------
 #
 # A downloadable kernel8-<machine>.img is what makes the "embedded, replace a
 # dead motherboard" appliance easy — the string changes the factory, never the
-# shelf. Each is a verbatim copy of kernel8-platform.img with that machine's
-# defaults string stamped into the 0x800 block by the host patcher, which
+# shelf. Each is a verbatim copy of this platform's kernel8-$(PLATFORM).img with
+# that machine's defaults string stamped into the 0x800 block by the host
+# patcher, which
 # reuses the boot picker's one writer (magic seatbelt, capacity enforcement).
 #
 # patch-defaults is host-native (it edits an image on the build host, it never

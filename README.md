@@ -12,25 +12,30 @@ bare-metal framework through a purpose-built
 same emulator; what differs is what happens at power-on, and that is
 decided when the image is **built** — never by config files or a command
 line, because there are none. A machine image powers on as its one
-machine, instantly, every time. The picker image powers on into MAME's
-system list instead: pick a machine with the keyboard and — if its ROMs
-are on the card — it starts. Nothing you pick is remembered — power off,
-and the next power-on asks again. 🔁
+machine, instantly, every time. A platform card powers on into a picker
+instead: a menu of that platform's machines — pick one with the keyboard
+and, if its ROMs are on the card, it starts. Nothing you pick is
+remembered — power off, and the next power-on asks again. 🔁
 
 ## 📥 Download a ready-made image
 
-Every tagged release builds two asset forms per machine — grab yours from
+Every tagged release carries several asset forms — grab yours from
 [**the latest release**](https://github.com/Xalior/pi-mame/releases/latest)
 and skip the toolchain:
 
-- **`pi-mame-<tag>-<machine>.zip`** — a complete copy-to-card bundle: Pi
-  firmware, `config.txt`, the machine's regional `cmdline.txt`,
+- **`pi-mame-<tag>-<machine>.zip`** — a complete single-machine copy-to-card
+  bundle: Pi firmware, `config.txt`, the machine's regional `cmdline.txt`,
   `kernel8-<machine>.img`, and the freely-redistributable "free-tier"
   assets (see [Assets you must supply](#-assets-you-must-supply)). Extract
   it onto a blank **FAT32** SD card — files at the card's top level, not
   in a subfolder — put the card in the Pi, plug the display into
   **HDMI0** (the micro-HDMI port next to the USB-C power connector), and
   power on.
+- **`pi-mame-<tag>-<platform>-<free|public>.zip`** — a platform card: the
+  boot picker plus that platform's binary and a menu of its machines. The
+  **free** card lists only machines whose ROMs are all free-tier; the
+  **public** card lists the full roster (its extra entries boot but want
+  their ROMs added). Both carry only free-tier assets.
 - **`kernel8-<machine>.img`** — just the kernel, for a card you've
   already prepared from a previous bundle. Drop it in over the existing
   image.
@@ -67,25 +72,32 @@ Delightfully small. Let's be precise about what this actually is:
 - **Single-threaded, and silent.** One of the Pi's four cores does all the
   work, and audio isn't wired up yet. 🔇
 
-Building more of MAME in is a `SOURCES` change in `scripts/build-mame.sh`;
-running more is a matter of what you put in `roms/`. Everything on this
-page describes **this repository's build system and its defaults** — all
-of it is yours to change: add a `MACHINE_DEFS_<name>` line in
-`host/Makefile` to bake a different machine, write your own canvas, go
-wild. A custom image is the same build with your choices in it. 🧪
+Building more of MAME in is a `SOURCES` change in `host/machines.mk`
+(each platform's driver list); running more is a matter of what you put in
+`roms/`. Everything on this page describes **this repository's build system
+and its defaults** — all of it is yours to change: add a machine's row to
+`host/machines.mk` (its defaults string and assets), write your own canvas,
+go wild. A custom image is the same build with your choices in it. 🧪
 
 ## 📦 The default images
 
-Every image bakes one machine (or the picker) into `host/kernel.cpp` as
-compiled-in constants — no CLI, no config files of ours. "Which machine"
-is not configuration; it's which binary you boot, and the SD card is
-identical in every case: only the kernel differs. 💾
+There is **one binary per platform** — one per vendor-class (Sinclair,
+Amstrad), each linked from that platform's own isolated MAME build (its own
+drivers, no crossover). No machine is compiled in: the machine name and its
+media ride a fixed-size **defaults string** at offset `0x800` in the image,
+written before boot. "Which machine" is not configuration you edit at
+runtime — there is no CLI and no config files of ours — it's what got
+stamped into that block. 💾
 
-| `make` | Image | Powers on into |
-|---|---|---|
-| `MACHINE=picker` | `kernel8-picker.img` | MAME's system list — a menu; machines with ROMs on the card run |
+Three shapes come out of that one binary per platform:
 
-Every other machine belongs to one of two platforms:
+| Image | Powers on into |
+|---|---|
+| `kernel8-<machine>.img` | one machine — the platform binary with that machine's defaults stamped in (`make kernel MACHINE=<name>`) |
+| `kernel8-<platform>.img` | the platform's **no-options** kernel — unpatched, so MAME boots its own system list; machines with ROMs on the card run |
+| `kernel8-rpi4.img` (the **boot picker**, `make picker`) | a menu of the platform's machines read from `bootmenu.cfg`; a pick patches the platform binary and chain-boots it |
+
+Every machine belongs to one of two platforms:
 
 | Platform | Details | Machines |
 |---|---|---|
@@ -143,23 +155,29 @@ git clone --recursive https://github.com/Xalior/pi-mame.git
 cd pi-mame
 
 make deps      # circle-stdlib (multicore) + the SDL2 shim
-make mame      # the MAME archives — the long one; log: build/mame-build.log
+make mame      # the MAME archives, one isolated tree per platform — the long
+               #   one; logs: build/mame-build-<platform>.log
                # (genie's final host-style link fails by design; the
                #  archives are the product and the kernel links itself)
-make kernels   # every machine's kernel8-<machine>.img, plus kernel8-picker.img
-               #   — see docs/sinclair/ and docs/amstrad/ for the full list,
-               #   or `make kernel MACHINE=<name>` for just one
+make kernels   # every platform binary + every machine's kernel8-<machine>.img
+               #   + the boot picker — see docs/sinclair/ and docs/amstrad/
+               #   for the full list, or `make kernel MACHINE=<name>` for one
 
-make sd MACHINE=spectrum ASSETS=~/my-assets   # see "Assets you must supply"
+make sd MACHINE=spectrum ASSETS=~/my-assets   # a single-machine card, or:
+make card PLATFORM=sinclair TIER=free ASSETS=~/my-assets   # a platform card
 ```
 
-`make sd` assembles a complete copy-to-card tree in `build/sd/`:
-Raspberry Pi firmware (fetched at the revision Circle pins), Circle's
-`config64.txt` boot configuration, the machine's regional canvas
-`cmdline.txt`, and the chosen kernel. `ASSETS` points at a directory you
-provide (layout on the platform pages); leave it off and `make sd` still
-builds the tree — you'll just add `roms/` (and any platform extras)
-to the card yourself.
+`make sd` assembles a complete single-machine copy-to-card tree in
+`build/sd/`: Raspberry Pi firmware (fetched at the revision Circle pins),
+Circle's `config64.txt` boot configuration, the machine's regional canvas
+`cmdline.txt`, and the chosen kernel. `make card PLATFORM=<p> TIER=<free|public>`
+instead lays out a platform card in `build/card-<p>-<tier>/`: the boot
+picker as the front door, the platform binary, and a generated
+`bootmenu.cfg` (the **free** menu lists only machines whose ROMs are all
+free-tier; **public** lists the full roster). `ASSETS` points at a directory
+you provide (layout on the platform pages); leave it off and the tree still
+builds — you'll just add `roms/` (and any platform extras) to the card
+yourself.
 
 Then, concretely: 💾
 

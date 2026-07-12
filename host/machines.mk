@@ -1,9 +1,9 @@
 #
 # machines.mk — the per-machine facts, one place.
 #
-# Under the patchable-defaults string there is ONE platform binary
-# (kernel8-platform.img): no machine is compiled in. Everything that used to
-# be a per-machine compile-time bake is now data here —
+# Under the patchable-defaults string there is ONE binary per vendor-class
+# platform (kernel8-<platform>.img): no machine is compiled in. Everything that
+# used to be a per-machine compile-time bake is now data here —
 #
 #   PLATFORM_MACHINES_<platform>  which machines belong to which card
 #   PLATFORM_SUBTARGET_<platform> the platform's isolated MAME SUBTARGET

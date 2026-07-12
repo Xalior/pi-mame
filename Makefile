@@ -76,7 +76,7 @@ kernel:
 machines:
 	@for p in $(PLATFORMS); do $(MAKE) -C host PLATFORM=$$p machines || exit 1; done
 
-# Everything CI verifies: the universal binary, every patched machine image,
+# Everything CI verifies: every platform binary, every patched machine image,
 # and the picker.
 kernels: platform machines picker
 
