@@ -14,9 +14,15 @@
 #                '-' when only 'zip' sources apply (located by CRC32)
 #       crc32/sha1 = '-' only on the checksum-exempt image asset
 #
-# TIER DOCTRINE ("free soda"): free = redistribution properly blessed, fetched
-# from a proper upstream (Amstrad's permission for the Sinclair/Amstrad 8-bit
-# ROMs, shipped by Fuse/proteanthread; the hosted Next SD image). public =
+# TIER DOCTRINE ("free soda"): free = redistribution properly blessed —
+# FREEDOM IS A RIGHT, NOT A LOCATION: the tier rides the LICENSE on the
+# bytes, never the mirror that serves them (Debian from archive.org is
+# still free). Blessings on record: Amstrad's permission for the
+# Sinclair 8-bit ROMs (Fuse/proteanthread) AND for its own classic CPC
+# firmware (the Cliff Lawson permission: distribute freely, copyright
+# message unchanged, Amstrad's copyright acknowledged — covers
+# cpc464/cpc664/cpc6128 from any source); the hosted Next SD image.
+# public =
 # publicly-available-but-grey MAME-set mirrors on archive.org. Checksums are
 # each machine's ROM_START in the MAME tree; every member is CRC32+SHA1 verified
 # before install. next.img is the sole checksum-exempt asset (a live SD image
@@ -187,12 +193,12 @@ asset|pc1512kb|public|zip|roms/pc1512kb.zip
 src|pc1512kb|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/pc1512kb.zip
 mem|pc1512kb|40042.ic801|607edaf6|4422c6475596c3881c11b6a6266811c336d55d19|-
 
-asset|cpc664|public|zip|roms/cpc664.zip
+asset|cpc664|free|zip|roms/cpc664.zip
 src|cpc664|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/cpc664.zip
 mem|cpc664|cpc664.rom|9ab5a036|073a7665527b5bd8a148747a3947dbd3328682c8|-
 mem|cpc664|cpcados.rom|1fe22ecd|39102c8e9cb55fcc0b9b62098780ed4a3cb6a4bb|-
 
-asset|cpc6128|public|zip|roms/cpc6128.zip
+asset|cpc6128|free|zip|roms/cpc6128.zip
 src|cpc6128|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/cpc6128.zip
 mem|cpc6128|cpc6128.rom|9e827fe1|5977adbad3f7c1e0e082cd02fe76a700d9860c30|-
 mem|cpc6128|cpcados.rom|1fe22ecd|39102c8e9cb55fcc0b9b62098780ed4a3cb6a4bb|-
@@ -256,7 +262,7 @@ asset|zx80|public|zip|roms/zx80.zip
 src|zx80|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/zx80.zip
 mem|zx80|zx80.rom|4c7fc597|b6769a3197c77009e0933e038c15b43cf4c98c7a|-
 
-asset|cpc464|public|zip|roms/cpc464.zip
+asset|cpc464|free|zip|roms/cpc464.zip
 src|cpc464|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/cpc464.zip
 mem|cpc464|cpc464.rom|40852f25|56d39c463da60968d93e58b4ba0e675829412a20|-
 
