@@ -33,6 +33,7 @@ below bakes one machine into its own `kernel8-<name>.img` — see the
 | `MACHINE=vic20_se` | VIC-20 (Sweden/Finland) | 1981 | `vic20_se.zip` | — | PAL | [details](vic20_se.md) |
 | `MACHINE=vic1001` | VIC-1001 (Japan) | 1980 | `vic1001.zip` | — | NTSC | [details](vic1001.md) |
 | `MACHINE=plus4` | Plus/4 (NTSC) | 1984 | `plus4.zip` | — | NTSC | [details](plus4.md) |
+| `MACHINE=plus4p` | Plus/4 (PAL) | 1984 | `plus4p.zip` | — | PAL | [details](plus4p.md) |
 
 Click through to a machine's details page for its exact romset (CRC32 per
 ROM) and what appears on the glass at power-on.
@@ -104,12 +105,19 @@ my-assets/
     │               #   romset, all three members in vic1001.zip (Japanese kernal
     │               #   901486-02, katakana chargen 901460-02, shared basic
     │               #   901486-01)
-    └── plus4.zip  # Plus/4 (NTSC): the first machine off plus4.cpp, opening the
-                    #   TED/264 family. Split-set clone of the c264 prototype —
-                    #   unique r5 kernal, basic and the two 3-PLUS-1 function
-                    #   ROMs from plus4.zip (318005-05.u24, 318006-01.u23,
-                    #   317053-01.u25, 317054-01.u26), shared PLA from the parent
-                    #   c264.zip (251641-02.u19)
+    ├── plus4.zip  # Plus/4 (NTSC): the first machine off plus4.cpp, opening the
+    │               #   TED/264 family. Split-set clone of the c264 prototype —
+    │               #   unique r5 kernal, basic and the two 3-PLUS-1 function
+    │               #   ROMs from plus4.zip (318005-05.u24, 318006-01.u23,
+    │               #   317053-01.u25, 317054-01.u26), shared PLA from the parent
+    │               #   c264.zip (251641-02.u19)
+    └── plus4p.zip # Plus/4 (PAL): the plus4p clone of the same plus4_state
+                    #   driver, PAL sibling of plus4. Split-set clone of the c264
+                    #   prototype — unique PAL r5 kernal from plus4p.zip
+                    #   (318004-05.u24, part 318004 vs the NTSC plus4's 318005),
+                    #   basic and the two 3-PLUS-1 function ROMs also from
+                    #   plus4p.zip (318006-01.u23, 317053-01.u25, 317054-01.u26),
+                    #   shared PLA from the parent c264.zip (251641-02.u19)
 ```
 
 Only supplying some assets is fine: machines without their ROMs simply

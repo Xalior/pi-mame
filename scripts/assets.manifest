@@ -606,6 +606,27 @@ mem|plus4|317053-01.u25|4fd1d8cb|3b69f6e7cb4c18bb08e203fb18b7dabfa853390f|-
 mem|plus4|317054-01.u26|109de2fc|0ad7ac2db7da692d972e586ca0dfd747d82c7693|-
 mem|plus4|251641-02.u19|83be2076|a89b18b2261233443c933c8b4663b108e7630924|-
 
+# plus4p (Plus/4, PAL) — the plus4p clone of the same plus4_state driver
+# (src/mame/commodore/plus4.cpp), PAL sibling of the NTSC plus4. Default kernal
+# is ROM_DEFAULT_BIOS("r5") (BIOS 2). plus4p is a CLONE of c264 (the Commodore
+# 264 prototype parent) under MAME's split-set convention, so its members span
+# two source zips: the unique PAL kernal r5 (318004-05, distinct from plus4's
+# NTSC 318005-05), the basic and the two 3-PLUS-1 "function" ROMs live in
+# plus4p.zip, while the 251641-02 PLA is byte-identical to the parent's (CRC
+# 83be2076) and is packed only in c264.zip. Two src lines: obtain_member tries
+# each in order and locates every member by CRC32, renaming it to the
+# ROM_START( plus4p ) name (251641-02.u19 comes from the parent's "251641-02").
+# The r3/r4/diag264 alternate kernals are optional ROMX_LOAD BIOS alternates,
+# not packed.
+asset|plus4p|public|zip|roms/plus4p.zip
+src|plus4p|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/plus4p.zip
+src|plus4p|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/c264.zip
+mem|plus4p|318004-05.u24|71c07bd4|7c7e07f016391174a557e790c4ef1cbe33512cdb|-
+mem|plus4p|318006-01.u23|74eaae87|161c96b4ad20f3a4f2321808e37a5ded26a135dd|-
+mem|plus4p|317053-01.u25|4fd1d8cb|3b69f6e7cb4c18bb08e203fb18b7dabfa853390f|-
+mem|plus4p|317054-01.u26|109de2fc|0ad7ac2db7da692d972e586ca0dfd747d82c7693|-
+mem|plus4p|251641-02.u19|83be2076|a89b18b2261233443c933c8b4663b108e7630924|-
+
 # +3 shares the +2A romset (identical members); source that set, repack.
 asset|specpls3|public|zip|roms/specpls3.zip
 src|specpls3|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/specpl2a.zip
