@@ -53,7 +53,7 @@ PLATFORM_MACHINES_amstrad = cpc464 cpc664 cpc6128 cpc464p cpc6128p gx4000 \
 PLATFORM_MACHINES_commodore = c64 c64p c64_jp c64_se c64c c64cp c64g c64c_es \
 	c64c_se c64gs sx64 sx64p dx64 vip64 tesa6240 pet64 edu64 vic20 vic20p \
 	vic20_se vic1001 c264 plus4 plus4p c16 c16p c116 c232 v364 c128 c128p \
-	c128d c128dp c128_de c128cr c128dcr c128dcrp
+	c128d c128dp c128_de c128_se c128cr c128dcr c128dcrp
 
 # All machines, every platform — the roster `make kernels` bakes and CI verifies.
 MACHINES = $(foreach p,$(PLATFORMS),$(PLATFORM_MACHINES_$(p)))
@@ -363,6 +363,20 @@ MACHINE_STRING_c128dp       = c128dp -iec8 ""
 # reaches COMMODORE BASIC V7.0 with no drive romset required. PAL canvas.
 MACHINE_STRING_c128_de      = c128_de -iec8 ""
 
+# The Commodore 128 (Sweden/Finland, PAL): a CLONE of c128 in the same C128 family
+# (src/mame/commodore/c128.cpp, c128_state) — NOT a #define alias; it has its own
+# ROM_START( c128_se ) carrying a Swedish/Finnish character generator (325181-01.bin),
+# BASIC lo/hi (325182-01.u32) and U35 kernal (325189-01.u35). There is NO
+# ROM_SYSTEM_BIOS — the set is flat. Its U33/U34 editor/kernal parts are the r2 dumps
+# (318018-02, 318019-02 — NOT the r4 dumps the other c128 machines ship) and the PLA
+# are byte-for-byte members of the base c128 set. It uses the PAL machine config
+# (c128_state::c128pal), the same config the c128p root uses. Same dual-CPU hardware
+# (Z80 CP/M + 8502 128/64 modes, one memory map, one kernal complement) and the same
+# external-bus C1571 default (cbm_iec_slot_device::add on m_iec — not a built-in-drive
+# config.replace), so the same -iec8 "" empties the bus and reaches COMMODORE BASIC
+# V7.0 with no drive romset required. PAL canvas.
+MACHINE_STRING_c128_se      = c128_se -iec8 ""
+
 # The Commodore 128CR (NTSC, prototype): a CLONE of c128 in the same C128 family
 # (src/mame/commodore/c128.cpp, c128_state) — but NOT a #define alias. The 128CR
 # is the cost-reduced 128 whose separate BASIC/editor/kernal parts are merged
@@ -483,6 +497,7 @@ MACHINE_ASSETS_c128p        = c128p
 MACHINE_ASSETS_c128d        = c128d
 MACHINE_ASSETS_c128dp       = c128dp
 MACHINE_ASSETS_c128_de      = c128_de
+MACHINE_ASSETS_c128_se      = c128_se
 MACHINE_ASSETS_c128cr       = c128cr
 MACHINE_ASSETS_c128dcr      = c128dcr
 MACHINE_ASSETS_c128dcrp     = c128dcrp

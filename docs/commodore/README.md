@@ -45,6 +45,7 @@ below bakes one machine into its own `kernel8-<name>.img` — see the
 | `MACHINE=c128d` | Commodore 128D (NTSC, prototype) | 1986 | `c128d.zip` | — | NTSC | [details](c128d.md) |
 | `MACHINE=c128dp` | Commodore 128D (PAL) | 1986 | `c128dp.zip` | — | PAL | [details](c128dp.md) |
 | `MACHINE=c128_de` | Commodore 128 (Germany) | 1985 | `c128_de.zip` | — | PAL | [details](c128_de.md) |
+| `MACHINE=c128_se` | Commodore 128 (Sweden/Finland) | 1985 | `c128_se.zip` | — | PAL | [details](c128_se.md) |
 | `MACHINE=c128cr` | Commodore 128CR (NTSC, prototype) | 1986 | `c128cr.zip` | — | NTSC | [details](c128cr.md) |
 | `MACHINE=c128dcr` | Commodore 128DCR (NTSC) | 1987 | `c128dcr.zip` | — | NTSC | [details](c128dcr.md) |
 | `MACHINE=c128dcrp` | Commodore 128DCR (PAL) | 1987 | `c128dcrp.zip` | — | PAL | [details](c128dcrp.md) |
@@ -212,6 +213,14 @@ my-assets/
     │               #   BIOS pair), unique members from the split-set c128_de.zip. BASIC
     │               #   lo/hi, r4 editor/kernal parts and PLA are the c128 line's, from
     │               #   c128.zip. Six ROMs. BASIC 7.0, 122365 bytes free
+    ├── c128_se.zip # Commodore 128 (Sweden/Finland, PAL): a clone of c128 in the same
+    │               #   family (c128.cpp, config c128pal) but NOT a romset alias — its
+    │               #   own ROM_START( c128_se ) carries a Swedish/Finnish chargen
+    │               #   (325181-01), BASIC lo/hi (325182-01) and U35 kernal (325189-01),
+    │               #   unique members from the split-set c128_se.zip. No ROM_SYSTEM_BIOS
+    │               #   — the set is flat. The r2 editor/kernal parts (318018-02,
+    │               #   318019-02) and PLA are the c128 line's, from c128.zip. Six ROMs.
+    │               #   BASIC 7.0, 122365 bytes free
     ├── c128cr.zip # Commodore 128CR (NTSC, prototype): a clone of c128 in the same
     │               #   family (c128.cpp, config c128) but NOT a romset alias — the
     │               #   cost-reduced 128CR merges BASIC/editor/kernal into two combined

@@ -854,6 +854,29 @@ mem|c128_de|315078-02.u35|b275bb2e|78ac5dcdd840b092ba1ee6d19b33af079613291f|-
 mem|c128_de|315079-01.u18|fe5a2db1|638f8aff51c2ac4f99a55b12c4f8c985ef4bebd3|-
 mem|c128_de|8721r3.u11|154db186|ccadcdb1db3b62c51dc4ce60fe6f96831586d297|-
 
+# c128_se (Commodore 128, Sweden/Finland, PAL) — a CLONE of c128 in the same C128
+# driver family (c128.cpp, c128_state) but NOT a #define alias: it has its own
+# ROM_START( c128_se ) carrying a Swedish/Finnish character generator (325181-01.bin),
+# BASIC lo/hi (325182-01.u32) and U35 kernal (325189-01.u35). There is NO
+# ROM_SYSTEM_BIOS — the set is flat, all six members always loaded. Those three
+# Sw/Fi members are UNIQUE, carried by the split-set c128_se.zip. The editor/kernal
+# U33/U34 parts (318018-02.u33, 318019-02.u34 — the r2 dumps, NOT the r4 dumps the
+# other c128 machines ship) and the MOS8721 PLA (8721r3.u11) are byte-identical to the
+# c128 line, located by CRC32 in the family-parent c128.zip (whose full split-set
+# carries every ROM_SYSTEM_BIOS alternate of ROM_START(c128), r2 included) and
+# repacked. Mixed provenance — the c64c_es / c64_jp / c128cr / c128_de precedent: own
+# split zip for the unique members, parent zip for the shared ones. Uses the c128pal
+# machine config.
+asset|c128_se|public|zip|roms/c128_se.zip
+src|c128_se|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/c128_se.zip
+src|c128_se|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/c128.zip
+mem|c128_se|325182-01.u32|2aff27d3|267654823c4fdf2167050f41faa118218d2569ce|-
+mem|c128_se|318018-02.u33|2ee6e2fa|60e1491e1d5782e3cf109f518eb73427609badc6|-
+mem|c128_se|318019-02.u34|d551fce0|4d223883e866645328f86a904b221464682edc4f|-
+mem|c128_se|325189-01.u35|9526fac4|a01dd871241c801db51e8ebc30fedfafd8cc506b|-
+mem|c128_se|325181-01.bin|7a70d9b8|aca3f7321ee7e6152f1f0afad646ae41964de4fb|-
+mem|c128_se|8721r3.u11|154db186|ccadcdb1db3b62c51dc4ce60fe6f96831586d297|-
+
 # c128cr (Commodore 128CR, NTSC prototype) — a CLONE of c128 in the same C128
 # driver family (c128.cpp, c128_state) but NOT a #define alias: the cost-reduced
 # 128CR merges the 128's BASIC/editor/kernal parts into two combined ROMs
