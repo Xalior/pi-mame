@@ -552,6 +552,20 @@ mem|vic20p|901486-01.ue11|db4c43c1|587d1e90950675ab6b12d91248a3f0d640d02e8d|-
 mem|vic20p|901486-07.ue12|4be07cb4|ce0137ed69f003a299f43538fa9eee27898e621e|-
 mem|vic20p|901460-03.ud7|83e032a6|4fd85ab6647ee2ac7ba40f729323f2472d35b9b4|-
 
+# vic1001 (VIC-1001, Japan, NTSC) — the family PARENT of the vic20_state driver
+# (src/mame/commodore/vic20.cpp), the Japanese-market original the vic20/vic20p
+# clones descend from. Single Japanese kernal (901486-02) + katakana charom
+# (901460-02); no ROM_SYSTEM_BIOS alternates. Under MAME's split-set convention
+# the parent zip carries the full romset — every member (the basic ROM, which is
+# byte-identical CRC db4c43c1 to the clones', plus the two Japan-unique members)
+# lives in vic1001.zip, so a single src line suffices. ROM_START( vic1001 ) names
+# the members plainly (no .ue11/.ud7 suffix, unlike the clones).
+asset|vic1001|public|zip|roms/vic1001.zip
+src|vic1001|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/vic1001.zip
+mem|vic1001|901486-01|db4c43c1|587d1e90950675ab6b12d91248a3f0d640d02e8d|-
+mem|vic1001|901486-02|336900d7|c9ead45e6674d1042ca6199160e8583c23aeac22|-
+mem|vic1001|901460-02|fcfd8a4b|dae61ac03065aa2904af5c123ce821855898c555|-
+
 # +3 shares the +2A romset (identical members); source that set, repack.
 asset|specpls3|public|zip|roms/specpls3.zip
 src|specpls3|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/specpl2a.zip

@@ -30,6 +30,7 @@ below bakes one machine into its own `kernel8-<name>.img` — see the
 | `MACHINE=edu64` | Educator 64 (NTSC) | 1983 | `edu64.zip` | — | NTSC | [details](edu64.md) |
 | `MACHINE=vic20` | VIC-20 (NTSC) | 1981 | `vic20.zip` | — | NTSC | [details](vic20.md) |
 | `MACHINE=vic20p` | VIC-20 / VC-20 (PAL) | 1981 | `vic20p.zip` | — | PAL | [details](vic20p.md) |
+| `MACHINE=vic1001` | VIC-1001 (Japan) | 1980 | `vic1001.zip` | — | NTSC | [details](vic1001.md) |
 
 Click through to a machine's details page for its exact romset (CRC32 per
 ROM) and what appears on the glass at power-on.
@@ -88,10 +89,14 @@ my-assets/
     │               #   Split-set clone of vic1001 — unique kernal + chargen
     │               #   from vic20.zip (901486-06.ue12, 901460-03.ud7), shared
     │               #   basic from the parent vic1001.zip (901486-01.ue11)
-    └── vic20p.zip # VIC-20 / VC-20 (PAL): the vic20p clone of the same driver.
-                    #   Unique PAL kernal from vic20p.zip (901486-07.ue12, -07
-                    #   vs NTSC's -06), chargen shared with vic20 (901460-03.ud7),
-                    #   shared basic from the parent vic1001.zip (901486-01.ue11)
+    ├── vic20p.zip # VIC-20 / VC-20 (PAL): the vic20p clone of the same driver.
+    │               #   Unique PAL kernal from vic20p.zip (901486-07.ue12, -07
+    │               #   vs NTSC's -06), chargen shared with vic20 (901460-03.ud7),
+    │               #   shared basic from the parent vic1001.zip (901486-01.ue11)
+    └── vic1001.zip # VIC-1001 (Japan, NTSC): the family parent — self-contained
+                    #   romset, all three members in vic1001.zip (Japanese kernal
+                    #   901486-02, katakana chargen 901460-02, shared basic
+                    #   901486-01)
 ```
 
 Only supplying some assets is fine: machines without their ROMs simply
