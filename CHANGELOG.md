@@ -28,30 +28,22 @@ and the core split below is still awaiting review.
   fits comfortably under the kernel size ceiling — and this cycle, the
   receiving side was proven on hardware too: given a selection, it
   chain-boots the chosen machine end to end.
-- **Per-platform isolated builds.** Platform is the logical unit — a MAME
-  `src/mame/<vendor>/` directory, never mixed: each platform compiles in
-  its own MAME tree (own `SUBTARGET`, own `SOURCES`, own `BUILDDIR`) and
-  links one binary, from which every machine image is a millisecond
-  byte-patch. The patchable-defaults factory realized at scale: one link
-  per platform, 62 machine images.
-- **The Commodore platform.** The third platform: 29 machines across the
-  C64 line (including the SX-64 portables with their built-in drives and
-  their romsets), the VIC-20 family, and the TED range (Plus/4, C16,
-  C116, and the 264-series prototypes) — every one boot-proven on real
-  Pi 4 hardware, one HDMI capture per machine in
+- **Per-platform builds.** Each platform (a MAME `src/mame/<vendor>/`
+  directory) builds in its own MAME tree — own `SUBTARGET`, `SOURCES`,
+  and `BUILDDIR` — and links one platform binary. Per-machine images
+  are byte-patches of that binary's defaults block.
+- **Commodore platform added.** 29 machines from the c64, vic20 and
+  plus4 driver families, each with an HDMI capture from a real Pi 4 in
   [docs/commodore/](docs/commodore/README.md).
-- **Multi-screen machines render.** The defaults string now carries
-  quoted, space-bearing MAME arguments (`-view "Screen 1"`), and view
-  selection puts a chosen screen full-canvas — the capability any
-  dual-display machine needs on a single fixed framebuffer.
-- **Platform cards, in two tiers.** Releases assemble one card zip per
-  platform and tier: the boot picker as the boot kernel, the platform
-  binary, a generated menu listing only the machines whose every asset
-  the tier can carry, and the tier's assets. The free tier follows the
-  license, not the mirror: Amstrad's classic CPC firmware is
-  free-tier under Amstrad's recorded distribution permission, so an
-  amstrad-free card exists alongside sinclair-free; Commodore ships
-  public-tier only, as no equivalent blessing exists.
+- **Quoted defaults arguments and view selection.** The defaults string
+  accepts double-quoted arguments containing spaces; `-view` selects
+  which screen a multi-screen machine renders full-canvas.
+- **Platform card zips.** Releases build one zip per platform and tier:
+  the boot picker, the platform binary, a generated `bootmenu.cfg`
+  listing the tier's machines, and the tier's assets. `cpc464`,
+  `cpc664` and `cpc6128` moved to the free tier under Amstrad's
+  recorded distribution permission; an amstrad-free card now builds.
+  Commodore has no free tier.
 
 ## PoC1 — vStranger · 2026-07-11
 
