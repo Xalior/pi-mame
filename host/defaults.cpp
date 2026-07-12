@@ -61,6 +61,7 @@ TDefaultsBlock _pimame_defaults =
 
 // Kernel flags settable by injected --rapi-* switches
 int rapi_show_fps = 0;
+int rapi_debug_uart = 0;
 
 }
 
@@ -75,6 +76,12 @@ static void DispatchKernelSwitch (const char *pSwitch)
 		rapi_show_fps = 1;
 		CLogger::Get ()->Write (From, LogNotice,
 					"--rapi-fps consumed: MAME FPS/speed readout on");
+	}
+	else if (strcmp (pSwitch, "--rapi-debug-uart") == 0)
+	{
+		rapi_debug_uart = 1;
+		CLogger::Get ()->Write (From, LogNotice,
+					"--rapi-debug-uart consumed: serial key injection on");
 	}
 	else
 	{

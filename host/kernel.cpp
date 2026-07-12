@@ -29,6 +29,12 @@
 extern "C" int mame_circle_main(int argc, char **argv);
 void CGlueStdioInit(CConsole &rConsole);
 
+// --rapi-debug-uart (consumed in defaults.cpp) arms serial key injection: the
+// shim types serial-RX bytes into the running machine. Dev bench only — the
+// switch is never baked into a shipped image.
+extern "C" int rapi_debug_uart;
+void SDL2Circle_SetInjectSerial(CSerialDevice *pSerial);
+
 static const char From[] = "mame-host";
 
 // The baked policy argv: evergreen appliance decrees only, no machine.
@@ -101,6 +107,15 @@ TShutdownMode CKernel::Run(void)
 
     m_Logger.Write(From, LogNotice, "starting MAME platform binary (%d args)",
                    argc - 1);
+
+    // Dev bench: hand the shim our serial so a console can type into the
+    // running machine (dismiss a warning box, pick a +3 Loader, LOAD a disk).
+    if (rapi_debug_uart)
+    {
+        SDL2Circle_SetInjectSerial(&m_Serial);
+        m_Logger.Write(From, LogNotice,
+                       "serial key injection armed (--rapi-debug-uart)");
+    }
 
     // Geometry evidence belongs on serial (the HDMI capture dongle is not
     // pixel-faithful): what boot config handed us, next to the shim's
