@@ -833,6 +833,27 @@ mem|c128dp|318020-05.u35|ba456b8e|ceb6e1a1bf7e08eb9cbc651afa29e26adccf38ab|-
 mem|c128dp|390059-01.u18|6aaaafe6|29ed066d513f2d5c09ff26d9166ba23c2afb2b3f|-
 mem|c128dp|8721r3.u11|154db186|ccadcdb1db3b62c51dc4ce60fe6f96831586d297|-
 
+# c128_de (Commodore 128, Germany, PAL) — a CLONE of c128 in the same C128 driver
+# family (c128.cpp, c128_state) but NOT a #define alias: it has its own
+# ROM_START( c128_de ) carrying a German character generator (315079-01.u18) and a
+# German U35 kernal under an r2/r4 ROM_SYSTEM_BIOS pair. ROM_DEFAULT_BIOS("r4")
+# pins the DEFAULT member 315078-02.u35; the r2 alternate (315078-01.u35) is not
+# shipped. Those two members are UNIQUE, carried by the split-set c128_de.zip. The
+# BASIC lo/hi (251913-01.u32), the r4 editor/kernal parts (318018-04.u33,
+# 318019-04.u34) and the MOS8721 PLA (8721r3.u11) are byte-identical to the c128
+# line, located by CRC32 in the family-parent c128.zip and repacked. Mixed
+# provenance — the c64c_es / c64_jp / c128cr precedent: own split zip for the
+# unique members, parent zip for the shared ones. Uses the c128pal machine config.
+asset|c128_de|public|zip|roms/c128_de.zip
+src|c128_de|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/c128_de.zip
+src|c128_de|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/c128.zip
+mem|c128_de|251913-01.u32|0010ec31|765372a0e16cbb0adf23a07b80f6b682b39fbf88|-
+mem|c128_de|318018-04.u33|9f9c355b|d53a7884404f7d18ebd60dd3080c8f8d71067441|-
+mem|c128_de|318019-04.u34|6e2c91a7|c4fb4a714e48a7bf6c28659de0302183a0e0d6c0|-
+mem|c128_de|315078-02.u35|b275bb2e|78ac5dcdd840b092ba1ee6d19b33af079613291f|-
+mem|c128_de|315079-01.u18|fe5a2db1|638f8aff51c2ac4f99a55b12c4f8c985ef4bebd3|-
+mem|c128_de|8721r3.u11|154db186|ccadcdb1db3b62c51dc4ce60fe6f96831586d297|-
+
 # c128cr (Commodore 128CR, NTSC prototype) — a CLONE of c128 in the same C128
 # driver family (c128.cpp, c128_state) but NOT a #define alias: the cost-reduced
 # 128CR merges the 128's BASIC/editor/kernal parts into two combined ROMs
