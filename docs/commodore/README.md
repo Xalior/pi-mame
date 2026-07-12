@@ -30,6 +30,7 @@ below bakes one machine into its own `kernel8-<name>.img` — see the
 | `MACHINE=edu64` | Educator 64 (NTSC) | 1983 | `edu64.zip` | — | NTSC | [details](edu64.md) |
 | `MACHINE=vic20` | VIC-20 (NTSC) | 1981 | `vic20.zip` | — | NTSC | [details](vic20.md) |
 | `MACHINE=vic20p` | VIC-20 / VC-20 (PAL) | 1981 | `vic20p.zip` | — | PAL | [details](vic20p.md) |
+| `MACHINE=vic20_se` | VIC-20 (Sweden/Finland) | 1981 | `vic20_se.zip` | — | PAL | [details](vic20_se.md) |
 | `MACHINE=vic1001` | VIC-1001 (Japan) | 1980 | `vic1001.zip` | — | NTSC | [details](vic1001.md) |
 
 Click through to a machine's details page for its exact romset (CRC32 per
@@ -92,6 +93,11 @@ my-assets/
     ├── vic20p.zip # VIC-20 / VC-20 (PAL): the vic20p clone of the same driver.
     │               #   Unique PAL kernal from vic20p.zip (901486-07.ue12, -07
     │               #   vs NTSC's -06), chargen shared with vic20 (901460-03.ud7),
+    │               #   shared basic from the parent vic1001.zip (901486-01.ue11)
+    ├── vic20_se.zip # VIC-20 (Sweden/Finland, PAL): the vic20_se clone of the
+    │               #   same driver, last of the VIC-20 family. Unique Nordic
+    │               #   kernal + national chargen from vic20_se.zip (nec22081.206,
+    │               #   nec22101.207 — its own character generator, not vic20's),
     │               #   shared basic from the parent vic1001.zip (901486-01.ue11)
     └── vic1001.zip # VIC-1001 (Japan, NTSC): the family parent — self-contained
                     #   romset, all three members in vic1001.zip (Japanese kernal

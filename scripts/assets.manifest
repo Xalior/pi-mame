@@ -552,6 +552,26 @@ mem|vic20p|901486-01.ue11|db4c43c1|587d1e90950675ab6b12d91248a3f0d640d02e8d|-
 mem|vic20p|901486-07.ue12|4be07cb4|ce0137ed69f003a299f43538fa9eee27898e621e|-
 mem|vic20p|901460-03.ud7|83e032a6|4fd85ab6647ee2ac7ba40f729323f2472d35b9b4|-
 
+# vic20_se (VIC-20, Sweden/Finland, PAL) — the vic20_se clone of the same
+# vic20_state driver (src/mame/commodore/vic20.cpp), the last VIC-20 family
+# machine, Nordic-market sibling of vic20p. No ROM_SYSTEM_BIOS alternates.
+# Under MAME's split-set convention the members span source zips: the unique
+# Swedish/Finnish kernal nec22081.206 (CRC b2a60662) and national charom
+# nec22101.207 (CRC d808551d — the Nordic set carries its own character
+# generator, distinct from vic20/vic20p's 901460-03) both live in vic20_se.zip,
+# while the basic ROM is byte-identical to the parent vic1001's (CRC db4c43c1)
+# and is packed only in vic1001.zip. Three src lines: obtain_member tries each
+# in order and locates every member by CRC32, renaming it to the
+# ROM_START( vic20_se ) name (901486-01.ue11 comes from the parent's
+# "901486-01", staged via vic20.zip).
+asset|vic20_se|public|zip|roms/vic20_se.zip
+src|vic20_se|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/vic20_se.zip
+src|vic20_se|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/vic20.zip
+src|vic20_se|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/vic1001.zip
+mem|vic20_se|901486-01.ue11|db4c43c1|587d1e90950675ab6b12d91248a3f0d640d02e8d|-
+mem|vic20_se|nec22081.206|b2a60662|cb3e2f6e661ea7f567977751846ce9ad524651a3|-
+mem|vic20_se|nec22101.207|d808551d|f403f0b0ce5922bd61bbd768bdd6f0b38e648c9f|-
+
 # vic1001 (VIC-1001, Japan, NTSC) — the family PARENT of the vic20_state driver
 # (src/mame/commodore/vic20.cpp), the Japanese-market original the vic20/vic20p
 # clones descend from. Single Japanese kernal (901486-02) + katakana charom
