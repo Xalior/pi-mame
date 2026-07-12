@@ -1,79 +1,46 @@
 #
-# MAME payload kernel: links MAME's archives + circle-libsdl2 + circle-stdlib
-# into one image per personality — the machine and its fixed facts are baked.
+# MAME payload: ONE universal platform binary, ANY machine.
 #
-#   make MACHINE=<name>   -> kernel8-<name>.img — one image per machine.
-#                            The machines are the MACHINE_DEFS_* table below,
-#                            documented per machine in docs/sinclair/ and
-#                            docs/amstrad/. Media a machine cannot boot
-#                            without is baked into its defs: the Next boards
-#                            attach /next/next.img as their SD card
-#                            (MAME_HARDDISK); the CPC+ range boots from the
-#                            game-free /carts/sysukpd.bin cartridge
-#                            (MAME_CART).
-#   make MACHINE=picker   -> kernel8-picker.img (nothing baked: MAME boots
-#                            into its system list; the family is the menu)
+# Under the patchable-defaults string (docs/pi-mame-poc2.html) no machine is
+# compiled in. kernel8-platform.img links MAME's archives + circle-libsdl2 +
+# circle-stdlib once, carrying the 0x800 defaults block; the machine name and
+# its media ride that block as plain text, written before boot.
 #
-# Framebuffer geometry is NOT in here: it is Circle boot config (width=/
+#   make                     -> kernel8-platform.img — the universal binary.
+#                               Unpatched (empty block) it IS the no-options
+#                               kernel: MAME boots its own system-selection
+#                               list. Ships on a platform card as
+#                               pi-mame-rpi4.img, chain-booted by the picker.
+#   make machines            -> kernel8-<machine>.img for every machine, each
+#                               a copy of kernel8-platform.img with that
+#                               machine's defaults string patched in at 0x800
+#                               (host tool patch-defaults). ONE link, then one
+#                               byte-patch per machine — no per-machine compile.
+#   make kernel8-<name>.img  -> that single machine's image.
+#
+# The per-machine facts (which machine belongs to which card, its defaults
+# string, its asset dependencies) are data in machines.mk, not compile-time
+# bakes. Framebuffer geometry is NOT here: it is Circle boot config (width=/
 # height= in the SD card's FAT-root cmdline.txt), set PER REGION, not per
 # machine — cmdline-pal.txt is the PAL canvas (720x576) every PAL machine
-# fills, cmdline-ntsc.txt the NTSC canvas (720x480) the American 60Hz
-# machines fill, the way a CRT was filled.
+# fills, cmdline-ntsc.txt the NTSC canvas (720x480) the American 60Hz machines
+# fill, the way a CRT was filled.
 #
 # Prerequisite: scripts/build-mame.sh has produced mame/build/rapi-circle/.
 #
 
 include ../circle-stdlib/Config.mk
+include machines.mk
 
 ROOT = ..
 MAMEBUILD = $(ROOT)/mame/build/rapi-circle
 
-MACHINE ?= spectrum
+TARGET = kernel8-platform
 
-# Per-personality fixed facts, compiled into the kernel (kernel.cpp).
-MACHINE_DEFS_spectrum = -DMAME_MACHINE='"spectrum"'
-MACHINE_DEFS_spec128  = -DMAME_MACHINE='"spec128"'
-MACHINE_DEFS_specpls2 = -DMAME_MACHINE='"specpls2"'
-MACHINE_DEFS_specpl2a = -DMAME_MACHINE='"specpl2a"'
-MACHINE_DEFS_specpls3 = -DMAME_MACHINE='"specpls3"'
-MACHINE_DEFS_tbblue   = -DMAME_MACHINE='"tbblue"' -DMAME_HARDDISK='"/next/next.img"'
-MACHINE_DEFS_specnext_ks1 = -DMAME_MACHINE='"specnext_ks1"' -DMAME_HARDDISK='"/next/next.img"'
-MACHINE_DEFS_specnext_ks2 = -DMAME_MACHINE='"specnext_ks2"' -DMAME_HARDDISK='"/next/next.img"'
-MACHINE_DEFS_specnext_ks3 = -DMAME_MACHINE='"specnext_ks3"' -DMAME_HARDDISK='"/next/next.img"'
-MACHINE_DEFS_zx80     = -DMAME_MACHINE='"zx80"'
-MACHINE_DEFS_zx81     = -DMAME_MACHINE='"zx81"'
-MACHINE_DEFS_tc2048   = -DMAME_MACHINE='"tc2048"'
-MACHINE_DEFS_ts2068   = -DMAME_MACHINE='"ts2068"'
-MACHINE_DEFS_ts1000   = -DMAME_MACHINE='"ts1000"'
-MACHINE_DEFS_ts1500   = -DMAME_MACHINE='"ts1500"'
-MACHINE_DEFS_pentagon = -DMAME_MACHINE='"pentagon"'
-MACHINE_DEFS_scorpio  = -DMAME_MACHINE='"scorpio"'
-MACHINE_DEFS_atmtb2   = -DMAME_MACHINE='"atmtb2"'
-MACHINE_DEFS_pentevo  = -DMAME_MACHINE='"pentevo"'
-MACHINE_DEFS_tsconf   = -DMAME_MACHINE='"tsconf"'
-MACHINE_DEFS_elwro800 = -DMAME_MACHINE='"elwro800"'
-MACHINE_DEFS_byte     = -DMAME_MACHINE='"byte"'
-MACHINE_DEFS_cpc464   = -DMAME_MACHINE='"cpc464"'
-MACHINE_DEFS_cpc664   = -DMAME_MACHINE='"cpc664"'
-MACHINE_DEFS_cpc6128  = -DMAME_MACHINE='"cpc6128"'
-MACHINE_DEFS_cpc464p  = -DMAME_MACHINE='"cpc464p"' -DMAME_CART='"/carts/sysukpd.bin"'
-MACHINE_DEFS_cpc6128p = -DMAME_MACHINE='"cpc6128p"' -DMAME_CART='"/carts/sysukpd.bin"'
-MACHINE_DEFS_gx4000   = -DMAME_MACHINE='"gx4000"' -DMAME_CART='"/carts/sysukpd.bin"'
-MACHINE_DEFS_kccomp   = -DMAME_MACHINE='"kccomp"'
-MACHINE_DEFS_nc100    = -DMAME_MACHINE='"nc100"'
-MACHINE_DEFS_nc200    = -DMAME_MACHINE='"nc200"'
-MACHINE_DEFS_sprinter = -DMAME_MACHINE='"sprinter"'
-MACHINE_DEFS_pc1512   = -DMAME_MACHINE='"pc1512"'
-MACHINE_DEFS_picker   = -DMAME_PICKER
-
-KERNEL_DEFS = $(MACHINE_DEFS_$(MACHINE))
-ifeq ($(strip $(KERNEL_DEFS)),)
-$(error unknown MACHINE '$(MACHINE)' — spectrum, spec128, specpls2, specpl2a, specpls3, tbblue, specnext_ks1, specnext_ks2, specnext_ks3, zx80, zx81, tc2048, ts2068, ts1000, ts1500, pentagon, scorpio, atmtb2, pentevo, tsconf, elwro800, byte, sprinter, pc1512, gx4000, or picker)
-endif
-
-TARGET = kernel8-$(MACHINE)
-
-OBJS = main.o kernel-$(MACHINE).o mamemain.o circle_stubs.o
+# No machine is baked: the kernel object is the same for every image. The
+# defaults receiver (defaults.o) carries the 0x800 block and the entry
+# trampoline the linker script pins.
+OBJS = main.o kernel.o defaults.o mamemain.o circle_stubs.o
 
 STANDARD = -std=gnu++23 -Wno-volatile
 
@@ -106,6 +73,12 @@ LIBS = $(MAME_OBJS) \
 	$(CIRCLEHOME)/lib/sound/libsound.a \
 	$(CIRCLE_STDLIB_LIBS)
 
+# The platform image carries the patchable-defaults block: link with the
+# defaults linker script (trampoline + block pinned at 0x800) and gate every
+# produced image on the 0x800 magic (mk/ld/circle-app.mk).
+APP_LDSCRIPT = ../mk/ld/circle-defaults.ld
+APP_DEFAULTS_BLOCK = 1
+
 include $(CIRCLEHOME)/Rules.mk
 
 # MAME is multicore by design: this kernel must link a multicore-configured
@@ -115,16 +88,6 @@ $(error the payload requires a multicore circle-stdlib world — reconfigure cir
 endif
 
 INCLUDE := -I $(ROOT)/circle-libsdl2/include $(CIRCLE_STDLIB_INCLUDES) $(INCLUDE)
-
-# The kernel object is per-personality: the baked facts live in it, and
-# distinct object names keep the personalities from inheriting each
-# other's bake.
-kernel-$(MACHINE).o: kernel.cpp
-	@echo "  CPP   $@ ($(KERNEL_DEFS))"
-	@$(CPP) $(CPPFLAGS) $(KERNEL_DEFS) -c -o $@ $<
-
-kernel-$(MACHINE).d: kernel.cpp
-	@$(CPP) $(CPPFLAGS) $(KERNEL_DEFS) -M -MG -MT kernel-$(MACHINE).o -MT $@ -MF $@ $<
 
 $(LIBOSD_NOMAIN): $(MAMEBUILD)/bin/libosd_sdl.a
 	@echo "  AR    $@ (libosd_sdl.a minus sdlmain.o)"
@@ -178,5 +141,45 @@ mamemain.d: mamemain.cpp
 
 -include $(DEPS)
 
-# pi-mame link rule: pristine Circle tree, TLS-adjacent linker script
+# pi-mame link rule: pristine Circle tree, TLS-adjacent linker script.
 include ../mk/ld/circle-app.mk
+
+# ---------------------------------------------------------------------------
+# Per-machine single-purpose images: one byte-patch of the universal binary.
+# ---------------------------------------------------------------------------
+#
+# A downloadable kernel8-<machine>.img is what makes the "embedded, replace a
+# dead motherboard" appliance easy — the string changes the factory, never the
+# shelf. Each is a verbatim copy of kernel8-platform.img with that machine's
+# defaults string stamped into the 0x800 block by the host patcher, which
+# reuses the boot picker's one writer (magic seatbelt, capacity enforcement).
+#
+# patch-defaults is host-native (it edits an image on the build host, it never
+# runs on the Pi), so it compiles with the host toolchain, not the cross one.
+HOST_CXX ?= c++
+patch-defaults: patch-defaults.cpp ../boot-picker/defaultsblock.cpp \
+		../boot-picker/defaultsblock.h
+	@echo "  HOSTCXX $@"
+	@$(HOST_CXX) -std=c++17 -I $(CIRCLEHOME)/include \
+		-o $@ patch-defaults.cpp ../boot-picker/defaultsblock.cpp
+
+# The explicit kernel8-platform.img rule (Rules.mk + circle-app.mk) wins for
+# the universal binary, so this pattern only ever fires for real machines.
+kernel8-%.img: $(TARGET).img patch-defaults machines.mk
+	@if [ -z "$(MACHINE_STRING_$*)" ]; then \
+		echo "unknown machine '$*' — not in machines.mk MACHINE_STRING_*"; \
+		exit 1; \
+	fi
+	@echo "  PATCH $@ <= \"$(MACHINE_STRING_$*)\""
+	@cp $(TARGET).img $@
+	@./patch-defaults $@ "$(MACHINE_STRING_$*)"
+
+# Every machine in both card rosters, patched from the one universal binary.
+MACHINE_IMAGES = $(patsubst %,kernel8-%.img,$(MACHINES))
+
+.PHONY: machines
+machines: $(MACHINE_IMAGES)
+
+.PHONY: clean-machines
+clean-machines:
+	rm -f $(MACHINE_IMAGES) patch-defaults

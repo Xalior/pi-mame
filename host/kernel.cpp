@@ -1,18 +1,27 @@
 //
-// kernel.cpp — Circle kernel hosting MAME.
+// kernel.cpp — Circle kernel hosting MAME (the pi-mame platform binary).
 //
-// One machine per image: the emulated machine and its fixed facts are
-// compiled-in constants (make MACHINE=spectrum|tbblue), so a shipped
-// binary contains zero runtime decisions. The only boot-time knobs are
-// Circle's own FAT-root cmdline.txt options (framebuffer geometry via
-// width=/height=, socmaxtemp=) — platform boot config, not application
-// configuration.
+// ONE binary, ANY machine. The machine name and its media
+// (-hard1 /next/next.img, -cart /carts/sysukpd.bin) are NOT compiled in:
+// they ride the patchable-defaults block at image offset 0x800 (shared ABI
+// in boot-picker/defaultsblock.h), written before boot by whoever holds the
+// image — the build system (baking a per-machine kernel8-<machine>.img), the
+// boot picker (a menu pick), or the dev loader. DefaultsBuildArgv() appends
+// that text to argv before MAME's first instruction; MAME's own CLI frontend
+// parses it, exactly as it parses the baked policy flags below.
 //
-// The picker image (make MACHINE=picker) is the one deliberate exception:
-// no machine is baked, so MAME boots into its system-selection list and
-// the compiled-in family is the menu.
+// An empty (or absent) block appends nothing, so MAME boots its own
+// system-selection list — the degenerate "no-options" personality is just
+// the unpatched platform binary. The only other boot-time knobs are Circle's
+// FAT-root cmdline.txt options (framebuffer geometry via width=/height=,
+// socmaxtemp=) — platform boot config, not application configuration.
+//
+// The law/policy line is physical: the evergreen decrees below stay compiled
+// C, unreachable by any patcher. The string carries only what a machine is
+// allowed to be.
 //
 #include "kernel.h"
+#include "defaults.h"
 #include <circle/startup.h>
 #include <circle/machineinfo.h>
 #include <cstdio>
@@ -22,32 +31,10 @@ void CGlueStdioInit(CConsole &rConsole);
 
 static const char From[] = "mame-host";
 
-#if !defined(MAME_MACHINE) && !defined(MAME_PICKER)
-#error the image's personality is baked: build with make MACHINE=spectrum|tbblue|picker
-#endif
-
-#ifndef MAME_MACHINE
-#define MAME_MACHINE "picker"   // log label only; no machine enters argv
-#endif
-
-// The machine's argv, baked. -numprocessors 1: one core, cooperative
-// threads — nothing preempts.
+// The baked policy argv: evergreen appliance decrees only, no machine.
+// -numprocessors 1: one core, cooperative threads — nothing preempts.
 static const char *MameArgv[] = {
     "mame",
-#ifndef MAME_PICKER
-    MAME_MACHINE,
-#endif
-#ifdef MAME_HARDDISK
-    "-hard1", MAME_HARDDISK,
-#endif
-#ifdef MAME_CART
-    // The Amstrad CPC+ hardware boots from a cartridge (empty romset,
-    // must_be_loaded): the firmware lives on the cart, not in ROM. The
-    // cart is baked as a direct file on the SD (generic_plain_slot takes
-    // .bin/.cpr with no hashpath machinery), so this is appliance
-    // configuration, not user-facing config surface.
-    "-cart", MAME_CART,
-#endif
     "-video", "soft",
     // keepaspect is desktop application surface; the appliance bakes it
     // off. The framebuffer IS the driver's raster (boot-config width=/
@@ -60,6 +47,12 @@ static const char *MameArgv[] = {
     "-cfg_directory", "/mame/cfg",
     "-skip_gameinfo",
 };
+
+// The final argv: the baked policy above plus whatever a pre-boot patcher
+// wrote into the 0x800 defaults block (the machine, its media, minus any
+// consumed --rapi-* kernel switch). Sized for the block's worst case —
+// Capacity-1 single-character tokens — on top of the baked set, plus NULL.
+static const char *s_FinalArgv[sizeof(MameArgv) / sizeof(MameArgv[0]) + 256 + 1];
 
 CKernel::CKernel(void)
     : m_Timer(&m_Interrupt),
@@ -98,10 +91,16 @@ boolean CKernel::Initialize(void)
 
 TShutdownMode CKernel::Run(void)
 {
-    int argc = sizeof(MameArgv) / sizeof(MameArgv[0]);
+    // Consume the patchable-defaults block (magic-verified at 0x80800)
+    // BEFORE MAME sees argv: patched and unpatched boots run the identical
+    // code path — an empty block appends nothing and MAME boots its system
+    // list.
+    int argc = DefaultsBuildArgv(MameArgv, sizeof(MameArgv) / sizeof(MameArgv[0]),
+                                 s_FinalArgv,
+                                 sizeof(s_FinalArgv) / sizeof(s_FinalArgv[0]));
 
-    m_Logger.Write(From, LogNotice, "starting MAME: %s (%d baked args)",
-                   MAME_MACHINE, argc - 1);
+    m_Logger.Write(From, LogNotice, "starting MAME platform binary (%d args)",
+                   argc - 1);
 
     // Geometry evidence belongs on serial (the HDMI capture dongle is not
     // pixel-faithful): what boot config handed us, next to the shim's
@@ -118,7 +117,7 @@ TShutdownMode CKernel::Run(void)
                    CMachineInfo::Get()->GetClockRate(CLOCK_ID_CORE) / 1000000,
                    CKernelOptions::Get()->GetSoCMaxTemp());
 
-    int res = mame_circle_main(argc, const_cast<char **>(MameArgv));
+    int res = mame_circle_main(argc, const_cast<char **>(s_FinalArgv));
 
     m_Logger.Write(From, LogNotice, "SoC: %uC, arm %u MHz, core %u MHz",
                    m_CPUThrottle.GetTemperature(),
