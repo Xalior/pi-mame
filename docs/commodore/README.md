@@ -22,6 +22,7 @@ below bakes one machine into its own `kernel8-<name>.img` — see the
 | `MACHINE=c64c_se` | Commodore 64C (Sweden/Finland) | 1986 | `c64c_se.zip` | — | PAL | [details](c64c_se.md) |
 | `MACHINE=c64gs` | Commodore 64 Games System | 1990 | `c64gs.zip` | — | PAL | [details](c64gs.md) |
 | `MACHINE=sx64` | SX-64 / Executive 64 (NTSC) | 1984 | `sx64.zip` | — | NTSC | [details](sx64.md) |
+| `MACHINE=sx64p` | SX-64 / Executive 64 (PAL) | 1984 | `sx64p.zip` | — | PAL | [details](sx64p.md) |
 
 Click through to a machine's details page for its exact romset (CRC32 per
 ROM) and what appears on the glass at power-on.
@@ -53,9 +54,11 @@ my-assets/
     ├── c64gs.zip  # Commodore 64 Games System: own GS boot KERNAL
     │               #   (390852-01.u4) + shared C64/C64C chargen
     │               #   (901225-01.u5) + shared PLA
-    └── sx64.zip   # SX-64 / Executive 64 (NTSC): own SX boot KERNAL
-                    #   (251104-04.ud3) + shared basic, chargen and PLA
-                    #   (901226-01.ud4, 901225-01.ud1, 906114-01.ue4)
+    ├── sx64.zip   # SX-64 / Executive 64 (NTSC): own SX boot KERNAL
+    │               #   (251104-04.ud3) + shared basic, chargen and PLA
+    │               #   (901226-01.ud4, 901225-01.ud1, 906114-01.ue4)
+    └── sx64p.zip  # SX-64 / Executive 64 (PAL): same four ROMs as sx64.zip
+                    #   (rom_sx64p == rom_sx64; only the timing is PAL)
 ```
 
 Only supplying some assets is fine: machines without their ROMs simply

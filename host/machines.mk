@@ -51,7 +51,7 @@ PLATFORM_MACHINES_amstrad = cpc464 cpc664 cpc6128 cpc464p cpc6128p gx4000 \
 	kccomp nc100 nc200 pc1512
 
 PLATFORM_MACHINES_commodore = c64 c64p c64_jp c64_se c64c c64cp c64g c64c_es \
-	c64c_se c64gs sx64
+	c64c_se c64gs sx64 sx64p
 
 # All machines, every platform — the roster `make kernels` bakes and CI verifies.
 MACHINES = $(foreach p,$(PLATFORMS),$(PLATFORM_MACHINES_$(p)))
@@ -153,6 +153,9 @@ MACHINE_STRING_c64gs        = c64gs -iec8 ""
 # not a real hardware configuration, but it is the smallest honest parcel and
 # it boots to the SX kernal's sign-on).
 MACHINE_STRING_sx64         = sx64 -iec8 ""
+# The PAL SX-64 (rom_sx64p == rom_sx64): pal_sx replaces the same iec8 slot's
+# default with the built-in sx1541 drive, emptied identically via -iec8 "".
+MACHINE_STRING_sx64p        = sx64p -iec8 ""
 
 # --- Sinclair asset dependencies (manifest asset names) ---
 MACHINE_ASSETS_spectrum     = spectrum
@@ -203,6 +206,7 @@ MACHINE_ASSETS_c64c_es      = c64c_es
 MACHINE_ASSETS_c64c_se      = c64c_se
 MACHINE_ASSETS_c64gs        = c64gs
 MACHINE_ASSETS_sx64         = sx64
+MACHINE_ASSETS_sx64p        = sx64p
 
 # Query helper: `make -f machines.mk -s print-MACHINE_STRING_spectrum`.
 # Lets scripts read these facts without pulling in the Circle build.
