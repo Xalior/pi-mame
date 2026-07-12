@@ -51,6 +51,7 @@ static const char *MameArgv[] = {
     "-numprocessors", "1",
     "-rompath", "/roms",
     "-cfg_directory", "/mame/cfg",
+    "-nvram_directory", "/mame/nvram",
     "-skip_gameinfo",
 };
 
@@ -70,6 +71,34 @@ CKernel::CKernel(void)
     m_ActLED.Blink(3);
 }
 
+// Build-timestamp epoch (seconds since 1970-01-01 UTC) from __DATE__/__TIME__.
+// Monotonic across releases, always a plausible "now".
+static unsigned BuildEpoch(void)
+{
+    static const char months[] = "JanFebMarAprMayJunJulAugSepOctNovDec";
+    const char *d = __DATE__;   // "Mmm dd yyyy"
+    const char *t = __TIME__;   // "hh:mm:ss"
+
+    int mon = 1;
+    for (int i = 0; i < 12; i++)
+        if (d[0] == months[i*3] && d[1] == months[i*3+1] && d[2] == months[i*3+2])
+            { mon = i + 1; break; }
+    int day  = (d[4] == ' ' ? 0 : d[4] - '0') * 10 + (d[5] - '0');
+    int year = (d[7]-'0')*1000 + (d[8]-'0')*100 + (d[9]-'0')*10 + (d[10]-'0');
+    int hh = (t[0]-'0')*10 + (t[1]-'0');
+    int mm = (t[3]-'0')*10 + (t[4]-'0');
+    int ss = (t[6]-'0')*10 + (t[7]-'0');
+
+    // days since 1970-01-01 (civil-to-days, treated as UTC)
+    int y = year - (mon <= 2);
+    int era = (y >= 0 ? y : y - 399) / 400;
+    unsigned yoe = (unsigned)(y - era * 400);
+    unsigned doy = (153u * (mon + (mon > 2 ? -3 : 9)) + 2) / 5 + day - 1;
+    unsigned doe = yoe*365 + yoe/4 - yoe/100 + doy;
+    long days = (long)era*146097 + (long)doe - 719468;
+    return (unsigned)(days * 86400L + hh*3600 + mm*60 + ss);
+}
+
 boolean CKernel::Initialize(void)
 {
     boolean bOK = TRUE;
@@ -77,6 +106,15 @@ boolean CKernel::Initialize(void)
     if (bOK) bOK = m_Logger.Initialize(&m_Serial);
     if (bOK) bOK = m_Interrupt.Initialize();
     if (bOK) bOK = m_Timer.Initialize();
+    // The appliance has no battery RTC and no NTP, so the wall-clock starts
+    // unset (time() -> 1970). A machine with an emulated RTC (Amstrad NC100/
+    // NC200) reads "1970 / clock never set" as power-loss and, on boot, WIPES
+    // its battery-backed store even after the NVRAM reloaded correctly. Seed a
+    // sane baked wall-clock (the build time) before MAME runs — like a device
+    // whose clock was set once at the factory — so the emulated RTC is valid
+    // and NVRAM persistence survives. MAME captures time() during machine
+    // construction, so this must happen here, ahead of mame_circle_main.
+    if (bOK) m_Timer.SetTime(BuildEpoch(), FALSE /* universal */);
     if (bOK) bOK = m_EMMC.Initialize();
     if (bOK) bOK = (f_mount(&m_FileSystem, "SD:", 1) == FR_OK);
     if (bOK)
@@ -84,11 +122,12 @@ boolean CKernel::Initialize(void)
         // Every directory MAME writes into must exist before it runs:
         // there is no OS to create it, and MAME's next-free-filename scan
         // spins forever when a path component is missing (its probe loop
-        // only stops on ENOENT for the file itself). Only what the
-        // machine's runtime actually writes: cfg. FR_EXIST results are
-        // fine here.
+        // only stops on ENOENT for the file itself). What the machine's
+        // runtime writes: cfg (settings on menu-close) and nvram (battery-
+        // backed stores on menu-close). FR_EXIST results are fine here.
         f_mkdir("SD:/mame");
         f_mkdir("SD:/mame/cfg");
+        f_mkdir("SD:/mame/nvram");
     }
     if (bOK) bOK = m_Console.Initialize();
     if (bOK) CGlueStdioInit(m_Console);
