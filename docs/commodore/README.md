@@ -35,6 +35,7 @@ below bakes one machine into its own `kernel8-<name>.img` — see the
 | `MACHINE=plus4` | Plus/4 (NTSC) | 1984 | `plus4.zip` | — | NTSC | [details](plus4.md) |
 | `MACHINE=plus4p` | Plus/4 (PAL) | 1984 | `plus4p.zip` | — | PAL | [details](plus4p.md) |
 | `MACHINE=c16` | Commodore 16 (NTSC) | 1984 | `c16.zip` | — | NTSC | [details](c16.md) |
+| `MACHINE=c16p` | Commodore 16 (PAL) | 1984 | `c16p.zip` | — | PAL | [details](c16p.md) |
 
 Click through to a machine's details page for its exact romset (CRC32 per
 ROM) and what appears on the glass at power-on.
@@ -119,13 +120,20 @@ my-assets/
     │               #   basic and the two 3-PLUS-1 function ROMs also from
     │               #   plus4p.zip (318006-01.u23, 317053-01.u25, 317054-01.u26),
     │               #   shared PLA from the parent c264.zip (251641-02.u19)
-    └── c16.zip    # Commodore 16 (NTSC): the cut-down 16K sibling on the same
-                    #   plus4.cpp TED/264 driver (c16_state). Split-set clone of
-                    #   the c264 prototype, and a subset of plus4 — the r5 kernal
-                    #   and basic (byte-identical to plus4's) from plus4.zip
-                    #   (318005-05.u24, 318006-01.u23), shared PLA from the parent
-                    #   c264.zip (251641-02.u19). No 3-PLUS-1 function ROMs — the
-                    #   C16 has none (12277 bytes free vs the Plus/4's 60671)
+    ├── c16.zip    # Commodore 16 (NTSC): the cut-down 16K sibling on the same
+    │               #   plus4.cpp TED/264 driver (c16_state). Split-set clone of
+    │               #   the c264 prototype, and a subset of plus4 — the r5 kernal
+    │               #   and basic (byte-identical to plus4's) from plus4.zip
+    │               #   (318005-05.u24, 318006-01.u23), shared PLA from the parent
+    │               #   c264.zip (251641-02.u19). No 3-PLUS-1 function ROMs — the
+    │               #   C16 has none (12277 bytes free vs the Plus/4's 60671)
+    └── c16p.zip   # Commodore 16 (PAL): the PAL machine of that same 16K sibling
+                    #   (c16_state). Split-set clone of the c264 prototype, and a
+                    #   subset of plus4p — the PAL r5 kernal and basic (byte-
+                    #   identical to plus4p's) from plus4p.zip (318004-05.u4, part
+                    #   318004 vs the NTSC c16's 318005, 318006-01.u3), shared PLA
+                    #   from the parent c264.zip (251641-02.u16). No 3-PLUS-1
+                    #   function ROMs — the C16 has none (12277 bytes free)
 ```
 
 Only supplying some assets is fine: machines without their ROMs simply

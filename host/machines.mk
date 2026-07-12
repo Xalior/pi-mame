@@ -52,7 +52,7 @@ PLATFORM_MACHINES_amstrad = cpc464 cpc664 cpc6128 cpc464p cpc6128p gx4000 \
 
 PLATFORM_MACHINES_commodore = c64 c64p c64_jp c64_se c64c c64cp c64g c64c_es \
 	c64c_se c64gs sx64 sx64p dx64 vip64 tesa6240 pet64 edu64 vic20 vic20p \
-	vic20_se vic1001 plus4 plus4p c16
+	vic20_se vic1001 plus4 plus4p c16 c16p
 
 # All machines, every platform — the roster `make kernels` bakes and CI verifies.
 MACHINES = $(foreach p,$(PLATFORMS),$(PLATFORM_MACHINES_$(p)))
@@ -242,6 +242,16 @@ MACHINE_STRING_plus4p       = plus4p -iec8 ""
 # 3-PLUS-1 function ROMs and has only 16K RAM, so it boots to BASIC V3.5 with
 # 12277 BYTES FREE (vs the Plus/4's 60671).
 MACHINE_STRING_c16          = c16 -iec8 ""
+# The Commodore 16 (PAL): the PAL machine of the cut-down 16K sibling on the same
+# TED/264 driver (src/mame/commodore/plus4.cpp, c16_state, machine config c16) —
+# the PAL counterpart of the NTSC c16. Same c264-clone lineage; the c16 config
+# keeps the same cbm_iec serial bus (a C1541 defaulted at device 8), so the same
+# -iec8 "" empties device 8 and reaches BASIC with no drive romset required.
+# Default kernal is ROM_DEFAULT_BIOS("r5") (BIOS 2) — the PAL r5 kernal 318004-05
+# (part 318004, vs NTSC's 318005-05); basic and PLA are byte-identical to the
+# 264 line, but the C16 omits the 3-PLUS-1 function ROMs and has only 16K RAM, so
+# it boots to BASIC V3.5 with 12277 BYTES FREE on the PAL canvas.
+MACHINE_STRING_c16p         = c16p -iec8 ""
 
 # --- Sinclair asset dependencies (manifest asset names) ---
 MACHINE_ASSETS_spectrum     = spectrum
@@ -305,6 +315,7 @@ MACHINE_ASSETS_vic1001      = vic1001
 MACHINE_ASSETS_plus4        = plus4
 MACHINE_ASSETS_plus4p       = plus4p
 MACHINE_ASSETS_c16          = c16
+MACHINE_ASSETS_c16p         = c16p
 
 # Query helper: `make -f machines.mk -s print-MACHINE_STRING_spectrum`.
 # Lets scripts read these facts without pulling in the Circle build.
