@@ -871,6 +871,23 @@ mem|c128dcr|318023-02.u32|eedc120a|f98c5a986b532c78bb68df9ec6dbcf876913b99f|-
 mem|c128dcr|390059-01.u18|6aaaafe6|29ed066d513f2d5c09ff26d9166ba23c2afb2b3f|-
 mem|c128dcr|8721r3.u11|154db186|ccadcdb1db3b62c51dc4ce60fe6f96831586d297|-
 
+# c128dcrp (Commodore 128DCR, PAL) — the PAL sibling of c128dcr and a #define
+# alias of its romset (#define rom_c128dcrp rom_c128dcr): byte-for-byte the same
+# four members as ROM_START( c128dcr ). Same mixed provenance as c128dcr — the two
+# UNIQUE combined ROMs (318022-02.u34, 318023-02.u32) from the split-set
+# c128dcr.zip, the shared character generator (390059-01.u18) and MOS8721 PLA
+# (8721r3.u11) located by CRC32 in the family-parent c128.zip — repacked under
+# c128dcrp.zip. Uses its own c128_state::c128dcrp machine config (PAL), which is
+# drive-identical to the base c128 (plain external C1571 default, emptied with
+# -iec8 "") — no drive-device romset ships.
+asset|c128dcrp|public|zip|roms/c128dcrp.zip
+src|c128dcrp|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/c128dcr.zip
+src|c128dcrp|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/c128.zip
+mem|c128dcrp|318022-02.u34|af1ae1e8|953dcdf5784a6b39ef84dd6fd968c7a03d8d6816|-
+mem|c128dcrp|318023-02.u32|eedc120a|f98c5a986b532c78bb68df9ec6dbcf876913b99f|-
+mem|c128dcrp|390059-01.u18|6aaaafe6|29ed066d513f2d5c09ff26d9166ba23c2afb2b3f|-
+mem|c128dcrp|8721r3.u11|154db186|ccadcdb1db3b62c51dc4ce60fe6f96831586d297|-
+
 # +3 shares the +2A romset (identical members); source that set, repack.
 asset|specpls3|public|zip|roms/specpls3.zip
 src|specpls3|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/specpl2a.zip

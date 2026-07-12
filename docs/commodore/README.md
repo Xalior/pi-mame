@@ -46,6 +46,7 @@ below bakes one machine into its own `kernel8-<name>.img` — see the
 | `MACHINE=c128dp` | Commodore 128D (PAL) | 1986 | `c128dp.zip` | — | PAL | [details](c128dp.md) |
 | `MACHINE=c128cr` | Commodore 128CR (NTSC, prototype) | 1986 | `c128cr.zip` | — | NTSC | [details](c128cr.md) |
 | `MACHINE=c128dcr` | Commodore 128DCR (NTSC) | 1987 | `c128dcr.zip` | — | NTSC | [details](c128dcr.md) |
+| `MACHINE=c128dcrp` | Commodore 128DCR (PAL) | 1987 | `c128dcrp.zip` | — | PAL | [details](c128dcrp.md) |
 
 Click through to a machine's details page for its exact romset (CRC32 per
 ROM) and what appears on the glass at power-on.
@@ -210,15 +211,23 @@ my-assets/
     │               #   chargen and PLA with the c128 line. Four ROMs: the two uniques
     │               #   from the split-set c128cr.zip, chargen + PLA from c128.zip.
     │               #   BASIC 7.0, 122365 bytes free
-    └── c128dcr.zip # Commodore 128DCR (NTSC): a clone of c128 in the same family
-                    #   (c128.cpp) with its OWN c128dcr config, NOT a romset alias — the
-                    #   cost-reduced 128D merges BASIC/editor/kernal into two combined
-                    #   ROMs (318022-02, 318023-02, unique to c128dcr), sharing only the
-                    #   chargen and PLA with the c128 line. Four ROMs: the two uniques
-                    #   from the split-set c128dcr.zip, chargen + PLA from c128.zip. The
-                    #   real 128DCR's built-in 1571CR is not modelled built-in in MAME
-                    #   0.250 (plain external C1571 default, emptied with -iec8 "").
-                    #   BASIC 7.0, 122365 bytes free
+    ├── c128dcr.zip # Commodore 128DCR (NTSC): a clone of c128 in the same family
+    │               #   (c128.cpp) with its OWN c128dcr config, NOT a romset alias — the
+    │               #   cost-reduced 128D merges BASIC/editor/kernal into two combined
+    │               #   ROMs (318022-02, 318023-02, unique to c128dcr), sharing only the
+    │               #   chargen and PLA with the c128 line. Four ROMs: the two uniques
+    │               #   from the split-set c128dcr.zip, chargen + PLA from c128.zip. The
+    │               #   real 128DCR's built-in 1571CR is not modelled built-in in MAME
+    │               #   0.250 (plain external C1571 default, emptied with -iec8 "").
+    │               #   BASIC 7.0, 122365 bytes free
+    └── c128dcrp.zip # Commodore 128DCR (PAL): the 128DCR's PAL sibling (c128.cpp) with
+                     #   its OWN c128dcrp config (pal(config)), and a #define alias of the
+                     #   DCR romset (rom_c128dcrp == rom_c128dcr) — byte-for-byte the same
+                     #   four ROMs as c128dcr.zip: the two combined uniques (318022-02,
+                     #   318023-02) plus the shared chargen + PLA. Only the timing/canvas
+                     #   is PAL. Like c128dcr, the real 128DCR's built-in 1571CR is not
+                     #   modelled built-in in MAME 0.250 (plain external C1571 default,
+                     #   emptied with -iec8 ""). BASIC 7.0, 122365 bytes free
 ```
 
 Only supplying some assets is fine: machines without their ROMs simply
