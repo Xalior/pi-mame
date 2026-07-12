@@ -1,24 +1,32 @@
 #
-# MAME payload: ONE universal platform binary, ANY machine.
+# MAME payload: ONE binary per vendor-class platform, ANY machine on it.
+#
+# This Makefile is scoped to ONE platform per invocation (PLATFORM=sinclair by
+# default; the top Makefile drives every platform). Platform is the logical
+# unit — a MAME src/mame/<vendor>/ directory, with no crossover — so each
+# platform is its own binary, linked from its own isolated MAME archive tree
+# (mame/build/<platform>/rapi-circle, built by scripts/build-mame.sh).
 #
 # Under the patchable-defaults string (docs/pi-mame-poc2.html) no machine is
-# compiled in. kernel8-platform.img links MAME's archives + circle-libsdl2 +
-# circle-stdlib once, carrying the 0x800 defaults block; the machine name and
-# its media ride that block as plain text, written before boot.
+# compiled in. kernel8-<platform>.img links that platform's MAME archives +
+# circle-libsdl2 + circle-stdlib once, carrying the 0x800 defaults block; the
+# machine name and its media ride that block as plain text, written before boot.
 #
-#   make                     -> kernel8-platform.img — the universal binary.
-#                               Unpatched (empty block) it IS the no-options
-#                               kernel: MAME boots its own system-selection
-#                               list. Ships on a platform card as
+#   make PLATFORM=<p>        -> kernel8-<p>.img — the platform binary.
+#                               Unpatched (empty block) it IS that platform's
+#                               no-options kernel: MAME boots its own system-
+#                               selection list. Ships on the platform card as
 #                               pi-mame-rpi4.img, chain-booted by the picker.
-#   make machines            -> kernel8-<machine>.img for every machine, each
-#                               a copy of kernel8-platform.img with that
-#                               machine's defaults string patched in at 0x800
-#                               (host tool patch-defaults). ONE link, then one
-#                               byte-patch per machine — no per-machine compile.
-#   make kernel8-<name>.img  -> that single machine's image.
+#   make PLATFORM=<p> machines
+#                            -> kernel8-<machine>.img for every machine of that
+#                               platform, each a copy of kernel8-<p>.img with
+#                               the machine's defaults string patched in at
+#                               0x800 (host tool patch-defaults). ONE link per
+#                               platform, then one byte-patch per machine — no
+#                               per-machine compile.
+#   make PLATFORM=<p> kernel8-<machine>.img  -> that single machine's image.
 #
-# The per-machine facts (which machine belongs to which card, its defaults
+# The per-machine facts (which platform a machine belongs to, its defaults
 # string, its asset dependencies) are data in machines.mk, not compile-time
 # bakes. Framebuffer geometry is NOT here: it is Circle boot config (width=/
 # height= in the SD card's FAT-root cmdline.txt), set PER REGION, not per
@@ -26,40 +34,55 @@
 # fills, cmdline-ntsc.txt the NTSC canvas (720x480) the American 60Hz machines
 # fill, the way a CRT was filled.
 #
-# Prerequisite: scripts/build-mame.sh has produced mame/build/rapi-circle/.
+# Prerequisite: scripts/build-mame.sh has produced mame/build/<platform>/rapi-circle/.
 #
 
 include ../circle-stdlib/Config.mk
 include machines.mk
 
 ROOT = ..
-MAMEBUILD = $(ROOT)/mame/build/rapi-circle
 
-TARGET = kernel8-platform
+# The platform this invocation builds. Every path below is scoped to it.
+PLATFORM ?= sinclair
+SUBTARGET := $(PLATFORM_SUBTARGET_$(PLATFORM))
+ifeq ($(SUBTARGET),)
+$(error unknown PLATFORM '$(PLATFORM)' — not in machines.mk PLATFORMS ($(PLATFORMS)))
+endif
 
-# No machine is baked: the kernel object is the same for every image. The
-# defaults receiver (defaults.o) carries the 0x800 block and the entry
-# trampoline the linker script pins.
+# The platform's OWN isolated MAME archive tree (per-platform BUILDDIR: genie
+# scopes obj/bin by TARGETOS, so a shared tree would share engine libraries).
+MAMEBUILD = $(ROOT)/mame/build/$(PLATFORM)/rapi-circle
+
+TARGET = kernel8-$(PLATFORM)
+
+# No machine is baked: the kernel object is the same for every image and every
+# platform. The defaults receiver (defaults.o) carries the 0x800 block and the
+# entry trampoline the linker script pins.
 OBJS = main.o kernel.o defaults.o mamemain.o circle_stubs.o
 
 STANDARD = -std=gnu++23 -Wno-volatile
 
-# The three objects genie links directly into the final binary.
+# The three objects genie links directly into the final binary. The drivlist
+# is subtarget-scoped (this platform's driver list); mame.o and version.o are
+# the platform's own copies in its isolated tree.
 MAME_OBJS = \
 	$(MAMEBUILD)/obj/Release/src/mame/mame.o \
-	$(MAMEBUILD)/obj/Release/generated/mame/spectrum/drivlist.o \
+	$(MAMEBUILD)/obj/Release/generated/mame/$(SUBTARGET)/drivlist.o \
 	$(MAMEBUILD)/obj/Release/generated/version.o
 
 # libosd_sdl.a ships sdlmain.o (MAME's own main() + sdl_entered_debugger,
 # which mamemain.cpp provides instead). Link a local copy with that member
-# deleted; the mame tree stays untouched.
-LIBOSD_NOMAIN = libosd_sdl-nomain.a
+# deleted; the mame tree stays untouched. Named per platform so the two
+# platforms' copies never collide in this shared build directory.
+LIBOSD_NOMAIN = libosd_sdl-nomain-$(PLATFORM).a
 
 # libprecompile.a is excluded (PCH carrier, nothing to link). libqtdbg_sdl.a
 # stays in: built with USE_QTDEBUG=0 it holds only the not-supported debugger
-# module (DEBUG_QT), which osdobj_common.cpp registers unconditionally.
+# module (DEBUG_QT), which osdobj_common.cpp registers unconditionally. The
+# driver archive is subtarget-scoped (bin/mame_<subtarget>/); the engine
+# archives (bin/*.a) are this platform's own, isolated by its BUILDDIR.
 MAME_ARCHIVES = \
-	$(wildcard $(MAMEBUILD)/bin/mame_spectrum/*.a) \
+	$(wildcard $(MAMEBUILD)/bin/mame_$(SUBTARGET)/*.a) \
 	$(filter-out %/libosd_sdl.a %/libprecompile.a, \
 		$(wildcard $(MAMEBUILD)/bin/*.a))
 
@@ -163,19 +186,28 @@ patch-defaults: patch-defaults.cpp ../boot-picker/defaultsblock.cpp \
 	@$(HOST_CXX) -std=c++17 -I $(CIRCLEHOME)/include \
 		-o $@ patch-defaults.cpp ../boot-picker/defaultsblock.cpp
 
-# The explicit kernel8-platform.img rule (Rules.mk + circle-app.mk) wins for
-# the universal binary, so this pattern only ever fires for real machines.
+# The explicit kernel8-$(PLATFORM).img rule (Rules.mk + circle-app.mk) wins for
+# the platform binary, so this pattern only ever fires for real machines. Each
+# machine is patched from ITS platform's binary ($(TARGET).img, this invocation's
+# platform); a machine belonging to another platform is refused, because its
+# defaults must never be stamped into the wrong vendor's engine.
 kernel8-%.img: $(TARGET).img patch-defaults machines.mk
 	@if [ -z "$(MACHINE_STRING_$*)" ]; then \
 		echo "unknown machine '$*' — not in machines.mk MACHINE_STRING_*"; \
+		exit 1; \
+	fi
+	@if [ "$(MACHINE_PLATFORM_$*)" != "$(PLATFORM)" ]; then \
+		echo "machine '$*' belongs to platform '$(MACHINE_PLATFORM_$*)', not '$(PLATFORM)'"; \
+		echo "  build it with: make -C host PLATFORM=$(MACHINE_PLATFORM_$*) $@"; \
 		exit 1; \
 	fi
 	@echo "  PATCH $@ <= \"$(MACHINE_STRING_$*)\""
 	@cp $(TARGET).img $@
 	@./patch-defaults $@ "$(MACHINE_STRING_$*)"
 
-# Every machine in both card rosters, patched from the one universal binary.
-MACHINE_IMAGES = $(patsubst %,kernel8-%.img,$(MACHINES))
+# This platform's machines, each patched from this platform's binary. (The top
+# Makefile invokes `machines` once per platform, so the full roster is covered.)
+MACHINE_IMAGES = $(patsubst %,kernel8-%.img,$(PLATFORM_MACHINES_$(PLATFORM)))
 
 .PHONY: machines
 machines: $(MACHINE_IMAGES)
