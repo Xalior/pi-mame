@@ -42,6 +42,7 @@ below bakes one machine into its own `kernel8-<name>.img` — see the
 | `MACHINE=v364` | Commodore V364 (NTSC, prototype) | 1984 | `v364.zip` | — | NTSC | [details](v364.md) |
 | `MACHINE=c128` | Commodore 128 (NTSC) | 1985 | `c128.zip` | — | NTSC | [details](c128.md) |
 | `MACHINE=c128p` | Commodore 128 (PAL) | 1985 | `c128p.zip` | — | PAL | [details](c128p.md) |
+| `MACHINE=c128d` | Commodore 128D (NTSC, prototype) | 1986 | `c128d.zip` | — | NTSC | [details](c128d.md) |
 
 Click through to a machine's details page for its exact romset (CRC32 per
 ROM) and what appears on the glass at power-on.
@@ -179,10 +180,15 @@ my-assets/
     │               #   (6aaaafe6) and the 8721 PLA 8721r3.u11 (154db186, a MAME
     │               #   BAD_DUMP that loads and boots straight through). BASIC 7.0,
     │               #   122365 bytes free
-    └── c128p.zip  # Commodore 128 (PAL): the c128 family's PAL sibling (c128.cpp,
-                    #   config c128pal). Same six ROMs as c128.zip — the driver aliases
-                    #   the romset (rom_c128p == rom_c128); only the timing/canvas is
-                    #   PAL. BASIC 7.0, 122365 bytes free
+    ├── c128p.zip  # Commodore 128 (PAL): the c128 family's PAL sibling (c128.cpp,
+    │               #   config c128pal). Same six ROMs as c128.zip — the driver aliases
+    │               #   the romset (rom_c128p == rom_c128); only the timing/canvas is
+    │               #   PAL. BASIC 7.0, 122365 bytes free
+    └── c128d.zip  # Commodore 128D (NTSC, prototype): a clone of c128 in the same
+                    #   family (c128.cpp, config c128). The 128D is a 128 with a
+                    #   built-in C1571 drive; the NTSC prototype is functionally an
+                    #   NTSC 128. Same six ROMs as c128.zip — the driver aliases the
+                    #   romset (rom_c128d == rom_c128). BASIC 7.0, 122365 bytes free
 ```
 
 Only supplying some assets is fine: machines without their ROMs simply

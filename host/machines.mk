@@ -52,7 +52,8 @@ PLATFORM_MACHINES_amstrad = cpc464 cpc664 cpc6128 cpc464p cpc6128p gx4000 \
 
 PLATFORM_MACHINES_commodore = c64 c64p c64_jp c64_se c64c c64cp c64g c64c_es \
 	c64c_se c64gs sx64 sx64p dx64 vip64 tesa6240 pet64 edu64 vic20 vic20p \
-	vic20_se vic1001 c264 plus4 plus4p c16 c16p c116 c232 v364 c128 c128p
+	vic20_se vic1001 c264 plus4 plus4p c16 c16p c116 c232 v364 c128 c128p \
+	c128d
 
 # All machines, every platform — the roster `make kernels` bakes and CI verifies.
 MACHINES = $(foreach p,$(PLATFORMS),$(PLATFORM_MACHINES_$(p)))
@@ -320,6 +321,17 @@ MACHINE_STRING_c128         = c128 -iec8 ""
 # COMMODORE BASIC V7.0 with no drive romset. PAL canvas.
 MACHINE_STRING_c128p        = c128p -iec8 ""
 
+# The Commodore 128D (NTSC, prototype): a CLONE of c128 in the same C128 family
+# (src/mame/commodore/c128.cpp, c128_state). The 128D is a 128 with a built-in
+# C1571 drive; in MAME's model the NTSC prototype is functionally an NTSC 128 —
+# it uses the base c128 machine config (c128_state::c128, NTSC), not a distinct
+# one. Its romset is aliased to the family parent (#define rom_c128d rom_c128) —
+# byte-for-byte the c128 set. Same dual-CPU hardware (Z80 CP/M + 8502 128/64
+# modes, one memory map, one kernal complement) and the same empty IEC device 8
+# (C1571 native drive), so the same -iec8 "" empties the bus and reaches
+# COMMODORE BASIC V7.0 with no drive romset required. NTSC canvas.
+MACHINE_STRING_c128d        = c128d -iec8 ""
+
 # --- Sinclair asset dependencies (manifest asset names) ---
 MACHINE_ASSETS_spectrum     = spectrum
 MACHINE_ASSETS_spec128      = spec128
@@ -389,6 +401,7 @@ MACHINE_ASSETS_c232         = c232
 MACHINE_ASSETS_v364         = v364
 MACHINE_ASSETS_c128         = c128
 MACHINE_ASSETS_c128p        = c128p
+MACHINE_ASSETS_c128d        = c128d
 
 # Query helper: `make -f machines.mk -s print-MACHINE_STRING_spectrum`.
 # Lets scripts read these facts without pulling in the Circle build.
