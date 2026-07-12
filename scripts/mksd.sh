@@ -8,8 +8,9 @@
 #
 # The tree is a complete FAT-root layout: Raspberry Pi firmware (fetched at
 # the revision pinned by circle/boot/Makefile, using Circle's own download
-# mechanism), Circle's config64.txt as config.txt, the machine's regional
-# canvas as cmdline.txt, the chosen kernel image, and — if an assets directory is
+# mechanism), our host/config-machine.txt as config.txt (firmware boots the MAME
+# core directly, no picker), the machine's regional canvas as cmdline.txt, the
+# chosen kernel image as pi-mame-core-rpi4.img, and — if an assets directory is
 # given — roms/, next/, and carts/ copied from it. ROMs, disk images, and
 # cartridges are yours to provide; they are not part of this repository.
 
@@ -19,6 +20,10 @@ MACHINE="${1:?usage: mksd.sh <machine> [assets-dir]}"
 ASSETS="$2"
 SD="$ROOT/build/sd"
 IMG="$ROOT/host/kernel8-$MACHINE.img"
+
+# On-card board token: the core's board suffix (Circle's image-suffix vocab,
+# matching the picker's SYSTEMBIT). PoC3 parameterizes this per board.
+BOARD=rpi4
 
 [ -f "$IMG" ] || { echo "mksd.sh: $IMG not built (make -C host MACHINE=$MACHINE)" >&2; exit 1; }
 
@@ -34,9 +39,9 @@ for f in start4.elf fixup4.dat bcm2711-rpi-4-b.dtb bcm2711-rpi-400.dtb \
     cp "$ROOT/circle/boot/$f" "$SD/"
 done
 
-# Circle's documented boot config selects kernel8-rpi4.img on a Pi 4.
-cp "$ROOT/circle/boot/config64.txt" "$SD/config.txt"
-cp "$IMG" "$SD/kernel8-rpi4.img"
+# Our config.txt boots pi-mame-core-rpi4.img (the MAME core) directly on a Pi 4.
+cp "$ROOT/host/config-machine.txt" "$SD/config.txt"
+cp "$IMG" "$SD/pi-mame-core-$BOARD.img"
 
 # The regional canvas: a machine's region picks its television. The American
 # 60Hz machines fill the NTSC tube (720x480); everything else fills PAL

@@ -11,11 +11,12 @@
 # public the full roster) and the asset bundle.
 #
 # The tree is a complete FAT-root layout:
-#   kernel8-rpi4.img   the boot picker (what the Pi firmware boots)
-#   pi-mame-rpi4.img   the platform binary (what the picker chain-boots and
-#                      patches per pick — SYSTEMBIT rpi4, see boot-picker/kernel.h)
+#   pi-mame-boot-rpi4.img  the boot picker (what the Pi firmware boots)
+#   pi-mame-core-rpi4.img  the platform binary — the MAME core (what the picker
+#                          chain-boots and patches per pick; board token rpi4
+#                          matches SYSTEMBIT, see boot-picker/kernel.h)
 #   bootmenu.cfg       generated for this platform + tier (gen-bootmenu.sh)
-#   config.txt         Circle's config64.txt
+#   config.txt         our host/config-card.txt ([pi4] boots the picker)
 #   cmdline.txt        the card's regional canvas (see the note below)
 #   firmware           start4.elf, fixups, dtbs, armstub — Circle's pinned revision
 #   roms/ next/ carts/ the tier's assets, if an assets dir is given
@@ -36,6 +37,10 @@ case "$TIER" in
     *) echo "mkcard.sh: tier must be 'free' or 'public', got '$TIER'" >&2; exit 2 ;;
 esac
 
+# On-card board token: the picker's compile-time SYSTEMBIT (boot-picker/kernel.h)
+# and Circle's image suffix. PoC3 parameterizes this per board.
+BOARD=rpi4
+
 PICKER="$ROOT/boot-picker/kernel8-rpi4.img"
 BINARY="$ROOT/host/kernel8-$PLATFORM.img"
 SD="$ROOT/build/card-$PLATFORM-$TIER"
@@ -55,12 +60,12 @@ for f in start4.elf fixup4.dat bcm2711-rpi-4-b.dtb bcm2711-rpi-400.dtb \
     cp "$ROOT/circle/boot/$f" "$SD/"
 done
 
-# Circle's documented boot config selects kernel8-rpi4.img on a Pi 4 — that is
-# the PICKER; the picker then chain-boots pi-mame-rpi4.img (the platform binary).
-cp "$ROOT/circle/boot/config64.txt" "$SD/config.txt"
+# Our config.txt boots pi-mame-boot-rpi4.img (the PICKER) on a Pi 4; the picker
+# then chain-boots pi-mame-core-rpi4.img (the platform binary — the MAME core).
+cp "$ROOT/host/config-card.txt" "$SD/config.txt"
 cp "$ROOT/host/cmdline-pal.txt" "$SD/cmdline.txt"
-cp "$PICKER" "$SD/kernel8-rpi4.img"
-cp "$BINARY" "$SD/pi-mame-rpi4.img"
+cp "$PICKER" "$SD/pi-mame-boot-$BOARD.img"
+cp "$BINARY" "$SD/pi-mame-core-$BOARD.img"
 
 # The tier's menu, generated fresh from the manifest.
 "$ROOT/scripts/gen-bootmenu.sh" "$PLATFORM" "$TIER" > "$SD/bootmenu.cfg"

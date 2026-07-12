@@ -2,6 +2,13 @@
 
 ## PoC2 — unreleased
 
+- **Card image naming scheme.** The Raspberry Pi firmware boots
+  `pi-mame-boot-<board>.img` (the boot picker), selected by the board section
+  in our own `config.txt`; the picker chain-boots `pi-mame-core-<board>.img`
+  (the MAME core carrying the defaults ABI). A single-machine card has no
+  picker — the firmware boots the core directly. The board token is Circle's
+  `rpi4` image suffix; the `config.txt` section is the firmware's `[pi4]`
+  board filter. Card zips are `pi-mame-<board>-<platform>-<tier>.zip`.
 - **Boot picker and defaults-ABI docs.** `docs/bootmenu.md` documents the
   boot picker and the `bootmenu.cfg` format for card builders;
   `docs/defaults-abi.md` documents the patchable-defaults block's layout

@@ -8,11 +8,12 @@ hand-editing that card — what's on it, who reads what, and the exact
 
 ## What the picker is
 
-`kernel8-rpi4.img` is a tiny, single-core boot kernel — the Pi 4's
-firmware boots it directly. It has one job: show a menu, read a keyboard
-pick, patch that pick's defaults string into the platform kernel image
-staged on the card, and chain-boot it. It never runs MAME itself; the
-platform binary it chain-boots is the one that does.
+`pi-mame-boot-rpi4.img` is a tiny, single-core boot kernel — the Pi 4's
+firmware boots it directly (the card's `config.txt` names it in the `[pi4]`
+section). It has one job: show a menu, read a keyboard pick, patch that
+pick's defaults string into the MAME core image staged on the card, and
+chain-boot it. It never runs MAME itself; the core binary it chain-boots is
+the one that does.
 
 ## What's on a platform card
 
@@ -21,16 +22,22 @@ platform binary it chain-boots is the one that does.
 
 | File | What it is |
 |---|---|
-| `kernel8-rpi4.img` | the boot picker — what the Pi 4's firmware boots first |
-| `pi-mame-rpi4.img` | the platform binary (built as `kernel8-<platform>.img`, renamed onto the card) — what the picker patches and chain-boots |
+| `pi-mame-boot-rpi4.img` | the boot picker — what the Pi 4's firmware boots first |
+| `pi-mame-core-rpi4.img` | the MAME core (built as `kernel8-<platform>.img`, renamed onto the card) — what the picker patches and chain-boots |
 | `bootmenu.cfg` | the menu the picker reads, generated per platform and tier by `scripts/gen-bootmenu.sh` |
-| `config.txt` | Circle's `config64.txt` |
+| `config.txt` | our card boot config (`[pi4] kernel=pi-mame-boot-rpi4.img`) |
 | `cmdline.txt` | the card's regional canvas (PAL by default) |
 | firmware files (`start4.elf`, `fixup4.dat`, device trees, `armstub8-rpi4.bin`, licences) | Circle's pinned Raspberry Pi firmware |
 | `roms/`, `next/`, `carts/` | the tier's assets, copied in from the assets directory you supply |
 
+The card ships our own `config.txt`: its `[pi4]` section names
+`pi-mame-boot-rpi4.img` as the kernel the firmware boots. Two vocabularies
+name the board here, and they are not the same word — the `[pi4]` section is
+the Raspberry Pi firmware's board filter (fixed by the firmware), while the
+`rpi4` in the filename is Circle's image-suffix token (also read as "RPi").
+
 The picker reads `bootmenu.cfg` from `SD:/bootmenu.cfg` and, on a pick,
-loads and patches `SD:/pi-mame-rpi4.img` (the platform binary's on-card
+loads and patches `SD:/pi-mame-core-rpi4.img` (the MAME core's on-card
 name — `rpi4` names the board, ahead of a future multi-board card).
 
 ## bootmenu.cfg format
@@ -87,8 +94,8 @@ memory or silently truncating a machine's arguments:
   on the highlighted line) and waits for a keyboard pick: **Up**/**Down**
   move the cursor, digits **1–9** jump straight to that entry, and
   **Enter** (main or numpad) selects the highlighted one.
-- **On selection**, the picker loads the platform image
-  (`SD:/pi-mame-rpi4.img`) into memory, patches the selected entry's
+- **On selection**, the picker loads the MAME core image
+  (`SD:/pi-mame-core-rpi4.img`) into memory, patches the selected entry's
   defaults string into it at offset `0x800` (see
   [defaults-abi.md](defaults-abi.md) for the block format), and
   chain-boots the patched image. Every step is logged to serial.

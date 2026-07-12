@@ -16,7 +16,7 @@
 #                               Unpatched (empty block) it IS that platform's
 #                               no-options kernel: MAME boots its own system-
 #                               selection list. Ships on the platform card as
-#                               pi-mame-rpi4.img, chain-booted by the picker.
+#                               pi-mame-core-rpi4.img, chain-booted by the picker.
 #   make PLATFORM=<p> machines
 #                            -> kernel8-<machine>.img for every machine of that
 #                               platform, each a copy of kernel8-<p>.img with

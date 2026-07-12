@@ -2,7 +2,7 @@
 
 Every pi-mame kernel image — a single-machine `kernel8-<machine>.img`, a
 platform's no-options `kernel8-<platform>.img`, or a platform card's
-`pi-mame-rpi4.img` — carries a small patchable block at a fixed offset.
+`pi-mame-core-rpi4.img` — carries a small patchable block at a fixed offset.
 Writing to it is how "which machine, and what media" gets baked into an
 image without a rebuild: the build system does it once at packaging time,
 and the boot picker does it again at boot, patching the same bytes by the

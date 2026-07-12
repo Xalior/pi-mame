@@ -179,10 +179,12 @@ make card PLATFORM=sinclair TIER=free ASSETS=~/my-assets   # a platform card
 
 `make sd` assembles a complete single-machine copy-to-card tree in
 `build/sd/`: Raspberry Pi firmware (fetched at the revision Circle pins),
-Circle's `config64.txt` boot configuration, the machine's regional canvas
-`cmdline.txt`, and the chosen kernel. `make card PLATFORM=<p> TIER=<free|public>`
+our `config.txt` boot configuration, the machine's regional canvas
+`cmdline.txt`, and the MAME core as `pi-mame-core-rpi4.img` (the firmware
+boots it directly — no picker). `make card PLATFORM=<p> TIER=<free|public>`
 instead lays out a platform card in `build/card-<p>-<tier>/`: the boot
-picker as the front door, the platform binary, and a generated
+picker (`pi-mame-boot-rpi4.img`) as the front door, the MAME core
+(`pi-mame-core-rpi4.img`), and a generated
 `bootmenu.cfg` (the **free** menu lists only machines whose ROMs are all
 free-tier; **public** lists the full roster). `ASSETS` points at a directory
 you provide (layout on the platform pages); leave it off and the tree still

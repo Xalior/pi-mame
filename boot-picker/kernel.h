@@ -29,15 +29,16 @@
 #include <fatfs/ff.h>
 #include "bootmenu.h"
 
-// The card's config and the platform kernel image. One platform kernel
-// binary per card; the machine name lives in the pick. The image is named
-// per board — pi-mame-<SYSTEMBIT>.img — so one card can carry a payload per
-// board (the PoC3 multi-board matrix), mirroring the firmware's kernel8*.img
-// convention. PoC2 is Pi 4 only; PoC3 resolves SYSTEMBIT at runtime
-// (Circle CMachineInfo::GetMachineModel) to add rpi3 / rpi5.
+// The card's config and the MAME core image. One core binary per card; the
+// machine name lives in the pick. The core is named per board —
+// pi-mame-core-<SYSTEMBIT>.img — so one card can carry a payload per board
+// (the PoC3 multi-board matrix), mirroring the firmware's kernel8*.img
+// convention. The picker itself ships alongside it as
+// pi-mame-boot-<SYSTEMBIT>.img. PoC2 is Pi 4 only; PoC3 resolves SYSTEMBIT at
+// runtime (Circle CMachineInfo::GetMachineModel) to add rpi3 / rpi5.
 #define SYSTEMBIT		"rpi4"
 #define BOOTMENU_CFG_PATH	"SD:/bootmenu.cfg"
-#define PLATFORM_KERNEL_PATH	"SD:/pi-mame-" SYSTEMBIT ".img"
+#define PLATFORM_KERNEL_PATH	"SD:/pi-mame-core-" SYSTEMBIT ".img"
 
 enum TShutdownMode
 {

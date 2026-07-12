@@ -18,8 +18,9 @@
 #   make kernels                 platform + machines + picker (all CI verifies)
 #   make bootmenu PLATFORM=<p> TIER=<free|public>   a card's bootmenu.cfg -> stdout
 #   make card PLATFORM=<p> TIER=<free|public> [ASSETS=<dir>]
-#                                a platform card tree: the picker as the boot
-#                                kernel, the platform binary as pi-mame-rpi4.img,
+#                                a platform card tree: the picker on-card as
+#                                pi-mame-boot-rpi4.img (firmware boots it), the
+#                                platform binary as pi-mame-core-rpi4.img,
 #                                a generated bootmenu.cfg, and the tier's assets
 #   make sd MACHINE=<m> [ASSETS=<dir>]   single-purpose copy-to-card tree
 #   make assets-free  [ASSETS=<dir>]     fetch the properly-redistributable ROMs
@@ -85,10 +86,11 @@ kernels: platform machines picker
 bootmenu:
 	scripts/gen-bootmenu.sh $(PLATFORM) $(TIER)
 
-# A platform card tree (build/card-<platform>-<tier>/): the picker as the boot
-# kernel, the platform binary as pi-mame-rpi4.img, a generated bootmenu.cfg for
-# the tier, and the tier's assets. The free and public cards share the one
-# platform binary — only the menu and the asset bundle differ.
+# A platform card tree (build/card-<platform>-<tier>/): the picker on-card as
+# pi-mame-boot-rpi4.img (firmware boots it), the platform binary as
+# pi-mame-core-rpi4.img, a generated bootmenu.cfg for the tier, and the tier's
+# assets. The free and public cards share the one platform binary — only the
+# menu and the asset bundle differ.
 card:
 	scripts/mkcard.sh $(PLATFORM) $(TIER) $(ASSETS)
 
