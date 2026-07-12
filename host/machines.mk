@@ -53,7 +53,7 @@ PLATFORM_MACHINES_amstrad = cpc464 cpc664 cpc6128 cpc464p cpc6128p gx4000 \
 PLATFORM_MACHINES_commodore = c64 c64p c64_jp c64_se c64c c64cp c64g c64c_es \
 	c64c_se c64gs sx64 sx64p dx64 vip64 tesa6240 pet64 edu64 vic20 vic20p \
 	vic20_se vic1001 c264 plus4 plus4p c16 c16p c116 c232 v364 c128 c128p \
-	c128d c128dp c128cr
+	c128d c128dp c128cr c128dcr
 
 # All machines, every platform — the roster `make kernels` bakes and CI verifies.
 MACHINES = $(foreach p,$(PLATFORMS),$(PLATFORM_MACHINES_$(p)))
@@ -362,6 +362,23 @@ MACHINE_STRING_c128dp       = c128dp -iec8 ""
 # reaches COMMODORE BASIC V7.0 with no drive romset required. NTSC canvas.
 MACHINE_STRING_c128cr       = c128cr -iec8 ""
 
+# The Commodore 128DCR (NTSC): a CLONE of c128 in the same C128 family
+# (src/mame/commodore/c128.cpp, c128_state) — NOT a #define alias; it has its own
+# ROM_START( c128dcr ). The DCR ("128D Cost-Reduced") merges the kernal parts into
+# two combined ROMs (318022-02, 318023-02), same two-ROM layout as the 128CR,
+# different dumps. It has its OWN machine config (c128_state::c128dcr, NTSC) — but
+# that config is drive-identical to the base c128: cbm_iec_slot_device::add(config,
+# m_iec, "c1571") (with a `// TODO c1571cr` note), the PLAIN external-bus C1571
+# default, NOT a config.replace() to a built-in drive device. The physical DCR had
+# an internal 1571CR, but MAME 0.250 does not model it as built-in (the C1571CR
+# device is offered only in a [[maybe_unused]] slot interface the config never
+# wires) — the built-in-hardware ruling's own test is the config.replace signature,
+# which c128dcr lacks. So, exactly like the physically-built-in-drive c128d and the
+# c128cr, the same -iec8 "" empties the external default and reaches COMMODORE BASIC
+# V7.0 with no drive romset required. (Contrast c128d81, which DOES config.replace
+# an internal c1563 and parked on a boot hang.) NTSC canvas.
+MACHINE_STRING_c128dcr      = c128dcr -iec8 ""
+
 # --- Sinclair asset dependencies (manifest asset names) ---
 MACHINE_ASSETS_spectrum     = spectrum
 MACHINE_ASSETS_spec128      = spec128
@@ -434,6 +451,7 @@ MACHINE_ASSETS_c128p        = c128p
 MACHINE_ASSETS_c128d        = c128d
 MACHINE_ASSETS_c128dp       = c128dp
 MACHINE_ASSETS_c128cr       = c128cr
+MACHINE_ASSETS_c128dcr      = c128dcr
 
 # Query helper: `make -f machines.mk -s print-MACHINE_STRING_spectrum`.
 # Lets scripts read these facts without pulling in the Circle build.

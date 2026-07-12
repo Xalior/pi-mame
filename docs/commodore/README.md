@@ -45,6 +45,7 @@ below bakes one machine into its own `kernel8-<name>.img` — see the
 | `MACHINE=c128d` | Commodore 128D (NTSC, prototype) | 1986 | `c128d.zip` | — | NTSC | [details](c128d.md) |
 | `MACHINE=c128dp` | Commodore 128D (PAL) | 1986 | `c128dp.zip` | — | PAL | [details](c128dp.md) |
 | `MACHINE=c128cr` | Commodore 128CR (NTSC, prototype) | 1986 | `c128cr.zip` | — | NTSC | [details](c128cr.md) |
+| `MACHINE=c128dcr` | Commodore 128DCR (NTSC) | 1987 | `c128dcr.zip` | — | NTSC | [details](c128dcr.md) |
 
 Click through to a machine's details page for its exact romset (CRC32 per
 ROM) and what appears on the glass at power-on.
@@ -202,12 +203,21 @@ my-assets/
     │               #   model runs the c128pal config. Same six ROMs as c128.zip — the
     │               #   driver aliases the romset (rom_c128dp == rom_c128); only the
     │               #   timing/canvas is PAL. BASIC 7.0, 122365 bytes free
-    └── c128cr.zip # Commodore 128CR (NTSC, prototype): a clone of c128 in the same
-                    #   family (c128.cpp, config c128) but NOT a romset alias — the
-                    #   cost-reduced 128CR merges BASIC/editor/kernal into two combined
-                    #   ROMs (252343-03, 252343-04, unique to c128cr), sharing only the
+    ├── c128cr.zip # Commodore 128CR (NTSC, prototype): a clone of c128 in the same
+    │               #   family (c128.cpp, config c128) but NOT a romset alias — the
+    │               #   cost-reduced 128CR merges BASIC/editor/kernal into two combined
+    │               #   ROMs (252343-03, 252343-04, unique to c128cr), sharing only the
+    │               #   chargen and PLA with the c128 line. Four ROMs: the two uniques
+    │               #   from the split-set c128cr.zip, chargen + PLA from c128.zip.
+    │               #   BASIC 7.0, 122365 bytes free
+    └── c128dcr.zip # Commodore 128DCR (NTSC): a clone of c128 in the same family
+                    #   (c128.cpp) with its OWN c128dcr config, NOT a romset alias — the
+                    #   cost-reduced 128D merges BASIC/editor/kernal into two combined
+                    #   ROMs (318022-02, 318023-02, unique to c128dcr), sharing only the
                     #   chargen and PLA with the c128 line. Four ROMs: the two uniques
-                    #   from the split-set c128cr.zip, chargen + PLA from c128.zip.
+                    #   from the split-set c128dcr.zip, chargen + PLA from c128.zip. The
+                    #   real 128DCR's built-in 1571CR is not modelled built-in in MAME
+                    #   0.250 (plain external C1571 default, emptied with -iec8 "").
                     #   BASIC 7.0, 122365 bytes free
 ```
 
