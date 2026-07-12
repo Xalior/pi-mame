@@ -202,9 +202,9 @@ kernel8-%.img: $(TARGET).img patch-defaults machines.mk
 		echo "  build it with: make -C host PLATFORM=$(MACHINE_PLATFORM_$*) $@"; \
 		exit 1; \
 	fi
-	@echo "  PATCH $@ <= \"$(MACHINE_STRING_$*)\""
+	@echo '  PATCH $@ <= [$(MACHINE_STRING_$*)]'
 	@cp $(TARGET).img $@
-	@./patch-defaults $@ "$(MACHINE_STRING_$*)"
+	@./patch-defaults $@ '$(MACHINE_STRING_$*)'
 
 # This platform's machines, each patched from this platform's binary. (The top
 # Makefile invokes `machines` once per platform, so the full roster is covered.)
