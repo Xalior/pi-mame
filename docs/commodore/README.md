@@ -40,15 +40,6 @@ below bakes one machine into its own `kernel8-<name>.img` — see the
 | `MACHINE=c116` | Commodore 116 | 1984 | `c116.zip` | — | PAL | [details](c116.md) |
 | `MACHINE=c232` | Commodore 232 (PAL, prototype) | 1984 | `c232.zip` | — | PAL | [details](c232.md) |
 | `MACHINE=v364` | Commodore V364 (NTSC, prototype) | 1984 | `v364.zip` | — | NTSC | [details](v364.md) |
-| `MACHINE=c128` | Commodore 128 (NTSC) | 1985 | `c128.zip` | — | NTSC | [details](c128.md) |
-| `MACHINE=c128p` | Commodore 128 (PAL) | 1985 | `c128p.zip` | — | PAL | [details](c128p.md) |
-| `MACHINE=c128d` | Commodore 128D (NTSC, prototype) | 1986 | `c128d.zip` | — | NTSC | [details](c128d.md) |
-| `MACHINE=c128dp` | Commodore 128D (PAL) | 1986 | `c128dp.zip` | — | PAL | [details](c128dp.md) |
-| `MACHINE=c128_de` | Commodore 128 (Germany) | 1985 | `c128_de.zip` | — | PAL | [details](c128_de.md) |
-| `MACHINE=c128_se` | Commodore 128 (Sweden/Finland) | 1985 | `c128_se.zip` | — | PAL | [details](c128_se.md) |
-| `MACHINE=c128cr` | Commodore 128CR (NTSC, prototype) | 1986 | `c128cr.zip` | — | NTSC | [details](c128cr.md) |
-| `MACHINE=c128dcr` | Commodore 128DCR (NTSC) | 1987 | `c128dcr.zip` | — | NTSC | [details](c128dcr.md) |
-| `MACHINE=c128dcrp` | Commodore 128DCR (PAL) | 1987 | `c128dcrp.zip` | — | PAL | [details](c128dcrp.md) |
 
 Click through to a machine's details page for its exact romset (CRC32 per
 ROM) and what appears on the glass at power-on.
@@ -173,7 +164,7 @@ my-assets/
     │               #   (dbdc3319) and shared basic 318006-01.u4 come from c232.zip,
     │               #   the shared PLA from the parent c264.zip (251641-02.u7). No
     │               #   3-PLUS-1 function ROMs, but 32K RAM (28661 bytes free)
-    ├── v364.zip   # Commodore V364 (NTSC, prototype): the LAST machine of the
+    └── v364.zip   # Commodore V364 (NTSC, prototype): the LAST machine of the
     │               #   plus4.cpp TED/264 driver (c16_state, config v364 = the NTSC
     │               #   plus4n config plus a T6721A speech synthesiser). Split-set
     │               #   clone of the c264 prototype — its UNIQUE kernal kern364p
@@ -182,69 +173,6 @@ my-assets/
     │               #   function pair 317053-01/317054-01, come from v364.zip; the
     │               #   shared PLA from the parent c264.zip (251641-02). Full 64K
     │               #   (60671 bytes free), with the 3-PLUS-1 suite
-    ├── c128.zip   # Commodore 128 (NTSC): the FIRST machine of a NEW driver family
-    │               #   (c128.cpp, c128_state, config c128) — dual-CPU (Z80 CP/M +
-    │               #   8502 128/64 modes) sharing one kernal complement, no separate
-    │               #   Z80 BIOS region. Self-contained family-parent romset: MAME's
-    │               #   default BIOS is r4, so the shipped set is the always-loaded
-    │               #   251913-01 (0010ec31), the r4 kernal triple 318018-04/318019-04/
-    │               #   318020-05 (9f9c355b/6e2c91a7/ba456b8e), the 390059-01 chargen
-    │               #   (6aaaafe6) and the 8721 PLA 8721r3.u11 (154db186, a MAME
-    │               #   BAD_DUMP that loads and boots straight through). BASIC 7.0,
-    │               #   122365 bytes free
-    ├── c128p.zip  # Commodore 128 (PAL): the c128 family's PAL sibling (c128.cpp,
-    │               #   config c128pal). Same six ROMs as c128.zip — the driver aliases
-    │               #   the romset (rom_c128p == rom_c128); only the timing/canvas is
-    │               #   PAL. BASIC 7.0, 122365 bytes free
-    ├── c128d.zip  # Commodore 128D (NTSC, prototype): a clone of c128 in the same
-    │               #   family (c128.cpp, config c128). The 128D is a 128 with a
-    │               #   built-in C1571 drive; the NTSC prototype is functionally an
-    │               #   NTSC 128. Same six ROMs as c128.zip — the driver aliases the
-    │               #   romset (rom_c128d == rom_c128). BASIC 7.0, 122365 bytes free
-    ├── c128dp.zip # Commodore 128D (PAL): the 128D's PAL sibling (c128.cpp, config
-    │               #   c128pal). A clone of c128 with a built-in C1571 drive; the PAL
-    │               #   model runs the c128pal config. Same six ROMs as c128.zip — the
-    │               #   driver aliases the romset (rom_c128dp == rom_c128); only the
-    │               #   timing/canvas is PAL. BASIC 7.0, 122365 bytes free
-    ├── c128_de.zip # Commodore 128 (Germany, PAL): a clone of c128 in the same
-    │               #   family (c128.cpp, config c128pal) but NOT a romset alias — its
-    │               #   own ROM_START( c128_de ) carries a German chargen (315079-01)
-    │               #   and a German U35 kernal (315078-02, the r4 default of an r2/r4
-    │               #   BIOS pair), unique members from the split-set c128_de.zip. BASIC
-    │               #   lo/hi, r4 editor/kernal parts and PLA are the c128 line's, from
-    │               #   c128.zip. Six ROMs. BASIC 7.0, 122365 bytes free
-    ├── c128_se.zip # Commodore 128 (Sweden/Finland, PAL): a clone of c128 in the same
-    │               #   family (c128.cpp, config c128pal) but NOT a romset alias — its
-    │               #   own ROM_START( c128_se ) carries a Swedish/Finnish chargen
-    │               #   (325181-01), BASIC lo/hi (325182-01) and U35 kernal (325189-01),
-    │               #   unique members from the split-set c128_se.zip. No ROM_SYSTEM_BIOS
-    │               #   — the set is flat. The r2 editor/kernal parts (318018-02,
-    │               #   318019-02) and PLA are the c128 line's, from c128.zip. Six ROMs.
-    │               #   BASIC 7.0, 122365 bytes free
-    ├── c128cr.zip # Commodore 128CR (NTSC, prototype): a clone of c128 in the same
-    │               #   family (c128.cpp, config c128) but NOT a romset alias — the
-    │               #   cost-reduced 128CR merges BASIC/editor/kernal into two combined
-    │               #   ROMs (252343-03, 252343-04, unique to c128cr), sharing only the
-    │               #   chargen and PLA with the c128 line. Four ROMs: the two uniques
-    │               #   from the split-set c128cr.zip, chargen + PLA from c128.zip.
-    │               #   BASIC 7.0, 122365 bytes free
-    ├── c128dcr.zip # Commodore 128DCR (NTSC): a clone of c128 in the same family
-    │               #   (c128.cpp) with its OWN c128dcr config, NOT a romset alias — the
-    │               #   cost-reduced 128D merges BASIC/editor/kernal into two combined
-    │               #   ROMs (318022-02, 318023-02, unique to c128dcr), sharing only the
-    │               #   chargen and PLA with the c128 line. Four ROMs: the two uniques
-    │               #   from the split-set c128dcr.zip, chargen + PLA from c128.zip. The
-    │               #   real 128DCR's built-in 1571CR is not modelled built-in in MAME
-    │               #   0.250 (plain external C1571 default, emptied with -iec8 "").
-    │               #   BASIC 7.0, 122365 bytes free
-    └── c128dcrp.zip # Commodore 128DCR (PAL): the 128DCR's PAL sibling (c128.cpp) with
-                     #   its OWN c128dcrp config (pal(config)), and a #define alias of the
-                     #   DCR romset (rom_c128dcrp == rom_c128dcr) — byte-for-byte the same
-                     #   four ROMs as c128dcr.zip: the two combined uniques (318022-02,
-                     #   318023-02) plus the shared chargen + PLA. Only the timing/canvas
-                     #   is PAL. Like c128dcr, the real 128DCR's built-in 1571CR is not
-                     #   modelled built-in in MAME 0.250 (plain external C1571 default,
-                     #   emptied with -iec8 ""). BASIC 7.0, 122365 bytes free
 ```
 
 Only supplying some assets is fine: machines without their ROMs simply

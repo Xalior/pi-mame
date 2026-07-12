@@ -52,8 +52,7 @@ PLATFORM_MACHINES_amstrad = cpc464 cpc664 cpc6128 cpc464p cpc6128p gx4000 \
 
 PLATFORM_MACHINES_commodore = c64 c64p c64_jp c64_se c64c c64cp c64g c64c_es \
 	c64c_se c64gs sx64 sx64p dx64 vip64 tesa6240 pet64 edu64 vic20 vic20p \
-	vic20_se vic1001 c264 plus4 plus4p c16 c16p c116 c232 v364 c128 c128p \
-	c128d c128dp c128_de c128_se c128cr c128dcr c128dcrp
+	vic20_se vic1001 c264 plus4 plus4p c16 c16p c116 c232 v364
 
 # All machines, every platform — the roster `make kernels` bakes and CI verifies.
 MACHINES = $(foreach p,$(PLATFORMS),$(PLATFORM_MACHINES_$(p)))
@@ -93,7 +92,7 @@ PLATFORM_SOURCES_amstrad = \
 
 PLATFORM_SOURCES_commodore = \
 	src/mame/commodore/c64.cpp src/mame/commodore/vic20.cpp \
-	src/mame/commodore/plus4.cpp src/mame/commodore/c128.cpp
+	src/mame/commodore/plus4.cpp
 
 # --- Sinclair defaults strings ---
 MACHINE_STRING_spectrum     = spectrum
@@ -306,125 +305,6 @@ MACHINE_STRING_c232         = c232 -iec8 ""
 # to the rest of the 264 line. NTSC canvas.
 MACHINE_STRING_v364         = v364 -iec8 ""
 
-# The Commodore 128 (NTSC): the FIRST machine of a new driver family
-# (src/mame/commodore/c128.cpp, c128_state, machine config c128) — not the
-# c64.cpp/vic20.cpp/plus4.cpp lines. The C128 is dual-CPU: a Z80 (CP/M) and an
-# 8502 (128/64 modes) sharing one memory map and one kernal ROM complement — no
-# separate Z80 BIOS region. Its cbm_iec serial bus defaults a C1571 disk drive
-# at device 8 (not the C1541 of the c64/plus4 lines — the 1571 is the 128's
-# native double-sided drive); that drive's own ROM would be a second romset this
-# appliance doesn't need to reach BASIC, so the same -iec8 "" empties device 8
-# and reaches COMMODORE BASIC V7.0 with no drive romset required. NTSC canvas.
-MACHINE_STRING_c128         = c128 -iec8 ""
-
-# The Commodore 128 (PAL): the c128p machine — a ROOT driver in the same C128
-# family (src/mame/commodore/c128.cpp, c128_state), driven by the PAL machine
-# config c128pal (the base c128 is NTSC). Its romset is the c128 family parent's,
-# aliased in the driver (#define rom_c128p rom_c128) — byte-for-byte the c128 set;
-# only the timing/canvas is PAL. Same dual-CPU hardware (Z80 CP/M + 8502 128/64
-# modes, one memory map, one kernal complement) and the same empty IEC device 8
-# (C1571 native drive) as c128, so the same -iec8 "" empties the bus and reaches
-# COMMODORE BASIC V7.0 with no drive romset. PAL canvas.
-MACHINE_STRING_c128p        = c128p -iec8 ""
-
-# The Commodore 128D (NTSC, prototype): a CLONE of c128 in the same C128 family
-# (src/mame/commodore/c128.cpp, c128_state). The 128D is a 128 with a built-in
-# C1571 drive; in MAME's model the NTSC prototype is functionally an NTSC 128 —
-# it uses the base c128 machine config (c128_state::c128, NTSC), not a distinct
-# one. Its romset is aliased to the family parent (#define rom_c128d rom_c128) —
-# byte-for-byte the c128 set. Same dual-CPU hardware (Z80 CP/M + 8502 128/64
-# modes, one memory map, one kernal complement) and the same empty IEC device 8
-# (C1571 native drive), so the same -iec8 "" empties the bus and reaches
-# COMMODORE BASIC V7.0 with no drive romset required. NTSC canvas.
-MACHINE_STRING_c128d        = c128d -iec8 ""
-
-# The Commodore 128D (PAL): a CLONE of c128 in the same C128 family
-# (src/mame/commodore/c128.cpp, c128_state) — the PAL sibling of c128d. The
-# 128D is a 128 with a built-in C1571 drive; the PAL model is driven by the PAL
-# machine config (c128_state::c128pal), the same config the c128p root uses.
-# Its romset is aliased to the family parent (#define rom_c128dp rom_c128) —
-# byte-for-byte the c128 set; only the timing/canvas is PAL. Same dual-CPU
-# hardware (Z80 CP/M + 8502 128/64 modes, one memory map, one kernal complement)
-# and the same empty IEC device 8 (C1571 native drive), so the same -iec8 ""
-# empties the bus and reaches COMMODORE BASIC V7.0 with no drive romset
-# required. PAL canvas.
-MACHINE_STRING_c128dp       = c128dp -iec8 ""
-
-# The Commodore 128 (Germany, PAL): a CLONE of c128 in the same C128 family
-# (src/mame/commodore/c128.cpp, c128_state) — NOT a #define alias; it has its own
-# ROM_START( c128_de ) carrying a German character generator (315079-01.u18) and
-# a German U35 kernal (315078-02.u35, the r4 default of an r2/r4 ROM_SYSTEM_BIOS
-# pair — ROM_DEFAULT_BIOS("r4")). Its BASIC lo/hi, r4 editor/kernal parts and PLA
-# are byte-for-byte the base c128 set. It uses the PAL machine config
-# (c128_state::c128pal), the same config the c128p root uses. Same dual-CPU
-# hardware (Z80 CP/M + 8502 128/64 modes, one memory map, one kernal complement)
-# and the same external-bus C1571 default (cbm_iec_slot_device::add on m_iec — not
-# a built-in-drive config.replace), so the same -iec8 "" empties the bus and
-# reaches COMMODORE BASIC V7.0 with no drive romset required. PAL canvas.
-MACHINE_STRING_c128_de      = c128_de -iec8 ""
-
-# The Commodore 128 (Sweden/Finland, PAL): a CLONE of c128 in the same C128 family
-# (src/mame/commodore/c128.cpp, c128_state) — NOT a #define alias; it has its own
-# ROM_START( c128_se ) carrying a Swedish/Finnish character generator (325181-01.bin),
-# BASIC lo/hi (325182-01.u32) and U35 kernal (325189-01.u35). There is NO
-# ROM_SYSTEM_BIOS — the set is flat. Its U33/U34 editor/kernal parts are the r2 dumps
-# (318018-02, 318019-02 — NOT the r4 dumps the other c128 machines ship) and the PLA
-# are byte-for-byte members of the base c128 set. It uses the PAL machine config
-# (c128_state::c128pal), the same config the c128p root uses. Same dual-CPU hardware
-# (Z80 CP/M + 8502 128/64 modes, one memory map, one kernal complement) and the same
-# external-bus C1571 default (cbm_iec_slot_device::add on m_iec — not a built-in-drive
-# config.replace), so the same -iec8 "" empties the bus and reaches COMMODORE BASIC
-# V7.0 with no drive romset required. PAL canvas.
-MACHINE_STRING_c128_se      = c128_se -iec8 ""
-
-# The Commodore 128CR (NTSC, prototype): a CLONE of c128 in the same C128 family
-# (src/mame/commodore/c128.cpp, c128_state) — but NOT a #define alias. The 128CR
-# is the cost-reduced 128 whose separate BASIC/editor/kernal parts are merged
-# into two combined ROMs (252343-03, 252343-04), so it has its own ROM_START.
-# It uses the base c128 machine config (c128_state::c128, NTSC) — the same
-# config c128/c128d use. Same dual-CPU hardware (Z80 CP/M + 8502 128/64 modes,
-# one memory map, one kernal complement) and the same empty IEC device 8 (C1571
-# native drive, added via cbm_iec_slot_device::add — an external-bus default,
-# not a built-in-drive config.replace), so the same -iec8 "" empties the bus and
-# reaches COMMODORE BASIC V7.0 with no drive romset required. NTSC canvas.
-MACHINE_STRING_c128cr       = c128cr -iec8 ""
-
-# The Commodore 128DCR (NTSC): a CLONE of c128 in the same C128 family
-# (src/mame/commodore/c128.cpp, c128_state) — NOT a #define alias; it has its own
-# ROM_START( c128dcr ). The DCR ("128D Cost-Reduced") merges the kernal parts into
-# two combined ROMs (318022-02, 318023-02), same two-ROM layout as the 128CR,
-# different dumps. It has its OWN machine config (c128_state::c128dcr, NTSC) — but
-# that config is drive-identical to the base c128: cbm_iec_slot_device::add(config,
-# m_iec, "c1571") (with a `// TODO c1571cr` note), the PLAIN external-bus C1571
-# default, NOT a config.replace() to a built-in drive device. The physical DCR had
-# an internal 1571CR, but MAME 0.250 does not model it as built-in (the C1571CR
-# device is offered only in a [[maybe_unused]] slot interface the config never
-# wires) — the built-in-hardware ruling's own test is the config.replace signature,
-# which c128dcr lacks. So, exactly like the physically-built-in-drive c128d and the
-# c128cr, the same -iec8 "" empties the external default and reaches COMMODORE BASIC
-# V7.0 with no drive romset required. (Contrast c128d81, which DOES config.replace
-# an internal c1563 and parked on a boot hang.) NTSC canvas.
-MACHINE_STRING_c128dcr      = c128dcr -iec8 ""
-
-# The Commodore 128DCR (PAL): a CLONE of c128 in the same C128 family
-# (src/mame/commodore/c128.cpp, c128_state) — the PAL sibling of c128dcr, and a
-# #define alias of its romset (#define rom_c128dcrp rom_c128dcr): the same two
-# combined ROMs (318022-02, 318023-02) plus the shared charom and PLA, byte-for-
-# byte; only the timing/canvas is PAL. It has its OWN machine config
-# (c128_state::c128dcrp, c128.cpp line 2006) that calls pal(config) — the PAL twin
-# of c128dcr's ntsc(config) — wiring the SAME external-bus C1571 default with the
-# SAME `// TODO c1571cr` note: cbm_iec_slot_device::add(config, m_iec, "c1571"),
-# the PLAIN external default, NOT a config.replace() to a built-in drive device.
-# The physical DCR had an internal 1571CR, but MAME 0.250 does not model it as
-# built-in (the C1571CR device is offered only in a [[maybe_unused]] slot
-# interface the config never wires) — the built-in-hardware ruling's own test is
-# the config.replace signature, which c128dcrp lacks. So, exactly like c128dcr,
-# c128d/c128dp and c128cr, the same -iec8 "" empties the external default and
-# reaches COMMODORE BASIC V7.0 with no drive romset required. (Contrast c128d81,
-# which DOES config.replace an internal c1563 and parked on a boot hang.) PAL
-# canvas.
-MACHINE_STRING_c128dcrp     = c128dcrp -iec8 ""
-
 # --- Sinclair asset dependencies (manifest asset names) ---
 MACHINE_ASSETS_spectrum     = spectrum
 MACHINE_ASSETS_spec128      = spec128
@@ -492,15 +372,6 @@ MACHINE_ASSETS_c16p         = c16p
 MACHINE_ASSETS_c116         = c116
 MACHINE_ASSETS_c232         = c232
 MACHINE_ASSETS_v364         = v364
-MACHINE_ASSETS_c128         = c128
-MACHINE_ASSETS_c128p        = c128p
-MACHINE_ASSETS_c128d        = c128d
-MACHINE_ASSETS_c128dp       = c128dp
-MACHINE_ASSETS_c128_de      = c128_de
-MACHINE_ASSETS_c128_se      = c128_se
-MACHINE_ASSETS_c128cr       = c128cr
-MACHINE_ASSETS_c128dcr      = c128dcr
-MACHINE_ASSETS_c128dcrp     = c128dcrp
 
 # Query helper: `make -f machines.mk -s print-MACHINE_STRING_spectrum`.
 # Lets scripts read these facts without pulling in the Circle build.
