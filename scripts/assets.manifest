@@ -666,6 +666,23 @@ mem|c16p|318006-01.u3|74eaae87|161c96b4ad20f3a4f2321808e37a5ded26a135dd|-
 mem|c16p|318004-05.u4|71c07bd4|7c7e07f016391174a557e790c4ef1cbe33512cdb|-
 mem|c16p|251641-02.u16|83be2076|a89b18b2261233443c933c8b4663b108e7630924|-
 
+# c116 (Commodore 116) — the cost-reduced, rubber-key sibling of the C16 on the
+# same TED/264 driver (src/mame/commodore/plus4.cpp, c16_state, machine config
+# c16p). Default kernal is ROM_DEFAULT_BIOS("r5") (BIOS 2). ROM_START( c116 ) is
+# byte-identical to c16p by checksum — same basic 318006-01 (74eaae87), same PAL
+# r5 kernal 318004-05 (71c07bd4) and same 251641-02 PLA (83be2076) — differing
+# ONLY in the PLA member name (251641-02.u101 vs c16p's .u16). Its three members
+# are the same SUBSET of plus4p's/c264's; two src lines, obtain_member locates
+# each by CRC32 and renames to the ROM_START( c116 ) name (basic 318006-01.u3,
+# kernal 318004-05.u4, PLA 251641-02.u101 from the parent's "251641-02"). The
+# r3/r4 alternate kernals are optional ROMX_LOAD BIOS alternates, not packed.
+asset|c116|public|zip|roms/c116.zip
+src|c116|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/plus4p.zip
+src|c116|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/c264.zip
+mem|c116|318006-01.u3|74eaae87|161c96b4ad20f3a4f2321808e37a5ded26a135dd|-
+mem|c116|318004-05.u4|71c07bd4|7c7e07f016391174a557e790c4ef1cbe33512cdb|-
+mem|c116|251641-02.u101|83be2076|a89b18b2261233443c933c8b4663b108e7630924|-
+
 # +3 shares the +2A romset (identical members); source that set, repack.
 asset|specpls3|public|zip|roms/specpls3.zip
 src|specpls3|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/specpl2a.zip
