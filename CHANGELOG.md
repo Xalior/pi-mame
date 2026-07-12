@@ -1,9 +1,5 @@
 # Changelog
 
-pi-mame doesn't version by semver yet — each cycle is a named proof-of-concept
-(PoC). Newest at the top: PoC2, the cycle in
-progress, then PoC1, the first released cycle.
-
 ## PoC2 — in progress (unreleased)
 
 Work landed so far this cycle. Nothing here has shipped: it's unreleased,
