@@ -69,8 +69,9 @@ jobs:
           fi
 
       # Resolve the pinned submodule SHAs into cache-key material. The
-      # deps world only changes when the configure line or one of the
-      # Circle-family submodules moves.
+      # deps world only changes when the configure line, one of the
+      # Circle-family submodules, or rapi-bootloader (its own single-core
+      # boot world, which the picker links) moves.
       - name: Resolve cache keys
         id: keys
         run: |
@@ -114,10 +115,12 @@ jobs:
           sudo apt-get install -y --no-install-recommends \
             build-essential make wget python3 zip unzip
 
-      # Cache the built circle-stdlib world (multicore newlib + libc++)
-      # and the SDL2 shim archive. A hit skips the ~40min newlib build.
-      # Key is the configure line + the Circle-family submodule SHAs.
-      - name: Cache deps (circle-stdlib world + SDL2 shim)
+      # Cache the built circle-stdlib world (multicore newlib + libc++),
+      # the SDL2 shim archive, AND rapi-bootloader (its own single-core boot
+      # world, which the picker links). A hit skips the ~40min newlib build.
+      # Key is the configure + boot-world recipe hash + the Circle-family
+      # submodule SHAs + the rapi-bootloader pin.
+      - name: Cache deps (circle-stdlib world + SDL2 shim + boot world)
         id: cache-deps
         uses: actions/cache@v4
         with:
