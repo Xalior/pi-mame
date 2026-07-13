@@ -8,11 +8,19 @@ hand-editing that card — what's on it, who reads what, and the exact
 
 ## What the picker is
 
-`pi-mame-boot-rpi4.img` is a tiny, single-core boot kernel — the Pi 4's
-firmware boots it directly (the card's `config.txt` names it in the `[pi4]`
-section). It has one job: show a menu, read a keyboard pick, patch that
-pick's defaults string into the MAME core image staged on the card, and
-chain-boot it. It never runs MAME itself; the core binary it chain-boots is
+The picker is the **menu-loader** from the
+[rapi-bootloader](https://github.com/Xalior/rapi-bootloader) project — a
+standalone bare-metal boot building block for the Raspberry Pi. Its design
+comes from NextPi (2018) and is very much its own entity: the rapi-bootloader
+repo was assembled to house the menu-loader (and its sibling network-loader)
+as reusable parts, none of it pi-mame-specific. pi-mame simply builds a card
+around the menu-loader.
+
+On a card, that menu-loader is `pi-mame-boot-rpi4.img`: a tiny, single-core
+boot kernel the Pi 4's firmware boots directly (the card's `config.txt` names
+it in the `[pi4]` section). It has one job: show a menu, read a keyboard pick,
+patch that pick's defaults string into the MAME core image staged on the card,
+and chain-boot it. It never runs MAME itself; the core binary it chain-boots is
 the one that does.
 
 ## What's on a platform card
@@ -48,7 +56,7 @@ One entry per line:
 label|defaults-string
 ```
 
-The parser (`boot-picker/bootmenu.cpp`) works like this:
+The parser (`rapi-bootloader/menu-loader/bootmenu.cpp`) works like this:
 
 - Each line is trimmed of leading and trailing whitespace, including a
   trailing `\r` from CRLF files.
