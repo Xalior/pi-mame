@@ -2,7 +2,7 @@
 // defaults.cpp — the receiver side of the pi-mame patchable-defaults block.
 //
 // Three responsibilities, all against the shared ABI in
-// boot-picker/defaultsblock.h (the single source of truth — the writer and
+// rapi-bootloader/defaultsblock/defaultsblock.h (the single source of truth — the writer and
 // this receiver compile the same header):
 //
 //  1. CARRY the block: the image's one TDefaultsBlock instance lives in
@@ -22,7 +22,7 @@
 //     and its media) to MAME's argv.
 //
 #include "defaults.h"
-#include "../boot-picker/defaultsblock.h"
+#include "../rapi-bootloader/defaultsblock/defaultsblock.h"
 
 #include <circle/memorymap.h>
 #include <circle/logger.h>

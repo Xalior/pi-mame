@@ -189,11 +189,11 @@ include ../mk/ld/circle-app.mk
 # patch-defaults is host-native (it edits an image on the build host, it never
 # runs on the Pi), so it compiles with the host toolchain, not the cross one.
 HOST_CXX ?= c++
-patch-defaults: patch-defaults.cpp ../boot-picker/defaultsblock.cpp \
-		../boot-picker/defaultsblock.h
+patch-defaults: patch-defaults.cpp ../rapi-bootloader/defaultsblock/defaultsblock.cpp \
+		../rapi-bootloader/defaultsblock/defaultsblock.h
 	@echo "  HOSTCXX $@"
 	@$(HOST_CXX) -std=c++17 -I $(CIRCLEHOME)/include \
-		-o $@ patch-defaults.cpp ../boot-picker/defaultsblock.cpp
+		-o $@ patch-defaults.cpp ../rapi-bootloader/defaultsblock/defaultsblock.cpp
 
 # The explicit kernel8-$(PLATFORM).img rule (Rules.mk + circle-app.mk) wins for
 # the platform binary, so this pattern only ever fires for real machines. Each

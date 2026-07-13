@@ -14,7 +14,7 @@
 #   pi-mame-boot-rpi4.img  the boot picker (what the Pi firmware boots)
 #   pi-mame-core-rpi4.img  the platform binary — the MAME core (what the picker
 #                          chain-boots and patches per pick; board token rpi4
-#                          matches SYSTEMBIT, see boot-picker/kernel.h)
+#                          matches SYSTEMBIT, see rapi-bootloader/menu-loader/kernel.h)
 #   bootmenu.cfg       generated for this platform + tier (gen-bootmenu.sh)
 #   config.txt         our host/config-card.txt ([pi4] boots the picker)
 #   cmdline.txt        the card's regional canvas (see the note below)
@@ -37,11 +37,11 @@ case "$TIER" in
     *) echo "mkcard.sh: tier must be 'free' or 'public', got '$TIER'" >&2; exit 2 ;;
 esac
 
-# On-card board token: the picker's compile-time SYSTEMBIT (boot-picker/kernel.h)
+# On-card board token: the picker's compile-time SYSTEMBIT (rapi-bootloader/menu-loader/kernel.h)
 # and Circle's image suffix. PoC3 parameterizes this per board.
 BOARD=rpi4
 
-PICKER="$ROOT/boot-picker/kernel8-rpi4.img"
+PICKER="$ROOT/rapi-bootloader/menu-loader/kernel8-rpi4.img"
 BINARY="$ROOT/host/kernel8-$PLATFORM.img"
 SD="$ROOT/build/card-$PLATFORM-$TIER"
 

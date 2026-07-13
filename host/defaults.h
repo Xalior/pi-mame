@@ -2,7 +2,7 @@
 // defaults.h — the receiver side of the pi-mame patchable-defaults block.
 //
 // The block itself (layout, magic, capacity contract) is the shared ABI in
-// boot-picker/defaultsblock.h — the writer (build system, boot picker) and
+// rapi-bootloader/defaultsblock/defaultsblock.h — the writer (build system, boot picker) and
 // this receiver share that one header; this header only declares how the
 // platform kernel consumes it.
 //

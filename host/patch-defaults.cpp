@@ -3,19 +3,19 @@
 //
 // Build tooling, never product surface: stamps a defaults string into a
 // built platform kernel image the same way every pre-boot writer does, by
-// compiling the boot picker's writer (boot-picker/defaultsblock.cpp — the
+// compiling the boot picker's writer (rapi-bootloader/defaultsblock/defaultsblock.cpp — the
 // shared ABI's one implementation) for the build host. The kernel Makefile
 // uses it to turn the one platform binary into a per-machine
 // kernel8-<machine>.img (patch the machine's defaults string in), and the
 // off-bench round-trip check uses it to read a block back.
 //
 //   c++ -std=c++17 -I ../circle-stdlib/libs/circle/include \
-//       -o patch-defaults patch-defaults.cpp ../boot-picker/defaultsblock.cpp
+//       -o patch-defaults patch-defaults.cpp ../rapi-bootloader/defaultsblock/defaultsblock.cpp
 //
 //   patch-defaults <kernel8-*.img> [string]   patch (empty string = clear)
 //   patch-defaults -r <kernel8-*.img>         read the block back
 //
-#include "../boot-picker/defaultsblock.h"
+#include "../rapi-bootloader/defaultsblock/defaultsblock.h"
 
 #include <cstdio>
 #include <cstdlib>

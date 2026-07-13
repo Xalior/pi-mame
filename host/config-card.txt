@@ -8,7 +8,7 @@
 #   - the `rpi4` in the kernel FILENAME is Circle's image-suffix vocabulary
 #     (Circle's own images are kernel8-rpi4.img), which also reads as "RPi".
 #     It is the on-card board token, matching the picker's compile-time
-#     SYSTEMBIT (boot-picker/kernel.h).
+#     SYSTEMBIT (rapi-bootloader/menu-loader/kernel.h).
 #
 # On a platform card the firmware boots the picker, which then chain-boots the
 # MAME core (pi-mame-core-rpi4.img).

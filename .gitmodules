@@ -14,3 +14,6 @@
 	path = mame
 	url = https://github.com/Xalior/mame.git
 	branch = rapi-circle
+[submodule "rapi-bootloader"]
+	path = rapi-bootloader
+	url = git@github.com:Xalior/rapi-bootloader.git

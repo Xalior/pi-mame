@@ -78,8 +78,11 @@ jobs:
           echo "circle=$(git -C circle rev-parse HEAD)" >> "$GITHUB_OUTPUT"
           echo "newlib=$(git -C circle-newlib rev-parse HEAD)" >> "$GITHUB_OUTPUT"
           echo "sdl2=$(git -C circle-libsdl2 rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-          # The deps recipe (the configure line) is part of the identity.
-          echo "deps=$(grep -A3 '^deps:' Makefile | sha256sum | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
+          # rapi-bootloader owns its OWN single-core circle-stdlib (the picker
+          # links it); its pin is part of the deps-world identity.
+          echo "bootloader=$(git -C rapi-bootloader rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          # The deps recipe (the configure + boot-world lines) is part of the identity.
+          echo "deps=$(grep -A9 '^deps:' Makefile | sha256sum | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
 
       # Cache the extracted toolchain, keyed on the release name. A hit
       # skips the ~96MB download + extract.
@@ -121,7 +124,8 @@ jobs:
           path: |
             circle-stdlib
             circle-libsdl2
-          key: deps-${{ steps.keys.outputs.deps }}-${{ steps.keys.outputs.stdlib }}-${{ steps.keys.outputs.circle }}-${{ steps.keys.outputs.newlib }}-${{ steps.keys.outputs.sdl2 }}
+            rapi-bootloader
+          key: deps-${{ steps.keys.outputs.deps }}-${{ steps.keys.outputs.stdlib }}-${{ steps.keys.outputs.circle }}-${{ steps.keys.outputs.newlib }}-${{ steps.keys.outputs.sdl2 }}-${{ steps.keys.outputs.bootloader }}
 
       - name: Build deps
         run: make deps
@@ -172,7 +176,7 @@ jobs:
       # expected image exists and each is under the 256MB ceiling: every
       # per-machine image (roster derived from machines.mk), every platform
       # binary (kernel8-<platform>.img, the no-options kernels), and the boot
-      # picker at its real path (boot-picker/, not host/).
+      # picker at its real path (rapi-bootloader/menu-loader/, not host/).
       - name: Verify kernel images
         run: |
           CEIL=268435456   # 256 MiB
@@ -189,7 +193,7 @@ jobs:
           for p in $(make -s -f host/machines.mk print-PLATFORMS); do
             check "host/kernel8-$p.img"
           done
-          check "boot-picker/kernel8-rpi4.img"
+          check "rapi-bootloader/menu-loader/kernel8-rpi4.img"
           [ "$fail" = 0 ] || { echo "kernel image verification failed"; exit 1; }
 
       # A platform card zip per (platform, tier): the picker as the boot kernel,

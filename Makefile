@@ -1,14 +1,16 @@
 #
 # pi-mame — top-level build orchestration.
 #
-#   make deps                    circle-stdlib (multicore) + the SDL2 shim
+#   make deps                    circle-stdlib (multicore payload world) + the
+#                                SDL2 shim + rapi-bootloader's single-core boot
+#                                world (the picker links it)
 #   make mame                    every platform's MAME archives, each in its
 #                                own isolated tree (long; logs in build/)
 #   make platform                one platform binary per vendor-class
 #                                (host/kernel8-<platform>.img); unpatched each
 #                                is that platform's no-options kernel (MAME's
 #                                own system list)
-#   make picker                  the boot picker (boot-picker/kernel8-rpi4.img)
+#   make picker                  the boot picker (rapi-bootloader/menu-loader/kernel8-rpi4.img)
 #   make kernel MACHINE=<m>      one single-purpose image — a copy of the
 #                                machine's PLATFORM binary with machine <m>'s
 #                                defaults patched in (machines are the tables in
@@ -62,6 +64,10 @@ deps:
 	cd circle-stdlib && bash ./configure -r 4 -p aarch64-none-elf- --libcxx-repo \
 		--kernel-max-size 256 -o ARM_ALLOW_MULTI_CORE && $(MAKE) MAKEINFO=true
 	$(MAKE) -C circle-libsdl2
+	# The boot world: rapi-bootloader owns its OWN single-core circle-stdlib
+	# (the picker/menu-loader links it). Build it here so `make picker` /
+	# `make kernels` can produce the picker image on a clean checkout.
+	$(MAKE) -C rapi-bootloader deps
 
 mame:
 	scripts/build-mame.sh
@@ -74,7 +80,7 @@ platform:
 
 # The platform card's front door (single-core boot world).
 picker:
-	$(MAKE) -C boot-picker
+	$(MAKE) -C rapi-bootloader/menu-loader
 
 # One single-purpose image: the machine's PLATFORM binary patched with <m>'s
 # defaults string.

@@ -4,7 +4,7 @@
 // ONE binary, ANY machine. The machine name and its media
 // (-hard1 /next/next.img, -cart /carts/sysukpd.bin) are NOT compiled in:
 // they ride the patchable-defaults block at image offset 0x800 (shared ABI
-// in boot-picker/defaultsblock.h), written before boot by whoever holds the
+// in rapi-bootloader/defaultsblock/defaultsblock.h), written before boot by whoever holds the
 // image — the build system (baking a per-machine kernel8-<machine>.img), the
 // boot picker (a menu pick), or the dev loader. DefaultsBuildArgv() appends
 // that text to argv before MAME's first instruction; MAME's own CLI frontend
