@@ -23,24 +23,22 @@ Every tagged release carries several asset forms — grab yours from
 [**the latest release**](https://github.com/Xalior/pi-mame/releases/latest)
 and skip the toolchain:
 
-- **`pi-mame-<tag>-<machine>.zip`** — a complete single-machine copy-to-card
-  bundle: Pi firmware, `config.txt`, the machine's regional `cmdline.txt`,
-  the machine's kernel as `pi-mame-core-rpi4.img` (the name `config.txt`
-  boots), and the freely-redistributable "free-tier"
-  assets (see [Assets you must supply](#-assets-you-must-supply)). Extract
-  it onto a blank **FAT32** SD card — files at the card's top level, not
-  in a subfolder — put the card in the Pi, plug the display into
-  **HDMI0** (the micro-HDMI port next to the USB-C power connector), and
-  power on.
-- **`pi-mame-<tag>-<platform>-<free|public>.zip`** — a platform card: the
-  boot picker plus that platform's binary and a menu of its machines. The
-  **free** card lists only machines whose ROMs are all free-tier; the
-  **public** card lists the full roster (its extra entries boot but want
-  their ROMs added). Both carry only free-tier assets.
-- **`kernel8-<machine>.img`** — just the kernel, for a card you've
-  already prepared from a previous bundle. Copy it onto the card as
-  `pi-mame-core-rpi4.img` (the name `config.txt` boots), replacing the
-  one already there.
+- **`pi-mame-<tag>-<platform>-<free|public>.zip`** — a platform card, the
+  ready-to-boot download: Pi firmware, `config.txt`, the platform's regional
+  `cmdline.txt`, the boot picker, that platform's binary (as
+  `pi-mame-core-rpi4.img`), a menu of the platform's machines, and the
+  freely-redistributable "free-tier" assets (see
+  [Assets you must supply](#-assets-you-must-supply)). The **free** card
+  lists only machines whose ROMs are all free-tier; the **public** card
+  lists the full roster (its extra entries boot but want their ROMs added).
+  Both carry only free-tier assets. Extract it onto a blank **FAT32** SD
+  card — files at the card's top level, not in a subfolder — put the card in
+  the Pi, plug the display into **HDMI0** (the micro-HDMI port next to the
+  USB-C power connector), and power on.
+- **`kernel8-<machine>.img`** — one machine's kernel, for every machine in
+  the roster. Drop it onto a card you prepared from a platform card, as
+  `pi-mame-core-rpi4.img` (the name `config.txt` boots), replacing the one
+  already there — that is how you point a card at a specific machine.
 
 Which machine? [docs/sinclair/](docs/sinclair/README.md),
 [docs/amstrad/](docs/amstrad/README.md) and
@@ -51,9 +49,9 @@ CI **compiles** every release on a clean Ubuntu runner — that's what's
 proven for every asset there. It does not boot-test them: hardware proof
 lives in the platform tables, where every screenshot is an HDMI capture
 from a real Pi 4 (more in
-[Continuous integration](#-continuous-integration) below). Machines whose
-ROMs are public-tier ship a bundle that boots but needs those ROMs added
-to the card's `roms/` (and `carts/` for the CPC+ range) yourself — see
+[Continuous integration](#-continuous-integration) below). The public card's
+extra entries boot but need their ROMs added to the card's `roms/` (and
+`carts/` for the CPC+ range) yourself — see
 [Assets you must supply](#-assets-you-must-supply).
 
 Prefer building it yourself? See

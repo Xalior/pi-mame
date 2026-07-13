@@ -192,34 +192,6 @@ jobs:
           check "boot-picker/kernel8-rpi4.img"
           [ "$fail" = 0 ] || { echo "kernel image verification failed"; exit 1; }
 
-      # A copy-to-card zip per machine: firmware, boot config, the machine's
-      # single-purpose kernel, and the FREE-tier assets — only the properly-
-      # redistributable ones ever ship in a release. Machines whose ROMs are
-      # public-tier (see scripts/assets.manifest) get a bundle that boots but
-      # wants its ROMs added. The 2GB Next SD image rides only where the kernel
-      # actually mounts it — machines whose asset list includes `next`. The
-      # roster comes from machines.mk (never the kernel8-*.img glob, which now
-      # also holds the platform binaries). Each zip root is the FAT root:
-      # extract onto a blank card and boot.
-      - name: Assemble per-machine SD card zips
-        run: |
-          make assets-free ASSETS=./free-assets
-          mkdir -p free-assets-lite dist
-          for d in roms carts; do
-            if [ -d "free-assets/$d" ]; then cp -R "free-assets/$d" free-assets-lite/; fi
-          done
-          for m in $(make -s -f host/machines.mk print-MACHINES); do
-            # Ship the big next.img only to the machines that actually mount it.
-            if make -s -f host/machines.mk print-MACHINE_ASSETS_$m | grep -qw next; then
-              assets=./free-assets
-            else
-              assets=./free-assets-lite
-            fi
-            make sd MACHINE="$m" ASSETS="$assets"
-            (cd build/sd && zip -qr "../../dist/pi-mame-${GITHUB_REF_NAME}-$m.zip" .)
-          done
-          ls -lh dist/
-
       # A platform card zip per (platform, tier): the picker as the boot kernel,
       # the platform binary as pi-mame-core-rpi4.img, a generated bootmenu.cfg,
       # and the FREE-tier assets (public ROMs never ship — the public card's
@@ -227,9 +199,13 @@ jobs:
       # card share the one platform binary; only the menu and the asset set
       # differ. A tier whose menu is empty (e.g. commodore-free — every
       # commodore romset is public) ships no card: an empty menu is nothing
-      # to boot.
+      # to boot. Individual machines ship as bare kernel8-<machine>.img (below);
+      # drop one onto a card as pi-mame-core-rpi4.img to run it — no per-machine
+      # bundle, so no near-duplicate zip per machine.
       - name: Assemble per-platform card zips
         run: |
+          make assets-free ASSETS=./free-assets
+          mkdir -p dist
           for p in $(make -s -f host/machines.mk print-PLATFORMS); do
             for tier in free public; do
               # Skip a tier with no bootable machines (comment lines start '#').
@@ -285,10 +261,9 @@ jobs:
             no-options kernel: booted directly it brings up MAME's own
             system-selection list.
 
-            The `pi-mame-<tag>-<machine>.zip` assets are complete copy-to-card
-            bundles: firmware, boot config, the machine's kernel, and the
-            **free-tier** assets — only the properly-redistributable ones ever
-            ship here.
+            To run a specific machine, take its `kernel8-<machine>.img` and
+            drop it onto a prepared card as `pi-mame-core-rpi4.img` (see the
+            README) — that is how you switch the card between machines.
 
             The `pi-mame-<tag>-<platform>-<free|public>.zip` assets are
             platform cards: the boot picker as the front door, the platform
