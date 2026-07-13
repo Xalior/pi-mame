@@ -1,12 +1,3 @@
-[submodule "circle"]
-	path = circle
-	url = https://github.com/rsta2/circle.git
-[submodule "circle-newlib"]
-	path = circle-newlib
-	url = https://codeberg.org/larchcone/circle-newlib.git
-[submodule "circle-stdlib"]
-	path = circle-stdlib
-	url = https://codeberg.org/larchcone/circle-stdlib.git
 [submodule "circle-libsdl2"]
 	path = circle-libsdl2
 	url = https://github.com/Xalior/circle-libsdl2.git

@@ -9,7 +9,7 @@ ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 REAL="$(command -v aarch64-none-elf-gcc)" || {
     echo "aarch64-circle-gcc: aarch64-none-elf-gcc not on PATH" >&2; exit 1; }
 TC="$(cd "$(dirname "$REAL")/.." && pwd)"
-STDLIB=$ROOT/circle-stdlib
+STDLIB=$ROOT/circle-libsdl2/circle-stdlib
 INSTALL=$STDLIB/install/aarch64-none-circle
 TCINC="$(echo "$TC"/lib/gcc/aarch64-none-elf/*/include)"
 

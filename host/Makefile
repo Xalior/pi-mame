@@ -37,7 +37,7 @@
 # Prerequisite: scripts/build-mame.sh has produced mame/build/<platform>/rapi-circle/.
 #
 
-include ../circle-stdlib/Config.mk
+include ../circle-libsdl2/circle-stdlib/Config.mk
 include machines.mk
 
 ROOT = ..
@@ -105,9 +105,10 @@ APP_DEFAULTS_BLOCK = 1
 include $(CIRCLEHOME)/Rules.mk
 
 # MAME is multicore by design: this kernel must link a multicore-configured
-# circle-stdlib world (configure with -o ARM_ALLOW_MULTI_CORE).
+# circle-stdlib world. circle-libsdl2 owns it (ARM_ALLOW_MULTI_CORE); build it
+# with `make -C ../circle-libsdl2 deps`.
 ifeq ($(findstring ARM_ALLOW_MULTI_CORE,$(DEFINE)),)
-$(error the payload requires a multicore circle-stdlib world — reconfigure circle-stdlib with -o ARM_ALLOW_MULTI_CORE)
+$(error the payload requires the multicore circle-stdlib world — build it with 'make -C ../circle-libsdl2 deps')
 endif
 
 INCLUDE := -I $(ROOT)/circle-libsdl2/include $(CIRCLE_STDLIB_INCLUDES) $(INCLUDE)

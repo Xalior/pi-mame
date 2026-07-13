@@ -1,9 +1,10 @@
 #
 # pi-mame — top-level build orchestration.
 #
-#   make deps                    circle-stdlib (multicore payload world) + the
-#                                SDL2 shim + rapi-bootloader's single-core boot
-#                                world (the picker links it)
+#   make deps                    the two Circle worlds, each owned by its
+#                                consumer: circle-libsdl2 (multicore, + the SDL2
+#                                shim) and rapi-bootloader (single-core, the
+#                                picker links it)
 #   make mame                    every platform's MAME archives, each in its
 #                                own isolated tree (long; logs in build/)
 #   make platform                one platform binary per vendor-class
@@ -45,28 +46,20 @@ KERNEL_PLATFORM = $(MACHINE_PLATFORM_$(MACHINE))
 .PHONY: deps mame platform picker kernel machines kernels bootmenu card \
 	sd assets assets-free assets-public
 
-# `bash ./configure` (not ./configure): the shebang would pin macOS's
-# bash 3.2; PATH resolution finds a modern bash when one is installed.
-# MAKEINFO=true: newlib insists on building its manuals otherwise, which
-# fails on any system without texinfo — the manuals aren't the product.
+# Each consumer owns its Circle world as a submodule, one per threading model,
+# so deps is just two self-contained builds — neither is configured here:
 #
-# LLVM/libc++ comes from a GIT CHECKOUT at a fixed tag via --libcxx-repo, NOT
-# circle-stdlib's default --libcxx tarball fetch. Codeberg regenerates its
-# auto-archive tarballs, so their bytes (and SHA256) drift from the hash
-# circle-stdlib pins — a clean --libcxx build then fails its hash check. A git
-# tag is immutable, so this reproduces from a fresh clone. The checkout lands
-# in the gitignored libs/llvm-project that --libcxx-repo reads.
-LLVM_REPO = https://codeberg.org/larchcone/llvm-project.git
-LLVM_TAG  = circle-stdlib-22.1.3-v2
+#   - circle-libsdl2 owns the MULTICORE circle-stdlib: the shim's core-split
+#     runs a presentation worker on a second physical core. The payload kernels
+#     link the shim AND that world (host/Makefile).
+#   - rapi-bootloader owns the SINGLE-CORE circle-stdlib: Circle's
+#     EnableChainBoot() refuses ARM_ALLOW_MULTI_CORE. The boot picker links it.
+#
+# Each repo's own `make deps` configures and builds its world (including the
+# immutable-tagged LLVM/libc++ checkout), so a fresh --recursive clone needs
+# nothing here but these two calls.
 deps:
-	@[ -f circle-stdlib/libs/llvm-project/runtimes/CMakeLists.txt ] || \
-		git clone --depth 1 --branch $(LLVM_TAG) $(LLVM_REPO) circle-stdlib/libs/llvm-project
-	cd circle-stdlib && bash ./configure -r 4 -p aarch64-none-elf- --libcxx-repo \
-		--kernel-max-size 256 -o ARM_ALLOW_MULTI_CORE && $(MAKE) MAKEINFO=true
-	$(MAKE) -C circle-libsdl2
-	# The boot world: rapi-bootloader owns its OWN single-core circle-stdlib
-	# (the picker/menu-loader links it). Build it here so `make picker` /
-	# `make kernels` can produce the picker image on a clean checkout.
+	$(MAKE) -C circle-libsdl2 deps
 	$(MAKE) -C rapi-bootloader deps
 
 mame:

@@ -9,7 +9,7 @@
 // kernel8-<machine>.img (patch the machine's defaults string in), and the
 // off-bench round-trip check uses it to read a block back.
 //
-//   c++ -std=c++17 -I ../circle-stdlib/libs/circle/include \
+//   c++ -std=c++17 -I ../circle-libsdl2/circle-stdlib/libs/circle/include \
 //       -o patch-defaults patch-defaults.cpp ../rapi-bootloader/defaultsblock/defaultsblock.cpp
 //
 //   patch-defaults <kernel8-*.img> [string]   patch (empty string = clear)
