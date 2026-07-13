@@ -47,8 +47,19 @@ KERNEL_PLATFORM = $(MACHINE_PLATFORM_$(MACHINE))
 # bash 3.2; PATH resolution finds a modern bash when one is installed.
 # MAKEINFO=true: newlib insists on building its manuals otherwise, which
 # fails on any system without texinfo — the manuals aren't the product.
+#
+# LLVM/libc++ comes from a GIT CHECKOUT at a fixed tag via --libcxx-repo, NOT
+# circle-stdlib's default --libcxx tarball fetch. Codeberg regenerates its
+# auto-archive tarballs, so their bytes (and SHA256) drift from the hash
+# circle-stdlib pins — a clean --libcxx build then fails its hash check. A git
+# tag is immutable, so this reproduces from a fresh clone. The checkout lands
+# in the gitignored libs/llvm-project that --libcxx-repo reads.
+LLVM_REPO = https://codeberg.org/larchcone/llvm-project.git
+LLVM_TAG  = circle-stdlib-22.1.3-v2
 deps:
-	cd circle-stdlib && bash ./configure -r 4 -p aarch64-none-elf- --libcxx \
+	@[ -f circle-stdlib/libs/llvm-project/runtimes/CMakeLists.txt ] || \
+		git clone --depth 1 --branch $(LLVM_TAG) $(LLVM_REPO) circle-stdlib/libs/llvm-project
+	cd circle-stdlib && bash ./configure -r 4 -p aarch64-none-elf- --libcxx-repo \
 		--kernel-max-size 256 -o ARM_ALLOW_MULTI_CORE && $(MAKE) MAKEINFO=true
 	$(MAKE) -C circle-libsdl2
 
