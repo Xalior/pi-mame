@@ -28,7 +28,7 @@ BOARD=rpi4
 [ -f "$IMG" ] || { echo "mksd.sh: $IMG not built (make -C host MACHINE=$MACHINE)" >&2; exit 1; }
 
 # Firmware + ARM stub via Circle's own boot makefile (pinned revision).
-make -C "$ROOT/circle/boot" firmware armstub64
+make -C "$ROOT/circle-libsdl2/circle-stdlib/libs/circle/boot" firmware armstub64
 
 rm -rf "$SD"
 mkdir -p "$SD"
@@ -36,7 +36,7 @@ mkdir -p "$SD"
 for f in start4.elf fixup4.dat bcm2711-rpi-4-b.dtb bcm2711-rpi-400.dtb \
          bcm2711-rpi-cm4.dtb LICENCE.broadcom COPYING.linux \
          armstub8-rpi4.bin; do
-    cp "$ROOT/circle/boot/$f" "$SD/"
+    cp "$ROOT/circle-libsdl2/circle-stdlib/libs/circle/boot/$f" "$SD/"
 done
 
 # Our config.txt boots pi-mame-core-rpi4.img (the MAME core) directly on a Pi 4.

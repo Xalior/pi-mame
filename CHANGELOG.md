@@ -2,6 +2,34 @@
 
 ## PoC2 — unreleased
 
+- **Settings and NVRAM persist.** The appliance never exits, so MAME's
+  exit-time persistence never fires, and no timer can tell a deliberate setting
+  from a ticking clock register. Machine settings and battery-backed RAM are
+  now checkpointed on the falling edge of MAME's own menu — the one trustworthy
+  signal that the user just changed something and closed the OSD — writing each
+  device's store into a baked NVRAM directory. Machines with an emulated
+  real-time clock (the Amstrad NC100/NC200) read an *unset* wall-clock as
+  power-loss and wipe their battery RAM on boot, so the kernel seeds a
+  factory-style wall-clock before MAME constructs the machine; the NC100 now
+  warm-boots to its own menu with the clock intact. Zero MAME modifications:
+  the OSD subclass drives MAME's own public save paths.
+- **The loaders became their own project.** The boot picker and the development
+  network-loader now live in a standalone repository,
+  [rapi-bootloader](https://github.com/Xalior/rapi-bootloader), which **owns the
+  0x800 defaults-block ABI** — its README is the authoritative spec, and
+  `docs/defaults-abi.md` here is now just a reference to it. pi-mame submodules
+  it: a card's picker is its *menu-loader*, and its *network-loader* serves
+  TFTP/HTTP/WebDAV for reflash-free development. Neither is pi-mame-specific —
+  the design dates to NextPi (2018) and stands on its own.
+- **One Circle world per threading model.** Each consumer now owns its
+  `circle-stdlib` as a nested submodule instead of the tree carrying shared
+  top-level ones: **circle-libsdl2** owns the MULTICORE world (the shim's
+  core-split runs a presentation worker on a second physical core) and
+  **rapi-bootloader** owns the SINGLE-CORE world (Circle's `EnableChainBoot()`
+  refuses a multicore build). The top-level `circle`, `circle-newlib` and
+  `circle-stdlib` submodules are gone, and `make deps` is two self-contained
+  calls. A fresh `git clone --recursive` plus `make deps` builds everything,
+  with nothing else to configure.
 - **Card image naming scheme.** The Raspberry Pi firmware boots
   `pi-mame-boot-<board>.img` (the boot picker), selected by the board section
   in our own `config.txt`; the picker chain-boots `pi-mame-core-<board>.img`
