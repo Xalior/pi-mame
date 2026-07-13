@@ -204,7 +204,14 @@ jobs:
       # bundle, so no near-duplicate zip per machine.
       - name: Assemble per-platform card zips
         run: |
+          # Each tier carries its OWN assets — that is the whole point of the
+          # split. Free cards get the free-blessed set; public cards get the
+          # full set (free + the grey public ROMs). The public ROMs are NOT in
+          # this repo (keeping it legal) — fetch-assets.sh pulls them from their
+          # mirrors HERE, at build time, into the release zip only. Fetch both
+          # bundles once; each card copies from the one for its tier.
           make assets-free ASSETS=./free-assets
+          make assets      ASSETS=./all-assets
           mkdir -p dist
           for p in $(make -s -f host/machines.mk print-PLATFORMS); do
             for tier in free public; do
@@ -216,7 +223,12 @@ jobs:
               if [ "$entries" -eq 0 ]; then
                 echo "skip: $p-$tier menu is empty"; continue
               fi
-              make card PLATFORM="$p" TIER="$tier" ASSETS=./free-assets
+              # free -> free-blessed assets only; public -> the full set.
+              case "$tier" in
+                free)   card_assets=./free-assets ;;
+                public) card_assets=./all-assets ;;
+              esac
+              make card PLATFORM="$p" TIER="$tier" ASSETS="$card_assets"
               (cd "build/card-$p-$tier" && \
                 zip -qr "../../dist/pi-mame-${GITHUB_REF_NAME}-$p-$tier.zip" .)
             done
@@ -271,12 +283,11 @@ jobs:
 
             The `pi-mame-<tag>-<platform>-<free|public>.zip` assets are
             platform cards: the boot picker as the front door, the platform
-            binary, and a menu of that platform's machines — the **free** card
-            lists only machines whose ROMs are all free-tier; the **public**
-            card lists the full roster. Both carry the same binary and only
-            free-tier assets.
-
-            Machines whose ROMs are public-tier (see `scripts/assets.manifest`)
-            boot from their bundle but need those ROMs added to the card's
-            `roms/` (and `carts/` for the CPC+ range) yourself. Extract a bundle
-            onto a blank FAT32 card and boot.
+            binary, a menu of that platform's machines, and their ROMs. Both
+            tiers share the one binary; they differ in menu and ROM set. The
+            **free** card lists only all-free-tier machines and bundles just
+            those free-blessed ROMs. The **public** card lists the full roster
+            and bundles the full ROM set — the grey "public-tier" ROMs
+            (`scripts/assets.manifest`) are not in the repo; they are fetched
+            from their mirrors at build time into the public zip alone. Extract
+            a card onto a blank FAT32 card and boot.

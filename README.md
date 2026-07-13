@@ -26,12 +26,13 @@ and skip the toolchain:
 - **`pi-mame-<tag>-<platform>-<free|public>.zip`** — a platform card, the
   ready-to-boot download: Pi firmware, `config.txt`, the platform's regional
   `cmdline.txt`, the boot picker, that platform's binary (as
-  `pi-mame-core-rpi4.img`), a menu of the platform's machines, and the
-  freely-redistributable "free-tier" assets (see
-  [Assets you must supply](#-assets-you-must-supply)). The **free** card
-  lists only machines whose ROMs are all free-tier; the **public** card
-  lists the full roster (its extra entries boot but want their ROMs added).
-  Both carry only free-tier assets. Extract it onto a blank **FAT32** SD
+  `pi-mame-core-rpi4.img`), a menu of the platform's machines, and their
+  ROMs. The **free** card lists only machines whose ROMs are all free-tier
+  and bundles just those free-blessed ROMs. The **public** card lists the
+  full roster and bundles the full ROM set — the grey "public-tier" ROMs are
+  not in this repo; CI fetches them from their mirrors at build time into this
+  zip alone (see [Assets you must supply](#-assets-you-must-supply) for the
+  tiers). Extract it onto a blank **FAT32** SD
   card — files at the card's top level, not in a subfolder — put the card in
   the Pi, plug the display into **HDMI0** (the micro-HDMI port next to the
   USB-C power connector), and power on.
@@ -49,9 +50,9 @@ CI **compiles** every release on a clean Ubuntu runner — that's what's
 proven for every asset there. It does not boot-test them: hardware proof
 lives in the platform tables, where every screenshot is an HDMI capture
 from a real Pi 4 (more in
-[Continuous integration](#-continuous-integration) below). The public card's
-extra entries boot but need their ROMs added to the card's `roms/` (and
-`carts/` for the CPC+ range) yourself — see
+[Continuous integration](#-continuous-integration) below). A bare
+`kernel8-<machine>.img` carries no ROMs — add the machine's ROMs to the
+card's `roms/` (and `carts/` for the CPC+ range) yourself; see
 [Assets you must supply](#-assets-you-must-supply).
 
 Prefer building it yourself? See
