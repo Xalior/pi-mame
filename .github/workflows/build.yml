@@ -208,8 +208,12 @@ jobs:
           mkdir -p dist
           for p in $(make -s -f host/machines.mk print-PLATFORMS); do
             for tier in free public; do
-              # Skip a tier with no bootable machines (comment lines start '#').
-              if ! scripts/gen-bootmenu.sh "$p" "$tier" | grep -qv '^#'; then
+              # Build every tier that has a bootable machine; skip only a truly
+              # empty menu (all lines are '#' comments or blank). Counted with
+              # awk, not `grep -qv '^#'` — the latter silently drops cards under
+              # a non-GNU grep (e.g. ugrep), losing public cards from a release.
+              entries=$(scripts/gen-bootmenu.sh "$p" "$tier" | awk '!/^#/ && NF' | wc -l)
+              if [ "$entries" -eq 0 ]; then
                 echo "skip: $p-$tier menu is empty"; continue
               fi
               make card PLATFORM="$p" TIER="$tier" ASSETS=./free-assets
