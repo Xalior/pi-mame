@@ -254,6 +254,19 @@ jobs:
           path: host/kernel8-*.img
           if-no-files-found: error
 
+      # The cards are the actual deliverable — a bare kernel is not something
+      # you can put in a Pi. A `ci` branch build exists to hand you the thing
+      # you are about to release so it can be bench-tested BEFORE a tag is cut,
+      # so the zips must come out of a branch build too; previously they were
+      # assembled and then thrown away, published only by the tag-gated release
+      # step, which meant the pre-tag validation could not give you a card.
+      - name: Upload card zips
+        uses: actions/upload-artifact@v4
+        with:
+          name: card-zips
+          path: dist/pi-mame-*.zip
+          if-no-files-found: error
+
       # Cut a GitHub Release carrying every kernel image as a separate
       # downloadable asset, plus the copy-to-card zips, so users can skip
       # the toolchain entirely. The body is deliberately honest about what
