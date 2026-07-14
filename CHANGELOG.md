@@ -43,17 +43,6 @@
   `docs/defaults-abi.md` documents the patchable-defaults block's layout
   and writer/receiver contracts for anyone building their own tooling
   against a pi-mame image.
-- **The core split.** MAME's emulation core now runs alone on its own CPU
-  core, with all platform access (video, input, audio, file I/O) marshaled
-  through the shim to a dedicated services core, presentation moved off the
-  emulation core entirely, a hardware-threads layer for secondary-core
-  work, and a cross-core heartbeat/watchdog that detects a stalled core
-  instead of hanging silently. De-risked by a series of on-hardware
-  experiments beforehand, then proven on real hardware with the ZX Spectrum
-  Next (tbblue), which booted NextZXOS to its main menu and sustained a
-  live, animating screensaver — continuous cross-core frame delivery, not
-  just a static boot screen. This work is unpushed and pending review; it
-  has not been promoted onto the full machine table yet.
 - **A defaults-block ABI in every kernel image.** Kernel images carry a
   patchable block at fixed offset `0x800`: `PM8D` magic, capacity and
   length fields, and a 512-byte text buffer holding the machine name
@@ -61,9 +50,9 @@
   build system, the dev chainloader, the boot picker, or third-party
   tooling — may rewrite the text after verifying the magic; the kernel
   tokenises it into MAME's argv at boot. Writers and receiver compile
-  the same header (`boot-picker/defaultsblock.h`); a four-byte
-  trampoline at the image entry displaces Circle's startup past the
-  block.
+  the same header (`rapi-bootloader/defaultsblock/defaultsblock.h`); a
+  four-byte trampoline at the image entry displaces Circle's startup past
+  the block.
 - **The patchable-defaults factory.** A platform now builds as a single
   kernel binary: the specific machine, and its media defaults, are patched
   into a small fixed block in the image at boot, rather than needing a
