@@ -1,6 +1,6 @@
 # Changelog
 
-## PoC2 — unreleased
+## PoC2 · 2026-07-14
 
 - **Settings and NVRAM persist.** The appliance never exits, so MAME's
   exit-time persistence never fires, and no timer can tell a deliberate setting
@@ -36,7 +36,8 @@
   (the MAME core carrying the defaults ABI). A single-machine card has no
   picker — the firmware boots the core directly. The board token is Circle's
   `rpi4` image suffix; the `config.txt` section is the firmware's `[pi4]`
-  board filter. Card zips are `pi-mame-<board>-<platform>-<tier>.zip`.
+  board filter. Card zips are `pi-mame-<tag>-<platform>-<tier>.zip` — the
+  board token lives inside, on the images.
 - **Boot picker and defaults-ABI docs.** `docs/bootmenu.md` documents the
   boot picker and the `bootmenu.cfg` format for card builders;
   `docs/defaults-abi.md` documents the patchable-defaults block's layout
