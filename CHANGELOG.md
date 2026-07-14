@@ -1,6 +1,6 @@
 # Changelog
 
-## PoC2 · 2026-07-14
+## PoC2 — Me and my Shadow core · 2026-07-14
 
 - **Settings and NVRAM persist.** The appliance never exits, so MAME's
   exit-time persistence never fires, and no timer can tell a deliberate setting
