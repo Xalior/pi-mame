@@ -9,4 +9,5 @@ host/libosd_sdl-nomain.a
 assets/
 .DS_Store
 host/libosd_sdl-nomain-*.a
+host/libocore_sdl-nofile-*.a
 host/patch-defaults

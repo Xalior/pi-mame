@@ -371,15 +371,12 @@ void SDL_HapticClose(SDL_Haptic *) {}
 
 // ---- SDL2: audio extras --------------------------------------------------------
 
+// SDL_GetDefaultAudioInfo and SDL_GetAudioDeviceSpec are NOT stubbed here:
+// the shim implements them (circle-libsdl2 src/audio.cpp), and a stub in this
+// object would win the link over the archive member and quietly replace a
+// working implementation with a failure return.
 int SDL_GetNumAudioDrivers(void) { return 1; }
 const char *SDL_GetAudioDriver(int) { return "circle"; }
-int SDL_GetDefaultAudioInfo(char **name, SDL_AudioSpec *, int)
-{
-    if (name != nullptr)
-        *name = nullptr;
-    return -1;
-}
-int SDL_GetAudioDeviceSpec(int, int, SDL_AudioSpec *) { return -1; }
 
 // ---- SDL2: misc -----------------------------------------------------------------
 

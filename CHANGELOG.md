@@ -43,6 +43,20 @@
   `docs/defaults-abi.md` documents the patchable-defaults block's layout
   and writer/receiver contracts for anyone building their own tooling
   against a pi-mame image.
+- **The core split: MAME gets a CPU core to itself.** The emulation core now
+  runs alone on core 1. Core 0 keeps the platform — devices, scheduler, the
+  shim's servo task and a cross-core watchdog that catches a stalled core
+  instead of hanging silently — and core 2 does nothing but present frames:
+  blit and page flip, off the emulation core entirely. MAME reaches the
+  hardware through lock-free rings (events in, audio out), a one-deep frame
+  mailbox, and a marshalled call path for the rare ones; its file I/O is
+  `osd_file` reimplemented over that path, because a core that does not own
+  the SD card must not touch it. MAME's threads become hardware threads,
+  pinned to cores, by link substitution — the standard library's threading is
+  swapped out, with no change to circle-stdlib. Proven on real hardware: the
+  ZX Spectrum Next boots NextZXOS from its 2 GB hard-disk image and sustains a
+  live, animating screensaver — continuous cross-core frame delivery, not a
+  static boot screen.
 - **A defaults-block ABI in every kernel image.** Kernel images carry a
   patchable block at fixed offset `0x800`: `PM8D` magic, capacity and
   length fields, and a 512-byte text buffer holding the machine name

@@ -58,7 +58,7 @@ TARGET = kernel8-$(PLATFORM)
 # No machine is baked: the kernel object is the same for every image and every
 # platform. The defaults receiver (defaults.o) carries the 0x800 block and the
 # entry trampoline the linker script pins.
-OBJS = main.o kernel.o defaults.o mamemain.o circle_stubs.o
+OBJS = main.o kernel.o defaults.o mamemain.o circlefile.o circle_stubs.o xthreading.o
 
 STANDARD = -std=gnu++23 -Wno-volatile
 
@@ -70,11 +70,17 @@ MAME_OBJS = \
 	$(MAMEBUILD)/obj/Release/generated/mame/$(SUBTARGET)/drivlist.o \
 	$(MAMEBUILD)/obj/Release/generated/version.o
 
-# libosd_sdl.a ships sdlmain.o (MAME's own main() + sdl_entered_debugger,
-# which mamemain.cpp provides instead). Link a local copy with that member
-# deleted; the mame tree stays untouched. Named per platform so the two
+# Archive surgery, mame tree untouched:
+#  - libosd_sdl.a ships sdlmain.o (MAME's own main() + sdl_entered_debugger,
+#    which mamemain.cpp provides instead);
+#  - libocore_sdl.a ships posixfile.o/posixdir.o (the osd_file surface, which
+#    circlefile.cpp reimplements over the shim's core-0 I/O service — the core
+#    split's file seam: the cut is osd_file, never below. MAME runs on core 1
+#    and must not touch FatFs directly).
+# Both are local copies with the member deleted, named per platform so the
 # platforms' copies never collide in this shared build directory.
-LIBOSD_NOMAIN = libosd_sdl-nomain-$(PLATFORM).a
+LIBOSD_NOMAIN   = libosd_sdl-nomain-$(PLATFORM).a
+LIBOCORE_NOFILE = libocore_sdl-nofile-$(PLATFORM).a
 
 # libprecompile.a is excluded (PCH carrier, nothing to link). libqtdbg_sdl.a
 # stays in: built with USE_QTDEBUG=0 it holds only the not-supported debugger
@@ -83,18 +89,23 @@ LIBOSD_NOMAIN = libosd_sdl-nomain-$(PLATFORM).a
 # archives (bin/*.a) are this platform's own, isolated by its BUILDDIR.
 MAME_ARCHIVES = \
 	$(wildcard $(MAMEBUILD)/bin/mame_$(SUBTARGET)/*.a) \
-	$(filter-out %/libosd_sdl.a %/libprecompile.a, \
+	$(filter-out %/libosd_sdl.a %/libocore_sdl.a %/libprecompile.a, \
 		$(wildcard $(MAMEBUILD)/bin/*.a))
 
 # Rules.mk's link recipe already wraps $(LIBS) in --start-group/--end-group,
 # which covers MAME's mutually referential archives. LIBS is also part of
 # the .img rule's prerequisite list: file paths only, defined before Rules.mk.
+# liblibcxx-threading.a is filtered out: xthreading.o provides the complete
+# external-threading ABI (objects always beat archive members), giving MAME
+# hardware threads pinned to cores by pure link substitution — no
+# circle-stdlib change.
 LIBS = $(MAME_OBJS) \
 	$(LIBOSD_NOMAIN) \
+	$(LIBOCORE_NOFILE) \
 	$(MAME_ARCHIVES) \
 	$(ROOT)/circle-libsdl2/libSDL2.a \
 	$(CIRCLEHOME)/lib/sound/libsound.a \
-	$(CIRCLE_STDLIB_LIBS)
+	$(filter-out %/liblibcxx-threading.a,$(CIRCLE_STDLIB_LIBS))
 
 # The platform image carries the patchable-defaults block: link with the
 # defaults linker script (trampoline + block pinned at 0x800) and gate every
@@ -118,6 +129,12 @@ $(LIBOSD_NOMAIN): $(MAMEBUILD)/bin/libosd_sdl.a
 	@cp $< $@
 	@chmod u+w $@
 	@$(AR) d $@ sdlmain.o
+
+$(LIBOCORE_NOFILE): $(MAMEBUILD)/bin/libocore_sdl.a
+	@echo "  AR    $@ (libocore_sdl.a minus posixfile.o posixdir.o)"
+	@cp $< $@
+	@chmod u+w $@
+	@$(AR) d $@ posixfile.o posixdir.o
 
 # mamemain.cpp compiles the way genie compiled sdlmain.cpp: same cross
 # wrapper, and the `release` config's DEFINES/INCLUDES from
@@ -170,6 +187,19 @@ mamemain.o: mamemain.cpp
 mamemain.d: mamemain.cpp
 	@$(MAME_CXX) $(MAME_DEFINES) $(MAME_INCLUDES) \
 		-M -MT mamemain.o -MT $@ -MF $@ $<
+
+# circlefile.cpp is MAME's osd_file/osd::directory surface reimplemented over
+# the shim's core-0 I/O service, so it compiles in the same MAME environment
+# as the code it replaces (posixfile.cpp), not the Circle one.
+circlefile.o: circlefile.cpp
+	@echo "  CPP   $@ (MAME env)"
+	@$(MAME_CXX) $(MAME_DEFINES) $(MAME_INCLUDES) \
+		-O3 -fno-strict-aliasing $(MAME_WARNINGS) \
+		-c -o $@ $<
+
+circlefile.d: circlefile.cpp
+	@$(MAME_CXX) $(MAME_DEFINES) $(MAME_INCLUDES) \
+		-M -MT circlefile.o -MT $@ -MF $@ $<
 
 -include $(DEPS)
 

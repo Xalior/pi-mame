@@ -20,6 +20,8 @@
 #include <circle/sched/scheduler.h>
 #include <circle/input/console.h>
 #include <circle/cputhrottle.h>
+#include <circle/multicore.h>
+#include <circle/memory.h>
 #include <circle/types.h>
 #include <SDCard/emmc.h>
 #include <fatfs/ff.h>
@@ -29,6 +31,19 @@ enum TShutdownMode
     ShutdownNone,
     ShutdownHalt,
     ShutdownReboot
+};
+
+// Secondary-core dispatch. Core 0 keeps the Circle world (devices, scheduler,
+// the shim's servo and watchdog); the cores it starts take their roles from
+// Run(), below in kernel.cpp:
+//   CORE1  MAME, alone — a pinned thread on the xthreading dispatcher.
+//   CORE2  the shim's presentation worker: blit + page flip.
+//   CORE3  the xthreading dispatcher's spare, dark unless a thread pins there.
+class CSplitCores : public CMultiCoreSupport
+{
+public:
+    CSplitCores(void) : CMultiCoreSupport(CMemorySystem::Get()) {}
+    void Run(unsigned nCore) override;
 };
 
 class CKernel
@@ -53,6 +68,7 @@ private:
     FATFS               m_FileSystem;
     CConsole            m_Console;
     CCPUThrottle        m_CPUThrottle;   // full clock: Circle boots at idle speed
+    CSplitCores         m_Cores;
 };
 
 #endif

@@ -21,10 +21,13 @@
 // allowed to be.
 //
 #include "kernel.h"
+#include "xthreading.h"
 #include "defaults.h"
 #include <circle/startup.h>
 #include <circle/machineinfo.h>
+#include <SDL2/SDL_circle.h>
 #include <cstdio>
+#include <thread>
 
 extern "C" int mame_circle_main(int argc, char **argv);
 void CGlueStdioInit(CConsole &rConsole);
@@ -36,6 +39,23 @@ extern "C" int rapi_debug_uart;
 void SDL2Circle_SetInjectSerial(CSerialDevice *pSerial);
 
 static const char From[] = "mame-host";
+
+// Secondary-core dispatch: MAME's core and the spare worker core run the
+// threading library's dispatcher; the presentation core runs the shim's
+// worker. Role-to-core binding is a per-world constant.
+void CSplitCores::Run(unsigned nCore)
+{
+    switch (nCore)
+    {
+    case 1:
+    case 3:
+        xthread_core_main(nCore);          // never returns
+        break;
+    case 2:
+        SDL2Circle_SplitPresentCore();     // never returns
+        break;
+    }
+}
 
 // The baked policy argv: evergreen appliance decrees only, no machine.
 // -numprocessors 1: one core, cooperative threads — nothing preempts.
@@ -131,6 +151,9 @@ boolean CKernel::Initialize(void)
     }
     if (bOK) bOK = m_Console.Initialize();
     if (bOK) CGlueStdioInit(m_Console);
+    // Start the secondary cores. They park in CSplitCores::Run until the
+    // split's rings and the threading dispatcher are armed, below.
+    if (bOK) bOK = m_Cores.Initialize();
     return bOK;
 }
 
@@ -171,7 +194,27 @@ TShutdownMode CKernel::Run(void)
                    CMachineInfo::Get()->GetClockRate(CLOCK_ID_CORE) / 1000000,
                    CKernelOptions::Get()->GetSoCMaxTemp());
 
-    int res = mame_circle_main(argc, const_cast<char **>(s_FinalArgv));
+    // Arm the split BEFORE MAME's first instruction: the shim's servo and
+    // watchdog tasks (core 0), and the threading library's creator task, so
+    // MAME can create its service threads from core 1 and every device call
+    // it makes is already being marshaled back to the core that owns the
+    // hardware.
+    SDL2Circle_SplitInit();
+    xthread_init();
+
+    // MAME, alone, on core 1: a pinned thread on the xthreading dispatcher —
+    // no pump work, no interrupt jitter, no audio mixing sharing its core.
+    xthread_pin_next(1);
+    static int s_mame_result = -1;
+    std::thread mame([argc]
+    {
+        s_mame_result = mame_circle_main(argc, const_cast<char **>(s_FinalArgv));
+    });
+
+    // Core 0 belongs to its tasks now; this join spins through scheduler
+    // yields, which IS this world's idle loop.
+    mame.join();
+    int res = s_mame_result;
 
     m_Logger.Write(From, LogNotice, "SoC: %uC, arm %u MHz, core %u MHz",
                    m_CPUThrottle.GetTemperature(),
