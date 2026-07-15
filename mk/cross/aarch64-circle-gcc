@@ -9,12 +9,24 @@ ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 REAL="$(command -v aarch64-none-elf-gcc)" || {
     echo "aarch64-circle-gcc: aarch64-none-elf-gcc not on PATH" >&2; exit 1; }
 TC="$(cd "$(dirname "$REAL")/.." && pwd)"
-STDLIB=$ROOT/circle-libsdl2/circle-stdlib
+
+# Board is selected by RAPI_BOARD (rpi3/rpi4/rpi5); build-mame.sh and host/Makefile
+# export it. Each maps to its Circle RASPPI, CPU tuning, and the matching per-board
+# multicore world hoisted from circle-libsdl2 — there is no separate circle-stdlib in
+# this tree. Defaults to rpi4.
+RAPI_BOARD="${RAPI_BOARD:-rpi4}"
+case "$RAPI_BOARD" in
+    rpi3) RAPI_RASPPI=3; RAPI_MCPU=cortex-a53 ;;
+    rpi4) RAPI_RASPPI=4; RAPI_MCPU=cortex-a72 ;;
+    rpi5) RAPI_RASPPI=5; RAPI_MCPU=cortex-a76 ;;
+    *) echo "aarch64-circle-gcc: unknown RAPI_BOARD='$RAPI_BOARD' (rpi3|rpi4|rpi5)" >&2; exit 1 ;;
+esac
+STDLIB=$ROOT/circle-libsdl2/circle-stdlib-$RAPI_BOARD
 INSTALL=$STDLIB/install/aarch64-none-circle
 TCINC="$(echo "$TC"/lib/gcc/aarch64-none-elf/*/include)"
 
 exec "$REAL" "$@" \
-    -mcpu=cortex-a72 -mlittle-endian \
+    -mcpu=$RAPI_MCPU -mlittle-endian \
     -nostdinc \
     -isystem "$ROOT/mk/cross/compat" \
     -isystem "$INSTALL/include" \
@@ -22,7 +34,7 @@ exec "$REAL" "$@" \
     -isystem "$STDLIB/libs/circle/include" \
     -isystem "$STDLIB/libs/circle/addon" \
     -isystem "$TCINC" \
-    -D__circle__ -DAARCH=64 -DRASPPI=4 -DARM_ALLOW_MULTI_CORE \
+    -D__circle__ -DAARCH=64 -DRASPPI=$RAPI_RASPPI -DARM_ALLOW_MULTI_CORE \
     -D__LINUX_ERRNO_EXTENSIONS__ \
     -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L \
     -D_POSIX_TIMERS=1 -D_POSIX_MONOTONIC_CLOCK=200112L \

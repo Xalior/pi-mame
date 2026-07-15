@@ -5,8 +5,10 @@
 #                                consumer: circle-libsdl2 (multicore, + the SDL2
 #                                shim) and rapi-bootloader (single-core, the
 #                                picker links it)
-#   make mame                    every platform's MAME archives, each in its
-#                                own isolated tree (long; logs in build/)
+#   make mame [RAPI_BOARD=<b>]    the board's ONE shared union MAME engine
+#                                (mame-<b>/build/union; long; log in build/).
+#                                Every platform kernel links it (build once,
+#                                link drivers per platform).
 #   make platform                one platform binary per vendor-class
 #                                (host/kernel8-<platform>.img); unpatched each
 #                                is that platform's no-options kernel (MAME's
@@ -35,10 +37,14 @@
 # The per-platform facts (PLATFORMS, MACHINE_PLATFORM_<m>) live in one place.
 include host/machines.mk
 
-MACHINE  ?= spectrum
-PLATFORM ?= sinclair
-TIER     ?= free
-ASSETS   ?= ./my-assets
+MACHINE    ?= spectrum
+PLATFORM   ?= sinclair
+TIER       ?= free
+ASSETS     ?= ./my-assets
+# Which board this build targets: rpi3 | rpi4 | rpi5. Selects the MAME source
+# tree (mame-<board>), the circle world, RASPPI and -mcpu. One board per
+# invocation; CI dispatches a job per board. Default rpi4 (the proven board).
+RAPI_BOARD ?= rpi4
 
 # `make kernel MACHINE=<m>` builds <m>'s image from its own platform's binary.
 KERNEL_PLATFORM = $(MACHINE_PLATFORM_$(MACHINE))
@@ -63,13 +69,13 @@ deps:
 	$(MAKE) -C rapi-bootloader deps
 
 mame:
-	scripts/build-mame.sh
+	scripts/build-mame.sh $(RAPI_BOARD)
 
 # One platform binary per vendor-class: each its own link against its own
 # isolated MAME tree, no machine baked. Unpatched, each is that platform's
 # no-options kernel (MAME's own system list).
 platform:
-	@for p in $(PLATFORMS); do $(MAKE) -C host PLATFORM=$$p || exit 1; done
+	@for p in $(PLATFORMS); do $(MAKE) -C host RAPI_BOARD=$(RAPI_BOARD) PLATFORM=$$p || exit 1; done
 
 # The platform card's front door (single-core boot world).
 picker:
@@ -80,12 +86,12 @@ picker:
 kernel:
 	@if [ -z "$(KERNEL_PLATFORM)" ]; then \
 		echo "unknown machine '$(MACHINE)' — not in host/machines.mk"; exit 1; fi
-	$(MAKE) -C host PLATFORM=$(KERNEL_PLATFORM) kernel8-$(MACHINE).img
+	$(MAKE) -C host RAPI_BOARD=$(RAPI_BOARD) PLATFORM=$(KERNEL_PLATFORM) kernel8-$(MACHINE).img
 
 # Every single-purpose image — one link per platform, then a byte-patch per
 # machine of that platform.
 machines:
-	@for p in $(PLATFORMS); do $(MAKE) -C host PLATFORM=$$p machines || exit 1; done
+	@for p in $(PLATFORMS); do $(MAKE) -C host RAPI_BOARD=$(RAPI_BOARD) PLATFORM=$$p machines || exit 1; done
 
 # Everything CI verifies: every platform binary, every patched machine image,
 # and the picker.

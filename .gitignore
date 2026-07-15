@@ -11,3 +11,6 @@ assets/
 host/libosd_sdl-nomain-*.a
 host/libocore_sdl-nofile-*.a
 host/patch-defaults
+# Per-platform drivlist generated at host-link time (makedep.py output).
+host/drivlist-*.flt
+host/drivlist-*.cpp

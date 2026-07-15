@@ -1,10 +1,20 @@
 [submodule "circle-libsdl2"]
 	path = circle-libsdl2
 	url = https://github.com/Xalior/circle-libsdl2.git
-[submodule "mame"]
-	path = mame
+[submodule "mame-rpi4"]
+	path = mame-rpi4
 	url = https://github.com/Xalior/mame.git
 	branch = rapi-circle
 [submodule "rapi-bootloader"]
 	path = rapi-bootloader
 	url = https://github.com/Xalior/rapi-bootloader.git
+[submodule "mame-rpi3"]
+	path = mame-rpi3
+	url = https://github.com/Xalior/mame.git
+	branch = rapi-circle
+	shallow = true
+[submodule "mame-rpi5"]
+	path = mame-rpi5
+	url = https://github.com/Xalior/mame.git
+	branch = rapi-circle
+	shallow = true

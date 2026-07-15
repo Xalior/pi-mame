@@ -1,11 +1,17 @@
 #
 # MAME payload: ONE binary per vendor-class platform, ANY machine on it.
 #
-# This Makefile is scoped to ONE platform per invocation (PLATFORM=sinclair by
-# default; the top Makefile drives every platform). Platform is the logical
-# unit — a MAME src/mame/<vendor>/ directory, with no crossover — so each
-# platform is its own binary, linked from its own isolated MAME archive tree
-# (mame/build/<platform>/rapi-circle, built by scripts/build-mame.sh).
+# This Makefile is scoped to ONE platform and ONE board per invocation
+# (PLATFORM=sinclair, RAPI_BOARD=rpi4 by default; the top Makefile drives every
+# platform, CI a job per board). Platform is the logical unit — a MAME
+# src/mame/<vendor>/ directory, with no crossover — so each platform is its own
+# binary. All platforms of a board link the ONE shared union engine that
+# scripts/build-mame.sh builds once into mame-<board>/build/union/rapi-circle;
+# this Makefile swaps in a per-platform drivlist it generates itself, so each
+# kernel carries only its own machines (build the engine once, link per platform).
+# Board picks the MAME source tree (mame-<board>), the circle world
+# (circle-libsdl2/circle-stdlib-<board>) and, via mk/cross reading RAPI_BOARD,
+# the RASPPI value and -mcpu.
 #
 # Under the patchable-defaults string (docs/pi-mame-poc2.html) no machine is
 # compiled in. kernel8-<platform>.img links that platform's MAME archives +
@@ -34,24 +40,38 @@
 # fills, cmdline-ntsc.txt the NTSC canvas (720x480) the American 60Hz machines
 # fill, the way a CRT was filled.
 #
-# Prerequisite: scripts/build-mame.sh has produced mame/build/<platform>/rapi-circle/.
+# Prerequisite: scripts/build-mame.sh <board> has produced
+# mame-<board>/build/union/rapi-circle/, and circle-libsdl2 has built the board's
+# world + libSDL2-<board>.a (make -C ../circle-libsdl2 deps).
 #
 
-include ../circle-libsdl2/circle-stdlib/Config.mk
+# Board selects the circle world, the MAME source tree, and (via mk/cross,
+# which reads RAPI_BOARD from the environment) the RASPPI value and -mcpu. Each
+# board's newlib+libc++ sysroot is baked per architecture, so the kernel is
+# per-board; the three build in complete isolation (own tree, own world). One
+# board per invocation — CI dispatches a job per board. Default rpi4.
+RAPI_BOARD ?= rpi4
+export RAPI_BOARD
+
+include ../circle-libsdl2/circle-stdlib-$(RAPI_BOARD)/Config.mk
 include machines.mk
 
 ROOT = ..
 
-# The platform this invocation builds. Every path below is scoped to it.
+# The platform this invocation links. Every driver-scoped path below is scoped
+# to it; the ENGINE it links against is the board's shared union tree.
 PLATFORM ?= sinclair
 SUBTARGET := $(PLATFORM_SUBTARGET_$(PLATFORM))
 ifeq ($(SUBTARGET),)
 $(error unknown PLATFORM '$(PLATFORM)' — not in machines.mk PLATFORMS ($(PLATFORMS)))
 endif
 
-# The platform's OWN isolated MAME archive tree (per-platform BUILDDIR: genie
-# scopes obj/bin by TARGETOS, so a shared tree would share engine libraries).
-MAMEBUILD = $(ROOT)/mame/build/$(PLATFORM)/rapi-circle
+# This board's MAME source tree, and its ONE shared union engine tree. The
+# engine + 3rdparty + superset device closure are built once per board by
+# scripts/build-mame.sh (SUBTARGET=$(UNION_SUBTARGET)); every platform kernel of
+# this board links that same tree and swaps in its own per-platform drivlist.
+MAMESRC   = $(ROOT)/mame-$(RAPI_BOARD)
+MAMEBUILD = $(MAMESRC)/build/union/rapi-circle
 
 TARGET = kernel8-$(PLATFORM)
 
@@ -62,12 +82,15 @@ OBJS = main.o kernel.o defaults.o mamemain.o circlefile.o circle_stubs.o xthread
 
 STANDARD = -std=gnu++23 -Wno-volatile
 
-# The three objects genie links directly into the final binary. The drivlist
-# is subtarget-scoped (this platform's driver list); mame.o and version.o are
-# the platform's own copies in its isolated tree.
+# The three objects that link directly into the final binary. mame.o and
+# version.o are SOURCES-invariant — the same for every platform — so they come
+# straight from the board's shared union tree. drivlist.o is the ONE per-platform
+# object: DRIVLIST_OBJ is generated below from this platform's SOURCES only, so
+# it references just this platform's machines and the linker pulls only those
+# from the shared union archives (the union's own drivlist.o is never linked).
 MAME_OBJS = \
 	$(MAMEBUILD)/obj/Release/src/mame/mame.o \
-	$(MAMEBUILD)/obj/Release/generated/mame/$(SUBTARGET)/drivlist.o \
+	$(DRIVLIST_OBJ) \
 	$(MAMEBUILD)/obj/Release/generated/version.o
 
 # Archive surgery, mame tree untouched:
@@ -85,10 +108,12 @@ LIBOCORE_NOFILE = libocore_sdl-nofile-$(PLATFORM).a
 # libprecompile.a is excluded (PCH carrier, nothing to link). libqtdbg_sdl.a
 # stays in: built with USE_QTDEBUG=0 it holds only the not-supported debugger
 # module (DEBUG_QT), which osdobj_common.cpp registers unconditionally. The
-# driver archive is subtarget-scoped (bin/mame_<subtarget>/); the engine
-# archives (bin/*.a) are this platform's own, isolated by its BUILDDIR.
+# driver archives are the UNION set (bin/mame_$(UNION_SUBTARGET)/) carrying every
+# platform's drivers and the superset device closure; the engine archives
+# (bin/*.a) are SOURCES-invariant. Both are shared by every platform of this
+# board — the per-platform drivlist.o alone decides which members link in.
 MAME_ARCHIVES = \
-	$(wildcard $(MAMEBUILD)/bin/mame_$(SUBTARGET)/*.a) \
+	$(wildcard $(MAMEBUILD)/bin/mame_$(UNION_SUBTARGET)/*.a) \
 	$(filter-out %/libosd_sdl.a %/libocore_sdl.a %/libprecompile.a, \
 		$(wildcard $(MAMEBUILD)/bin/*.a))
 
@@ -103,7 +128,7 @@ LIBS = $(MAME_OBJS) \
 	$(LIBOSD_NOMAIN) \
 	$(LIBOCORE_NOFILE) \
 	$(MAME_ARCHIVES) \
-	$(ROOT)/circle-libsdl2/libSDL2.a \
+	$(ROOT)/circle-libsdl2/libSDL2-$(RAPI_BOARD).a \
 	$(CIRCLEHOME)/lib/sound/libsound.a \
 	$(filter-out %/liblibcxx-threading.a,$(CIRCLE_STDLIB_LIBS))
 
@@ -151,22 +176,22 @@ MAME_DEFINES = -DNDEBUG -DCRLF=2 -DLSB_FIRST -DFLAC__NO_DLL \
 	-DNO_USE_MIDI -DUSE_QTDEBUG=0
 
 MAME_INCLUDES = \
-	-I $(ROOT)/mame/src/osd \
-	-I $(ROOT)/mame/3rdparty/asio/include \
-	-I $(ROOT)/mame/3rdparty/bgfx/examples/common \
-	-I $(ROOT)/mame/3rdparty/bgfx/include \
-	-I $(ROOT)/mame/3rdparty/bgfx/3rdparty \
-	-I $(ROOT)/mame/3rdparty/bgfx/3rdparty/khronos \
-	-I $(ROOT)/mame/3rdparty/bx/include \
-	-I $(ROOT)/mame/3rdparty/rapidjson/include \
-	-I $(ROOT)/mame/src/emu \
-	-I $(ROOT)/mame/src/devices \
-	-I $(ROOT)/mame/src/lib \
-	-I $(ROOT)/mame/src/lib/util \
-	-I $(ROOT)/mame/src/osd/modules/file \
-	-I $(ROOT)/mame/src/osd/modules/render \
-	-I $(ROOT)/mame/3rdparty \
-	-I $(ROOT)/mame/src/osd/sdl \
+	-I $(MAMESRC)/src/osd \
+	-I $(MAMESRC)/3rdparty/asio/include \
+	-I $(MAMESRC)/3rdparty/bgfx/examples/common \
+	-I $(MAMESRC)/3rdparty/bgfx/include \
+	-I $(MAMESRC)/3rdparty/bgfx/3rdparty \
+	-I $(MAMESRC)/3rdparty/bgfx/3rdparty/khronos \
+	-I $(MAMESRC)/3rdparty/bx/include \
+	-I $(MAMESRC)/3rdparty/rapidjson/include \
+	-I $(MAMESRC)/src/emu \
+	-I $(MAMESRC)/src/devices \
+	-I $(MAMESRC)/src/lib \
+	-I $(MAMESRC)/src/lib/util \
+	-I $(MAMESRC)/src/osd/modules/file \
+	-I $(MAMESRC)/src/osd/modules/render \
+	-I $(MAMESRC)/3rdparty \
+	-I $(MAMESRC)/src/osd/sdl \
 	-I $(ROOT)/circle-libsdl2/include
 
 # The same -Wall + suppression set genie applies to the osd_sdl project (the
@@ -200,6 +225,41 @@ circlefile.o: circlefile.cpp
 circlefile.d: circlefile.cpp
 	@$(MAME_CXX) $(MAME_DEFINES) $(MAME_INCLUDES) \
 		-M -MT circlefile.o -MT $@ -MF $@ $<
+
+# --- Per-platform drivlist, generated against the shared union engine ---
+# The board's union build compiled every platform's drivers into shared
+# archives. To link a kernel carrying only THIS platform's machines, regenerate
+# MAME's own drivlist for just this platform's SOURCES — the exact two makedep.py
+# steps genie runs for a SOURCES= build, but standalone, touching no engine:
+# `sourcesfilter` turns the platform's driver files into a .flt; `driverlist`
+# turns mame.lst + that .flt into drivlist.cpp. The object references only this
+# platform's drivers, so the linker pulls only those (and their device closure)
+# from the union archives — the kernel stays the size it always was.
+PYTHON  ?= python3
+MAKEDEP  = $(MAMESRC)/scripts/build/makedep.py
+MAMELST  = $(MAMESRC)/src/mame/mame.lst
+DRIVLIST_FLT = drivlist-$(PLATFORM).flt
+DRIVLIST_SRC = drivlist-$(PLATFORM).cpp
+DRIVLIST_OBJ = drivlist-$(PLATFORM).o
+
+$(DRIVLIST_FLT): machines.mk $(MAMELST)
+	@echo "  FLT   $@ ($(PLATFORM) sources)"
+	@$(PYTHON) $(MAKEDEP) -r $(MAMESRC) sourcesfilter -l $(MAMELST) \
+		$(PLATFORM_SOURCES_$(PLATFORM)) > $@
+
+$(DRIVLIST_SRC): $(DRIVLIST_FLT) $(MAMELST)
+	@echo "  DRVL  $@"
+	@$(PYTHON) $(MAKEDEP) -r $(MAMESRC) driverlist $(MAMELST) -f $(DRIVLIST_FLT) > $@
+
+# Compiled in the same MAME environment as mamemain.o (drivlist.cpp is stock
+# generated MAME source: emu.h + the driver_list array). Board-specific tuning
+# (-mcpu, -DRASPPI) rides the cross wrapper via RAPI_BOARD, so switching boards
+# in this dir needs a clean first, exactly as the fixed-name Circle objects do.
+$(DRIVLIST_OBJ): $(DRIVLIST_SRC)
+	@echo "  CPP   $@ (MAME env, $(PLATFORM) drivlist)"
+	@$(MAME_CXX) $(MAME_DEFINES) $(MAME_INCLUDES) \
+		-O3 -fno-strict-aliasing $(MAME_WARNINGS) \
+		-c -o $@ $<
 
 -include $(DEPS)
 
@@ -254,4 +314,6 @@ machines: $(MACHINE_IMAGES)
 
 .PHONY: clean-machines
 clean-machines:
-	rm -f $(MACHINE_IMAGES) patch-defaults
+	rm -f $(MACHINE_IMAGES) patch-defaults \
+		$(DRIVLIST_FLT) $(DRIVLIST_SRC) $(DRIVLIST_OBJ) \
+		$(LIBOSD_NOMAIN) $(LIBOCORE_NOFILE)
