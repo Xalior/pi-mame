@@ -45,7 +45,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 360   # 6h ceiling; one board's cold union build lands well inside it.
+    timeout-minutes: 360   # 6h ceiling; a board's cold per-platform builds land well inside it.
 
     # ONE JOB PER BOARD, dispatched concurrently. Circle's newlib+libc++ sysroot
     # is baked per architecture, so MAME is a full per-board build (Pi 3/4/5 =
@@ -150,45 +150,43 @@ jobs:
 
       # mame-<board>/build is NOT cached: the tree is several GB and risks
       # evicting the far more valuable (and slower to rebuild) deps cache from
-      # the 10GB repo budget. We eat the cold union build instead. This is ONE
-      # union engine for the board (SOURCES-invariant engine + 3rdparty + the
-      # superset device closure of every platform), built once; each platform
-      # kernel links it with its own drivlist. Size is measured below so the
-      # cache trade can be revisited with data, not guesswork.
-      - name: Build MAME union engine (this board)
+      # the 10GB repo budget. We eat the cold build instead. Each platform builds
+      # its OWN complete MAME (engine + 3rdparty + only its drivers) into
+      # build/<platform> — one arch per card, nothing shared. Size is measured
+      # below so the cache trade can be revisited with data, not guesswork.
+      - name: Build MAME per platform (this board)
         run: make mame RAPI_BOARD=${{ matrix.board }}
 
       # TRUTH GATE #1: build-mame.sh tees through `tail` and genie's final
       # host-style link ALWAYS fails by design (it links for the build host;
       # our kernel links the archives itself). So the shell pipe can exit
       # non-fatally on a real failure too. Here we check the real success
-      # criteria for the board's ONE union tree: the two SOURCES-invariant
-      # objects host/Makefile links (mame.o, version.o), the OSD archive, and
-      # the union driver archives. Absent => a genuine compile failure slipped
-      # through; fail RED right here.
-      - name: Verify MAME union engine (the final host-link fails by design)
+      # criteria for EVERY platform's own tree: the two objects host/Makefile
+      # links (mame.o, version.o), the OSD archive, and that platform's driver
+      # archives. Any absent => a genuine compile failure slipped through the
+      # by-design host-link failure; fail RED right here.
+      - name: Verify MAME per-platform builds (the final host-link fails by design)
         run: |
-          st=$(make -s -f host/machines.mk print-UNION_SUBTARGET)
-          MB="mame-${{ matrix.board }}/build/union/rapi-circle"
           ok=1
-          [ -f "$MB/obj/Release/src/mame/mame.o" ]        || { echo "MISSING: $MB/obj/Release/src/mame/mame.o"; ok=0; }
-          [ -f "$MB/obj/Release/generated/version.o" ]    || { echo "MISSING: $MB/obj/Release/generated/version.o"; ok=0; }
-          [ -f "$MB/bin/libosd_sdl.a" ]                   || { echo "MISSING: $MB/bin/libosd_sdl.a"; ok=0; }
-          if ls "$MB"/bin/mame_$st/*.a >/dev/null 2>&1; then :; else
-            echo "MISSING: $MB/bin/mame_$st/*.a"; ok=0
-          fi
-          echo "union archive tree size (for future cache decisions):"
-          du -sh "$MB" || true
+          for p in $(make -s -f host/machines.mk print-PLATFORMS); do
+            st=$(make -s -f host/machines.mk print-PLATFORM_SUBTARGET_$p)
+            MB="mame-${{ matrix.board }}/build/$p/rapi-circle"
+            [ -f "$MB/obj/Release/src/mame/mame.o" ]     || { echo "MISSING: $MB/obj/Release/src/mame/mame.o"; ok=0; }
+            [ -f "$MB/obj/Release/generated/version.o" ] || { echo "MISSING: $MB/obj/Release/generated/version.o"; ok=0; }
+            [ -f "$MB/bin/libosd_sdl.a" ]                || { echo "MISSING: $MB/bin/libosd_sdl.a"; ok=0; }
+            ls "$MB"/bin/mame_$st/*.a >/dev/null 2>&1    || { echo "MISSING: $MB/bin/mame_$st/*.a"; ok=0; }
+            echo "$p archive tree size:"; du -sh "$MB" || true
+          done
           if [ "$ok" != 1 ]; then
-            echo "MAME union archives absent — a real compile failure hid behind"
-            echo "genie's by-design host-link failure. See build/mame-build-${{ matrix.board }}.log."
+            echo "MAME archives absent for a platform — a real compile failure hid behind"
+            echo "genie's by-design host-link failure. See build/mame-build-${{ matrix.board }}-<platform>.log."
             exit 1
           fi
-          echo "genie's host link failed on purpose; checked — actually, it's okay after all."
+          echo "every platform's archives present; genie's host link failed on purpose — okay."
 
       # This board's payload: every platform binary (kernel8-<platform>.img) and
       # every single-purpose machine image (a byte-patch of its platform binary),
-      # all linking the board's shared union engine. The boot picker is a
+      # each linking its own platform's MAME tree. The boot picker is a
       # single-core boot-world kernel — board-agnostic and part of the (deferred)
       # card format — so it is built on rpi4 only, alongside the cards below.
       - name: Build kernels (this board)

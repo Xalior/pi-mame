@@ -23,11 +23,11 @@
 #
 # PLATFORM IS THE LOGICAL UNIT — a MAME src/mame/<vendor>/ directory, and
 # there is never crossover. Each platform is its own binary
-# (kernel8-<platform>.img). The MAME engine underneath is built ONCE per board
-# as a single union of every platform's SOURCES (scripts/build-mame.sh); each
-# platform kernel links that shared engine with its OWN generated drivlist, so
-# it carries only its own machines (host/Makefile). A machine's single-purpose
-# image is patched from ITS platform's binary, never a shared one.
+# (kernel8-<platform>.img). Each platform builds its OWN complete MAME engine +
+# drivers per board (scripts/build-mame.sh, one build-dir per platform); the
+# kernel links that platform's own tree and its own drivlist, so it carries only
+# its own machines (host/Makefile). Nothing is shared across platforms. A
+# machine's single-purpose image is patched from ITS platform's binary.
 #
 # host/Makefile includes this to bake per-machine images by patching, and
 # scripts/gen-bootmenu.sh reads it (via `make -f machines.mk print-VAR`) to

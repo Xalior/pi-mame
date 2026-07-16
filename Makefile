@@ -5,8 +5,8 @@
 #                                consumer: circle-libsdl2 (multicore, + the SDL2
 #                                shim) and rapi-bootloader (single-core, the
 #                                picker links it)
-#   make mame [RAPI_BOARD=<b>]    the board's ONE shared union MAME engine
-#                                (mame-<b>/build/union; long; log in build/).
+#   make mame [RAPI_BOARD=<b>]    build every platform's own MAME for the board
+#                                (mame-<b>/build/<platform>; long; log in build/).
 #                                Every platform kernel links it (build once,
 #                                link drivers per platform).
 #   make platform                one platform binary per vendor-class
