@@ -1185,3 +1185,20 @@ mem|ar_argh|argh-11-hi-11-28-87.u26|2932054f|f03e71170bd24719c26427c3fbf4fdf1363
 mem|ar_argh|argh-11-lo-11-28-87.u30|3ebf8c30|b2018b55cf2339fcf67b338fa2804afa2e47d577|-
 mem|ar_argh|argh-12-hi-11-28-87.u25|0e055d4a|8993596018e90107623e04c24e91b02887d6252c|-
 mem|ar_argh|argh-12-lo-11-28-87.u29|940168b0|7f86226d533a5d5a84fbcaeea5c4ac08e0e7df09|-
+
+# --- PUBLIC tier: Amiga / Cubo CD32 coin-ops ---
+# CD32 arcade: an Akiko board that boots a per-game CD-ROM. Two assets per game:
+# the shared cubo.zip (CD32 Kickstart 3.1 + Extended-ROM — Cloanto-controlled,
+# same grey-mirror public-tier doctrine as the Commodore KERNALs) and the game's
+# CD image as a CHD. PoC for the CD-media type: cndypuzl (Candy Puzzle), the
+# smallest CHD. NOTE the CHD member's sha1 is the FILE hash from the mirror (what
+# fetch-assets.sh verifies); MAME separately checks the CHD's INTERNAL data hash
+# 5f41ed3521b3e05d233ac1245b78cb0b118b2b90 (the driver's DISK_IMAGE value, marked
+# BAD_DUMP upstream) — the byte-identical file satisfies both.
+asset|cubo|public|zip|roms/cubo.zip
+src|cubo|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/cubo.zip
+mem|cubo|391640-03.u6a|d3837ae4|06807db3181637455f4d46582d9972afec8956d9|-
+
+asset|cndypuzl|public|file|roms/cndypuzl/cndypuzl.chd
+src|cndypuzl|raw|https://archive.org/download/mame-chd-collection_01/MAME%20CHDs%20%28merged%29/cndypuzl
+mem|cndypuzl|cndypuzl.chd|-|1d81b4274deedbfc53eb7299989d62dd247e5694|cndypuzl.chd
