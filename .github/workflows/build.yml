@@ -68,6 +68,27 @@ jobs:
           submodules: recursive
           fetch-depth: 1
 
+      # Reclaim runner disk before anything builds. ubuntu-latest ships ~25GB of
+      # preinstalled toolchains (dotnet, android, ghc, CodeQL, boost) this build
+      # never touches, and the ROOT filesystem that holds $GITHUB_WORKSPACE is
+      # the tight one (~14GB free) — the union engine's obj tree carries the
+      # SUPERSET device closure of every shipped platform and can exhaust it.
+      # First-party restraint holds: this is an inline rm, not a third-party
+      # "free disk space" action. Also drop the two sibling MAME trees — the
+      # recursive checkout pulls all of mame-rpi3/4/5, but each runner builds
+      # exactly ONE board (build-mame.sh + host/Makefile touch only mame-<board>),
+      # so the other two are multi-GB dead weight.
+      - name: Reclaim disk (unused runner toolchains + sibling MAME trees)
+        run: |
+          echo "before:"; df -h / | tail -1
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc \
+            /opt/hostedtoolcache/CodeQL /usr/local/share/boost || true
+          sudo docker image prune --all --force >/dev/null 2>&1 || true
+          for b in rpi3 rpi4 rpi5; do
+            [ "$b" = "${{ matrix.board }}" ] || rm -rf "mame-$b"
+          done
+          echo "after:";  df -h / | tail -1
+
       # The "on main" half of the trigger. A git tag isn't branch-scoped:
       # a v-tag on any commit fires `push: tags`. Only tags pointing at
       # main's history build — the tagged commit must be an ancestor of
