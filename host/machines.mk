@@ -9,9 +9,8 @@
 #   PLATFORM_SUBTARGET_<platform> the platform's MAME SUBTARGET name (kept as
 #                                 the per-platform identity / PLATFORM validity)
 #   PLATFORM_SOURCES_<platform>   the platform's driver SOURCES (only that
-#                                 vendor's src/mame/<vendor>/ files) — feed both
-#                                 the union engine (PLATFORM_SOURCES_UNION) and
-#                                 the platform's own generated drivlist
+#                                 vendor's src/mame/<vendor>/ files) — feed the
+#                                 platform's own MAME build and its drivlist
 #   MACHINE_PLATFORM_<machine>    the vendor-class a machine belongs to
 #                                 (derived from PLATFORM_MACHINES_*, below)
 #   MACHINE_STRING_<machine>      the defaults-string patched into the block
@@ -42,7 +41,7 @@
 # Next boards share tbblue.zip + next.img, sprinter needs kb_ms_natural.zip,
 # pc1512 needs pc1512kb.zip, and the CPC+ range needs only sysukpd.bin.
 
-PLATFORMS = sinclair amstrad commodore
+PLATFORMS = sinclair amstrad commodore amiga
 
 PLATFORM_MACHINES_sinclair = spectrum spec128 specpls2 specpl2a specpls3 \
 	tbblue specnext_ks1 specnext_ks2 specnext_ks3 zx80 zx81 tc2048 ts2068 \
@@ -54,6 +53,11 @@ PLATFORM_MACHINES_amstrad = cpc464 cpc664 cpc6128 cpc464p cpc6128p gx4000 \
 PLATFORM_MACHINES_commodore = c64 c64p c64_jp c64_se c64c c64cp c64g c64c_es \
 	c64c_se c64gs sx64 sx64p dx64 vip64 tesa6240 pet64 edu64 vic20 vic20p \
 	vic20_se vic1001 c264 plus4 plus4p c16 c16p c116 c232 v364
+
+PLATFORM_MACHINES_amiga = a500 ar_blast ar_airh ar_airh2 ar_bowl ar_dart \
+	ar_fast ar_fasta ar_ldrb ar_ldrba ar_ldrbb ar_ninj ar_ninj2 ar_rdwr \
+	ar_sdwr ar_sdwr2 ar_socc ar_spot ar_sprg ar_xeon ar_pm ar_dlta ar_argh \
+	cndypuzl haremchl lasstixx mgnumber mgprem11 upscope
 
 # All machines, every platform — the roster `make kernels` bakes and CI verifies.
 MACHINES = $(foreach p,$(PLATFORMS),$(PLATFORM_MACHINES_$(p)))
@@ -68,16 +72,17 @@ $(foreach p,$(PLATFORMS),$(foreach m,$(PLATFORM_MACHINES_$(p)),\
 #
 # PLATFORM_SUBTARGET names the platform (retained as its identity and as the
 # PLATFORM validity check in host/Makefile). PLATFORM_SOURCES is ONLY that
-# vendor's src/mame/<vendor>/ drivers, with no crossover. These lists feed two
-# consumers: PLATFORM_SOURCES_UNION (below) joins them into the ONE union engine
-# scripts/build-mame.sh compiles per board, and host/Makefile passes a single
-# platform's list to makedep.py to generate that platform's drivlist. The lists
+# vendor's src/mame/<vendor>/ drivers, with no crossover. scripts/build-mame.sh
+# compiles each platform's list into that platform's own SUBTARGET (its own
+# build-dir, per board), and host/Makefile links the kernel against that tree.
+# The lists
 # are space-separated (build-mame.sh joins with commas for MAME's SOURCES=; a
 # comma-separated value cannot carry make's line-continuation spaces, a
 # space-separated one can, and makedep.py takes them space-separated directly).
 PLATFORM_SUBTARGET_sinclair  = sinclair
 PLATFORM_SUBTARGET_amstrad   = amstrad
 PLATFORM_SUBTARGET_commodore = commodore
+PLATFORM_SUBTARGET_amiga     = amiga
 
 PLATFORM_SOURCES_sinclair = \
 	src/mame/sinclair/spectrum.cpp src/mame/sinclair/spec128.cpp \
@@ -96,23 +101,14 @@ PLATFORM_SOURCES_commodore = \
 	src/mame/commodore/c64.cpp src/mame/commodore/vic20.cpp \
 	src/mame/commodore/plus4.cpp
 
-# The UNION of every shipped platform's SOURCES. The shared-engine build
-# (scripts/build-mame.sh) compiles ONE union SUBTARGET from this — the
-# SOURCES-invariant engine + 3rdparty, plus the superset device closure of every
-# platform — exactly once per board. Each platform's kernel then links that one
-# tree, trimmed to its own machines by its per-platform drivlist seed (the
-# linker's --start-group member selection drops everything the drivlist doesn't
-# reference, so the kernel stays the size it always was). Data-driven from
-# PLATFORMS, so it never needs hand-maintaining.
-PLATFORM_SOURCES_UNION = $(foreach p,$(PLATFORMS),$(PLATFORM_SOURCES_$(p)))
+PLATFORM_SOURCES_amiga = \
+	src/mame/amiga/amiga.cpp src/mame/amiga/arsystems.cpp \
+	src/mame/amiga/cubo.cpp src/mame/amiga/mquake.cpp \
+	src/mame/amiga/alg.cpp src/mame/amiga/upscope.cpp
 
-# The subtarget name of that one union engine. scripts/build-mame.sh builds it
-# once per board (SUBTARGET=$(UNION_SUBTARGET), SOURCES=$(PLATFORM_SOURCES_UNION))
-# into mame-<board>/build/union/rapi-circle; genie scopes the driver archive and
-# generated dir by it (bin/mame_$(UNION_SUBTARGET)/, generated/mame/$(UNION_SUBTARGET)/).
-# host/Makefile links that shared engine and swaps in a per-PLATFORM drivlist it
-# generates itself, so each kernel carries only its own platform's machines.
-UNION_SUBTARGET = union
+# No shared/union engine: each platform builds its own SUBTARGET independently
+# (scripts/build-mame.sh, one build-dir per platform), and host/Makefile links
+# that platform's own tree + its own drivlist. One arch per card, nothing shared.
 
 # --- Sinclair defaults strings ---
 MACHINE_STRING_spectrum     = spectrum
@@ -324,6 +320,37 @@ MACHINE_STRING_c232         = c232 -iec8 ""
 # v364; basic 318006-01, the function pair and PLA 251641-02 are byte-identical
 # to the rest of the 264 line. NTSC canvas.
 MACHINE_STRING_v364         = v364 -iec8 ""
+
+# --- Amiga defaults strings ---
+MACHINE_STRING_a500         = a500 -flop1 /floppy/demo.adf
+MACHINE_STRING_ar_blast     = ar_blast
+MACHINE_STRING_ar_airh      = ar_airh
+MACHINE_STRING_ar_airh2     = ar_airh2
+MACHINE_STRING_ar_bowl      = ar_bowl
+MACHINE_STRING_ar_dart      = ar_dart
+MACHINE_STRING_ar_fast      = ar_fast
+MACHINE_STRING_ar_fasta     = ar_fasta
+MACHINE_STRING_ar_ldrb      = ar_ldrb
+MACHINE_STRING_ar_ldrba     = ar_ldrba
+MACHINE_STRING_ar_ldrbb     = ar_ldrbb
+MACHINE_STRING_ar_ninj      = ar_ninj
+MACHINE_STRING_ar_ninj2     = ar_ninj2
+MACHINE_STRING_ar_rdwr      = ar_rdwr
+MACHINE_STRING_ar_sdwr      = ar_sdwr
+MACHINE_STRING_ar_sdwr2     = ar_sdwr2
+MACHINE_STRING_ar_socc      = ar_socc
+MACHINE_STRING_ar_spot      = ar_spot
+MACHINE_STRING_ar_sprg      = ar_sprg
+MACHINE_STRING_ar_xeon      = ar_xeon
+MACHINE_STRING_ar_pm        = ar_pm
+MACHINE_STRING_ar_dlta      = ar_dlta
+MACHINE_STRING_ar_argh      = ar_argh
+MACHINE_STRING_cndypuzl     = cndypuzl
+MACHINE_STRING_haremchl     = haremchl
+MACHINE_STRING_lasstixx     = lasstixx
+MACHINE_STRING_mgnumber     = mgnumber
+MACHINE_STRING_mgprem11     = mgprem11
+MACHINE_STRING_upscope      = upscope
 
 # --- Sinclair asset dependencies (manifest asset names) ---
 MACHINE_ASSETS_spectrum     = spectrum
