@@ -9,8 +9,9 @@
 #   PLATFORM_SUBTARGET_<platform> the platform's MAME SUBTARGET name (kept as
 #                                 the per-platform identity / PLATFORM validity)
 #   PLATFORM_SOURCES_<platform>   the platform's driver SOURCES (only that
-#                                 vendor's src/mame/<vendor>/ files) — feed the
-#                                 platform's own MAME build and its drivlist
+#                                 vendor's src/mame/<vendor>/ files) — feed both
+#                                 the union engine (PLATFORM_SOURCES_UNION) and
+#                                 the platform's own generated drivlist
 #   MACHINE_PLATFORM_<machine>    the vendor-class a machine belongs to
 #                                 (derived from PLATFORM_MACHINES_*, below)
 #   MACHINE_STRING_<machine>      the defaults-string patched into the block
@@ -23,11 +24,11 @@
 #
 # PLATFORM IS THE LOGICAL UNIT — a MAME src/mame/<vendor>/ directory, and
 # there is never crossover. Each platform is its own binary
-# (kernel8-<platform>.img). Each platform builds its OWN complete MAME engine +
-# drivers per board (scripts/build-mame.sh, one build-dir per platform); the
-# kernel links that platform's own tree and its own drivlist, so it carries only
-# its own machines (host/Makefile). Nothing is shared across platforms. A
-# machine's single-purpose image is patched from ITS platform's binary.
+# (kernel8-<platform>.img). The MAME engine underneath is built ONCE per board
+# as a single union of every platform's SOURCES (scripts/build-mame.sh); each
+# platform kernel links that shared engine with its OWN generated drivlist, so
+# it carries only its own machines (host/Makefile). A machine's single-purpose
+# image is patched from ITS platform's binary, never a shared one.
 #
 # host/Makefile includes this to bake per-machine images by patching, and
 # scripts/gen-bootmenu.sh reads it (via `make -f machines.mk print-VAR`) to
@@ -71,10 +72,10 @@ $(foreach p,$(PLATFORMS),$(foreach m,$(PLATFORM_MACHINES_$(p)),\
 #
 # PLATFORM_SUBTARGET names the platform (retained as its identity and as the
 # PLATFORM validity check in host/Makefile). PLATFORM_SOURCES is ONLY that
-# vendor's src/mame/<vendor>/ drivers, with no crossover. scripts/build-mame.sh
-# compiles each platform's list into that platform's own SUBTARGET (its own
-# build-dir, per board), and host/Makefile links the kernel against that tree.
-# The lists
+# vendor's src/mame/<vendor>/ drivers, with no crossover. These lists feed two
+# consumers: PLATFORM_SOURCES_UNION (below) joins them into the ONE union engine
+# scripts/build-mame.sh compiles per board, and host/Makefile passes a single
+# platform's list to makedep.py to generate that platform's drivlist. The lists
 # are space-separated (build-mame.sh joins with commas for MAME's SOURCES=; a
 # comma-separated value cannot carry make's line-continuation spaces, a
 # space-separated one can, and makedep.py takes them space-separated directly).
@@ -105,9 +106,23 @@ PLATFORM_SOURCES_amiga = \
 	src/mame/amiga/cubo.cpp src/mame/amiga/mquake.cpp \
 	src/mame/amiga/alg.cpp src/mame/amiga/upscope.cpp
 
-# No shared/union engine: each platform builds its own SUBTARGET independently
-# (scripts/build-mame.sh, one build-dir per platform), and host/Makefile links
-# that platform's own tree + its own drivlist. One arch per card, nothing shared.
+# The UNION of every shipped platform's SOURCES. The shared-engine build
+# (scripts/build-mame.sh) compiles ONE union SUBTARGET from this — the
+# SOURCES-invariant engine + 3rdparty, plus the superset device closure of every
+# platform — exactly once per board. Each platform's kernel then links that one
+# tree, trimmed to its own machines by its per-platform drivlist seed (the
+# linker's --start-group member selection drops everything the drivlist doesn't
+# reference, so the kernel stays the size it always was). Data-driven from
+# PLATFORMS, so it never needs hand-maintaining.
+PLATFORM_SOURCES_UNION = $(foreach p,$(PLATFORMS),$(PLATFORM_SOURCES_$(p)))
+
+# The subtarget name of that one union engine. scripts/build-mame.sh builds it
+# once per board (SUBTARGET=$(UNION_SUBTARGET), SOURCES=$(PLATFORM_SOURCES_UNION))
+# into mame-<board>/build/union/rapi-circle; genie scopes the driver archive and
+# generated dir by it (bin/mame_$(UNION_SUBTARGET)/, generated/mame/$(UNION_SUBTARGET)/).
+# host/Makefile links that shared engine and swaps in a per-PLATFORM drivlist it
+# generates itself, so each kernel carries only its own platform's machines.
+UNION_SUBTARGET = union
 
 # --- Sinclair defaults strings ---
 MACHINE_STRING_spectrum     = spectrum
@@ -321,10 +336,8 @@ MACHINE_STRING_c232         = c232 -iec8 ""
 MACHINE_STRING_v364         = v364 -iec8 ""
 
 # --- Amiga defaults strings ---
-MACHINE_STRING_a500         = a500 -flop1 /floppy/demo.adf
 MACHINE_STRING_ar_blast     = ar_blast
 MACHINE_STRING_ar_airh      = ar_airh
-MACHINE_STRING_ar_airh2     = ar_airh2
 MACHINE_STRING_ar_bowl      = ar_bowl
 MACHINE_STRING_ar_dart      = ar_dart
 MACHINE_STRING_ar_fast      = ar_fast
@@ -333,10 +346,8 @@ MACHINE_STRING_ar_ldrb      = ar_ldrb
 MACHINE_STRING_ar_ldrba     = ar_ldrba
 MACHINE_STRING_ar_ldrbb     = ar_ldrbb
 MACHINE_STRING_ar_ninj      = ar_ninj
-MACHINE_STRING_ar_ninj2     = ar_ninj2
 MACHINE_STRING_ar_rdwr      = ar_rdwr
 MACHINE_STRING_ar_sdwr      = ar_sdwr
-MACHINE_STRING_ar_sdwr2     = ar_sdwr2
 MACHINE_STRING_ar_socc      = ar_socc
 MACHINE_STRING_ar_spot      = ar_spot
 MACHINE_STRING_ar_sprg      = ar_sprg
@@ -344,12 +355,6 @@ MACHINE_STRING_ar_xeon      = ar_xeon
 MACHINE_STRING_ar_pm        = ar_pm
 MACHINE_STRING_ar_dlta      = ar_dlta
 MACHINE_STRING_ar_argh      = ar_argh
-MACHINE_STRING_cndypuzl     = cndypuzl
-MACHINE_STRING_haremchl     = haremchl
-MACHINE_STRING_lasstixx     = lasstixx
-MACHINE_STRING_mgnumber     = mgnumber
-MACHINE_STRING_mgprem11     = mgprem11
-MACHINE_STRING_upscope      = upscope
 
 # --- Sinclair asset dependencies (manifest asset names) ---
 MACHINE_ASSETS_spectrum     = spectrum
