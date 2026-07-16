@@ -54,10 +54,9 @@ PLATFORM_MACHINES_commodore = c64 c64p c64_jp c64_se c64c c64cp c64g c64c_es \
 	c64c_se c64gs sx64 sx64p dx64 vip64 tesa6240 pet64 edu64 vic20 vic20p \
 	vic20_se vic1001 c264 plus4 plus4p c16 c16p c116 c232 v364
 
-PLATFORM_MACHINES_amiga = a500 ar_blast ar_airh ar_airh2 ar_bowl ar_dart \
-	ar_fast ar_fasta ar_ldrb ar_ldrba ar_ldrbb ar_ninj ar_ninj2 ar_rdwr \
-	ar_sdwr ar_sdwr2 ar_socc ar_spot ar_sprg ar_xeon ar_pm ar_dlta ar_argh \
-	cndypuzl haremchl lasstixx mgnumber mgprem11 upscope
+PLATFORM_MACHINES_amiga = ar_blast ar_airh ar_bowl ar_dart ar_fast ar_fasta \
+	ar_ldrb ar_ldrba ar_ldrbb ar_ninj ar_rdwr ar_sdwr ar_socc ar_spot \
+	ar_sprg ar_xeon ar_pm ar_dlta ar_argh
 
 # All machines, every platform — the roster `make kernels` bakes and CI verifies.
 MACHINES = $(foreach p,$(PLATFORMS),$(PLATFORM_MACHINES_$(p)))
@@ -419,6 +418,27 @@ MACHINE_ASSETS_c16p         = c16p
 MACHINE_ASSETS_c116         = c116
 MACHINE_ASSETS_c232         = c232
 MACHINE_ASSETS_v364         = v364
+
+# --- Amiga asset dependencies (each Arcadia game needs the shared ar_bios) ---
+MACHINE_ASSETS_ar_blast     = ar_bios ar_blast
+MACHINE_ASSETS_ar_airh      = ar_bios ar_airh
+MACHINE_ASSETS_ar_bowl      = ar_bios ar_bowl
+MACHINE_ASSETS_ar_dart      = ar_bios ar_dart
+MACHINE_ASSETS_ar_fast      = ar_bios ar_fast
+MACHINE_ASSETS_ar_fasta     = ar_bios ar_fasta
+MACHINE_ASSETS_ar_ldrb      = ar_bios ar_ldrb
+MACHINE_ASSETS_ar_ldrba     = ar_bios ar_ldrba
+MACHINE_ASSETS_ar_ldrbb     = ar_bios ar_ldrbb
+MACHINE_ASSETS_ar_ninj      = ar_bios ar_ninj
+MACHINE_ASSETS_ar_rdwr      = ar_bios ar_rdwr
+MACHINE_ASSETS_ar_sdwr      = ar_bios ar_sdwr
+MACHINE_ASSETS_ar_socc      = ar_bios ar_socc
+MACHINE_ASSETS_ar_spot      = ar_bios ar_spot
+MACHINE_ASSETS_ar_sprg      = ar_bios ar_sprg
+MACHINE_ASSETS_ar_xeon      = ar_bios ar_xeon
+MACHINE_ASSETS_ar_pm        = ar_bios ar_pm
+MACHINE_ASSETS_ar_dlta      = ar_bios ar_dlta
+MACHINE_ASSETS_ar_argh      = ar_bios ar_argh
 
 # Query helper: `make -f machines.mk -s print-MACHINE_STRING_spectrum`.
 # Lets scripts read these facts without pulling in the Circle build.
