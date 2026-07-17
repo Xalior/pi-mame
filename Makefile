@@ -21,6 +21,10 @@
 #   make machines                every single-purpose image (one link per
 #                                platform, then a byte-patch per machine)
 #   make kernels                 platform + machines + picker (all CI verifies)
+#   make verify-mame [RAPI_BOARD=<b>]     truth-gate: the board's mamedrivers
+#                                archives exist (genie's host link fails by design)
+#   make verify-kernels [RAPI_BOARD=<b>]  truth-gate: every kernel image exists,
+#                                each under the 256MB ceiling
 #   make bootmenu PLATFORM=<p> TIER=<free|public>   a card's bootmenu.cfg -> stdout
 #   make card PLATFORM=<p> TIER=<free|public> [ASSETS=<dir>]
 #                                a platform card tree: the picker on-card as
@@ -28,6 +32,8 @@
 #                                platform binary as pi-mame-core-rpi4.img,
 #                                a generated bootmenu.cfg, and the tier's assets
 #   make sd MACHINE=<m> [ASSETS=<dir>]   single-purpose copy-to-card tree
+#   make dist [TAG=<t>]          the whole release: every platform-card zip into
+#                                dist/ (pi-mame-<TAG>-<platform>-<tier>.zip)
 #   make assets-free  [ASSETS=<dir>]     fetch the properly-redistributable ROMs
 #   make assets-public [ASSETS=<dir>]    fetch from public MAME-set mirrors
 #   make assets       [ASSETS=<dir>]     fetch both (free + public)
@@ -53,12 +59,15 @@ DOCS_PLATFORM ?= amiga
 # tree (mame-<board>), the circle world, RASPPI and -mcpu. One board per
 # invocation; CI dispatches a job per board. Default rpi4 (the proven board).
 RAPI_BOARD ?= rpi4
+# Release tag naming the card zips (pi-mame-<TAG>-<platform>-<tier>.zip). CI
+# passes the ref name; locally it defaults to `git describe` (else "dev").
+TAG ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
 
 # `make kernel MACHINE=<m>` builds <m>'s image from its own platform's binary.
 KERNEL_PLATFORM = $(MACHINE_PLATFORM_$(MACHINE))
 
-.PHONY: deps mame platform picker kernel machines kernels bootmenu card \
-	sd assets assets-free assets-public docs
+.PHONY: deps mame platform picker kernel machines kernels verify-mame \
+	verify-kernels bootmenu card sd dist assets assets-free assets-public docs
 
 # Each consumer owns its Circle world as a submodule, one per threading model,
 # so deps is just two self-contained builds — neither is configured here:
@@ -105,6 +114,15 @@ machines:
 # and the picker.
 kernels: platform machines picker
 
+# Truth-gates, runnable locally and in CI (CI just calls these). verify-mame
+# checks the board's mamedrivers archives survived genie's by-design host-link
+# failure; verify-kernels checks every image exists and fits the 256MB ceiling.
+verify-mame:
+	scripts/verify-mame.sh $(RAPI_BOARD)
+
+verify-kernels:
+	scripts/verify-kernels.sh $(RAPI_BOARD)
+
 # A platform card's menu, derived per tier from the manifest (free = only
 # all-free machines; public = the full roster). Writes to stdout.
 bootmenu:
@@ -120,6 +138,11 @@ card:
 
 sd:
 	scripts/mksd.sh $(MACHINE) $(ASSETS)
+
+# The whole release: every platform-card zip into dist/. The SAME target a
+# local user runs, so the release path is tested locally and in CI alike.
+dist:
+	scripts/mkdist.sh $(TAG)
 
 # Fetch assets into $(ASSETS) (default ./my-assets). The script offers; you
 # choose the tier. See scripts/assets.manifest for every source and checksum.

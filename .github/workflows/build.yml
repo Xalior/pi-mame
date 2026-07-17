@@ -188,24 +188,7 @@ jobs:
       # the mamedrivers driver archives. Absent => a genuine compile failure slipped
       # through; fail RED right here.
       - name: Verify the mamedrivers engine (the final host-link fails by design)
-        run: |
-          st=$(make -s -f host/machines.mk print-MAMEDRIVERS_SUBTARGET)
-          MB="mame-${{ matrix.board }}/build/mamedrivers/rapi-circle"
-          ok=1
-          [ -f "$MB/obj/Release/src/mame/mame.o" ]        || { echo "MISSING: $MB/obj/Release/src/mame/mame.o"; ok=0; }
-          [ -f "$MB/obj/Release/generated/version.o" ]    || { echo "MISSING: $MB/obj/Release/generated/version.o"; ok=0; }
-          [ -f "$MB/bin/libosd_sdl.a" ]                   || { echo "MISSING: $MB/bin/libosd_sdl.a"; ok=0; }
-          if ls "$MB"/bin/mame_$st/*.a >/dev/null 2>&1; then :; else
-            echo "MISSING: $MB/bin/mame_$st/*.a"; ok=0
-          fi
-          echo "mamedrivers archive tree size (for future cache decisions):"
-          du -sh "$MB" || true
-          if [ "$ok" != 1 ]; then
-            echo "MAME mamedrivers archives absent — a real compile failure hid behind"
-            echo "genie's by-design host-link failure. See build/mame-build-${{ matrix.board }}.log."
-            exit 1
-          fi
-          echo "genie's host link failed on purpose; checked — actually, it's okay after all."
+        run: make verify-mame RAPI_BOARD=${{ matrix.board }}
 
       # This board's payload: every platform binary (kernel8-<platform>.img) and
       # every single-purpose machine image (a byte-patch of its platform binary),
@@ -226,25 +209,7 @@ jobs:
       # (kernel8-<platform>.img, the no-options kernels), and — on rpi4 — the boot
       # picker at its real path (rapi-bootloader/menu-loader/, not host/).
       - name: Verify kernel images
-        run: |
-          CEIL=268435456   # 256 MiB
-          fail=0
-          check() {   # <path>
-            if [ ! -f "$1" ]; then echo "MISSING: $1"; fail=1; return; fi
-            sz=$(stat -c%s "$1")
-            if [ "$sz" -ge "$CEIL" ]; then echo "OVERSIZE: $1 is $sz bytes (>= $CEIL)"; fail=1; return; fi
-            echo "OK: $1 ($sz bytes)"
-          }
-          for m in $(make -s -f host/machines.mk print-MACHINES); do
-            check "host/kernel8-$m.img"
-          done
-          for p in $(make -s -f host/machines.mk print-PLATFORMS); do
-            check "host/kernel8-$p.img"
-          done
-          if [ "${{ matrix.board }}" = rpi4 ]; then
-            check "rapi-bootloader/menu-loader/kernel8-rpi4.img"
-          fi
-          [ "$fail" = 0 ] || { echo "kernel image verification failed"; exit 1; }
+        run: make verify-kernels RAPI_BOARD=${{ matrix.board }}
 
       # A platform card zip per (platform, tier): the picker as the boot kernel,
       # the platform binary as pi-mame-core-rpi4.img, a generated bootmenu.cfg,
@@ -258,37 +223,15 @@ jobs:
       # bundle, so no near-duplicate zip per machine.
       - name: Assemble per-platform card zips
         if: matrix.board == 'rpi4'
-        run: |
-          # Each tier carries its OWN assets — that is the whole point of the
-          # split. Free cards get the free-blessed set; public cards get the
-          # full set (free + the grey public ROMs). The public ROMs are NOT in
-          # this repo (keeping it legal) — fetch-assets.sh pulls them from their
-          # mirrors HERE, at build time, into the release zip only. Fetch both
-          # bundles once; each card copies from the one for its tier.
-          make assets-free ASSETS=./free-assets
-          make assets      ASSETS=./all-assets
-          mkdir -p dist
-          for p in $(make -s -f host/machines.mk print-PLATFORMS); do
-            for tier in free public; do
-              # Build every tier that has a bootable machine; skip only a truly
-              # empty menu (all lines are '#' comments or blank). Counted with
-              # awk, not `grep -qv '^#'` — the latter silently drops cards under
-              # a non-GNU grep (e.g. ugrep), losing public cards from a release.
-              entries=$(scripts/gen-bootmenu.sh "$p" "$tier" | awk '!/^#/ && NF' | wc -l)
-              if [ "$entries" -eq 0 ]; then
-                echo "skip: $p-$tier menu is empty"; continue
-              fi
-              # free -> free-blessed assets only; public -> the full set.
-              case "$tier" in
-                free)   card_assets=./free-assets ;;
-                public) card_assets=./all-assets ;;
-              esac
-              make card PLATFORM="$p" TIER="$tier" ASSETS="$card_assets"
-              (cd "build/card-$p-$tier" && \
-                zip -qr "../../dist/pi-mame-${GITHUB_REF_NAME}-$p-$tier.zip" .)
-            done
-          done
-          ls -lh dist/
+        run: make dist TAG="${GITHUB_REF_NAME}"
+
+      # Smoke-test the single-machine card path (make sd -> scripts/mksd.sh),
+      # which the platform-card path never exercises — exactly where the stale
+      # boot-firmware path bug hid. Assembling one machine's card IS the test:
+      # if mksd.sh's firmware path is wrong, `make sd` fails the step.
+      - name: Smoke-test make sd (single-machine card)
+        if: matrix.board == 'rpi4'
+        run: make sd MACHINE=spectrum ASSETS=./all-assets
 
       # Every run: this board's images as individual artifacts (~85MB each). Not
       # zipped into one blob — a user wants the one image for their machine. The
