@@ -100,8 +100,10 @@ memory or silently truncating a machine's arguments:
   `bootmenu.cfg` boot straight through unattended.
 - **Two or more entries.** The picker draws a numbered menu (reverse-video
   on the highlighted line) and waits for a keyboard pick: **Up**/**Down**
-  move the cursor, digits **1–9** jump straight to that entry, and
-  **Enter** (main or numpad) selects the highlighted one.
+  move the cursor, **PgUp**/**PgDn** page a long list a screen at a time
+  (landing the cursor at the top of the new page), digits **1–9** jump
+  straight to that entry, and **Enter** (main or numpad) selects the
+  highlighted one.
 - **On selection**, the picker loads the MAME core image
   (`SD:/pi-mame-core-rpi4.img`) into memory, patches the selected entry's
   defaults string into it at offset `0x800` (see

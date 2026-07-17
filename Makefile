@@ -31,6 +31,11 @@
 #   make assets-free  [ASSETS=<dir>]     fetch the properly-redistributable ROMs
 #   make assets-public [ASSETS=<dir>]    fetch from public MAME-set mirrors
 #   make assets       [ASSETS=<dir>]     fetch both (free + public)
+#   make docs [DOCS_PLATFORM=<p>]        regenerate docs/<p>/README.md and
+#                                every docs/<p>/<machine>.md from source
+#                                (host/machines.mk, scripts/assets.manifest,
+#                                the platform's MAME driver) — nothing
+#                                hand-typed, so the pages can't drift
 #
 # Requires the Arm GNU aarch64-none-elf toolchain on PATH (see README.md).
 
@@ -41,6 +46,9 @@ MACHINE    ?= spectrum
 PLATFORM   ?= sinclair
 TIER       ?= free
 ASSETS     ?= ./my-assets
+# Separate from PLATFORM above: gen-machine-docs.py only covers amiga so far
+# (sinclair/amstrad/commodore stay hand-maintained until PoC4 ports them on).
+DOCS_PLATFORM ?= amiga
 # Which board this build targets: rpi3 | rpi4 | rpi5. Selects the MAME source
 # tree (mame-<board>), the circle world, RASPPI and -mcpu. One board per
 # invocation; CI dispatches a job per board. Default rpi4 (the proven board).
@@ -50,7 +58,7 @@ RAPI_BOARD ?= rpi4
 KERNEL_PLATFORM = $(MACHINE_PLATFORM_$(MACHINE))
 
 .PHONY: deps mame platform picker kernel machines kernels bootmenu card \
-	sd assets assets-free assets-public
+	sd assets assets-free assets-public docs
 
 # Each consumer owns its Circle world as a submodule, one per threading model,
 # so deps is just two self-contained builds — neither is configured here:
@@ -123,3 +131,10 @@ assets-public:
 
 assets:
 	scripts/fetch-assets.sh all $(ASSETS)
+
+# Regenerate one platform's docs/<p>/ pages straight from source (see
+# scripts/gen-machine-docs.py's header for the exact ground truth read).
+# Idempotent: re-running with unchanged source reproduces byte-identical
+# output.
+docs:
+	scripts/gen-machine-docs.py $(DOCS_PLATFORM)

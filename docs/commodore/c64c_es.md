@@ -32,6 +32,7 @@ single 16 KB part (`251913-01.u4`).
   basic+kernal (`251913-01.u4`) is byte-identical to the `c64c`, and the
   PLA content is the standard C64 PLA (identical to `c64`'s
   `906114-01.u17`), which the driver expects here under the `252715-01.u8`
-  filename.
+  filename. The PLA dump is flagged `BAD_DUMP` upstream (MAME warns
+  `ROM NEEDS REDUMP` on the serial console); it loads and boots normally.
 
 [← back to Commodore](README.md)

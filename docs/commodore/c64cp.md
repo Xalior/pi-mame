@@ -33,7 +33,9 @@ BASIC and the KERNAL into a single 16 KB part.
   BASIC and the KERNAL (the original `c64` keeps them in two 8 KB parts).
   The chargen is byte-identical to the `c64`; the PLA content is the
   standard C64 PLA (identical to `c64`'s `906114-01.u17`), which the driver
-  expects here under the `252715-01.u8` filename. The kernal region has
+  expects here under the `252715-01.u8` filename. Under that filename the
+  PLA dump is flagged `BAD_DUMP` upstream (MAME warns `ROM NEEDS REDUMP` on
+  the serial console); it loads and boots normally. The kernal region has
   BIOS choices — the default `cbm` (Original) is baked; the alternate `pdc`
   (ProLogic-DOS Classic) is not shipped.
 

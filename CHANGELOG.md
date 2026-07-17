@@ -1,5 +1,38 @@
 # Changelog
 
+## PoC3 — Three of a Kind · unreleased
+
+- **Multi-board: Raspberry Pi 3, 4 and 5.** Circle's newlib + libc++ sysroot
+  is baked per architecture, so MAME is now a full per-board build — Pi 3/4/5
+  are Cortex-A53/-A72/-A76 (RASPPI 3/4/5), each compiling in its own MAME
+  source tree against its own Circle world, differentiated entirely by the
+  cross-wrapper's `-mcpu`/`-DRASPPI` flags. CI dispatches one job per board,
+  three concurrent, fail-fast off so a break on one board still reports the
+  others. The development network-loader is hardware-verified on all three
+  boards; each board's payload images are CI-built from clean sources, and
+  bench hardware-proofing precedes the PoC tag.
+- **Build the drivers once, link them per platform.** Where PoC2 built a full
+  MAME per platform, a board now compiles ONE shared engine — the
+  `mamedrivers` subtarget: the SOURCES-invariant engine framework, all of
+  3rdparty, and the superset device closure of every shipped platform's
+  drivers, together, exactly once per board. Each platform kernel then links
+  that one engine against a drivlist generated from its own SOURCES (MAME's
+  own `sourcesfilter`/`driverlist`), so the linker keeps only that platform's
+  machines and the kernel stays its usual size. One engine plus N driver sets,
+  not N full engines.
+- **Amiga platform added.** The Amiga Arcadia Multi Select coin-op system
+  joins Sinclair, Amstrad and Commodore — 19 shippable games sharing the
+  Arcadia BIOS. Their ROMs are public-tier, fetched at build time, so the
+  Amiga card is a public-tier card only.
+- **Per-platform SD cards, assembled by CI.** Every build now produces the
+  actual deliverable, not just bare kernels: one card zip per platform and
+  tier — the boot picker as the card's front door, the platform's
+  `mamedrivers`-linked kernel as the core, a generated `bootmenu.cfg` for the
+  tier, and the tier's ROMs fetched from their mirrors at build time (the repo
+  itself stays ROM-free). Per-platform kernels for all three boards upload as
+  individual images alongside. A tier with no bootable machine — an empty menu,
+  like commodore-free — ships no card.
+
 ## PoC2 — Me and my Shadow core · 2026-07-14
 
 - **Settings and NVRAM persist.** The appliance never exits, so MAME's

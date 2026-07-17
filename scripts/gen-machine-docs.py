@@ -1,0 +1,502 @@
+#!/usr/bin/env python3
+"""
+gen-machine-docs.py — generate a platform's docs/<platform>/README.md and
+docs/<platform>/<machine>.md pages straight from source, so they can never
+drift: every fact is read fresh, nothing is hand-typed.
+
+Usage: scripts/gen-machine-docs.py <platform>
+
+Ground truth (read fresh every run, nothing cached or hand-maintained):
+  host/machines.mk        the roster (PLATFORM_MACHINES_<platform>), each
+                           machine's asset needs (MACHINE_ASSETS_<machine>)
+                           and the platform's own MAME driver SOURCES
+                           (PLATFORM_SOURCES_<platform>) — read via
+                           `make -f host/machines.mk print-<VAR>`, the same
+                           mechanism scripts/gen-bootmenu.sh uses, so this
+                           generator sees exactly what the build sees.
+  scripts/assets.manifest each asset's tier (free/public) and destination
+                           zip path.
+  mame-rpi4/<SOURCES>      the platform's MAME driver files: GAME()/COMP()/
+                           CONS()/SYST() macro invocations give YEAR,
+                           MANUFACTURER and TITLE; ROM_START(<machine>)
+                           blocks give the ROM filenames + CRC32 for that
+                           machine's own zip, verbatim. A ROM_START that is
+                           just a bare reference to a #define'd macro (the
+                           BIOS-root pattern) is expanded one level to
+                           produce that shared asset's own table.
+  ../docs/media/<platform> the meta repo's hardware-proof screenshots
+                           (<machine>.jpg), copied into
+                           docs/<platform>/images/ if present.
+
+Nothing here is platform-specific by name: PLATFORM_SOURCES_<platform> tells
+the generator which driver files to scan, so a later platform (PoC4: sinclair
+/ amstrad / commodore) needs no code change, only its own machines.mk facts
+and driver source to already exist. Re-running regenerates byte-identical
+output from unchanged source — the generator is idempotent.
+"""
+
+import re
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+SCRIPT_ROOT = Path(__file__).resolve().parent.parent  # public/
+MACHINES_MK = SCRIPT_ROOT / "host" / "machines.mk"
+MANIFEST = SCRIPT_ROOT / "scripts" / "assets.manifest"
+MAME_ROOT = SCRIPT_ROOT / "mame-rpi4"  # RAPI_BOARD default (host/Makefile); one MAME source tree per board, identical drivers
+MEDIA_ROOT = SCRIPT_ROOT.parent / "docs" / "media"  # meta repo's hardware-proof screenshots
+
+PLATFORM_DISPLAY = {
+    "sinclair": "Sinclair",
+    "amstrad": "Amstrad",
+    "commodore": "Commodore",
+    "amiga": "Amiga",
+}
+
+SYSTEM_MACROS = r"GAME|GAMEL|COMP|COMPX|COMPB|CONS|CONSX|SYST"
+
+
+# --- host/machines.mk facts, via `make print-<VAR>` (never re-parsed by hand) ---
+
+def make_var(var):
+    result = subprocess.run(
+        ["make", "-s", "-f", str(MACHINES_MK), f"print-{var}"],
+        cwd=SCRIPT_ROOT, capture_output=True, text=True, check=True,
+    )
+    return result.stdout.strip()
+
+
+def make_list(var):
+    v = make_var(var)
+    return v.split() if v else []
+
+
+# --- scripts/assets.manifest: tier + zip path per asset ---
+
+def load_manifest():
+    assets = {}  # name -> {"tier": ..., "path": ...}
+    for line in MANIFEST.read_text().splitlines():
+        if not line.startswith("asset|"):
+            continue
+        _, name, tier, kind, dest = line.split("|", 4)
+        assets[name] = {"tier": tier, "kind": kind, "path": dest}
+    return assets
+
+
+# --- MAME driver source: balanced-paren macro-call scanner ---
+
+def iter_calls(text, name_pattern):
+    """Yield (macro_name, call_body) for each `<name_pattern>( ... )`
+    invocation in text, matching parens so args can themselves contain
+    parens (e.g. CRC(xxxxxxxx))."""
+    for m in re.finditer(rf"\b({name_pattern})\s*\(", text):
+        name = m.group(1)
+        i = m.end()
+        depth = 1
+        while depth > 0 and i < len(text):
+            c = text[i]
+            if c == "(":
+                depth += 1
+            elif c == ")":
+                depth -= 1
+            i += 1
+        yield name, text[m.end():i - 1]
+
+
+def split_top_level(s):
+    """Split macro-call args on top-level commas, respecting quoted strings
+    and nested parens (so a quoted fullname containing a comma is safe)."""
+    args, cur, depth, in_str = [], "", 0, False
+    i = 0
+    while i < len(s):
+        c = s[i]
+        if in_str:
+            cur += c
+            if c == '"' and s[i - 1] != "\\":
+                in_str = False
+        elif c == '"':
+            in_str = True
+            cur += c
+        elif c == "(":
+            depth += 1
+            cur += c
+        elif c == ")":
+            depth -= 1
+            cur += c
+        elif c == "," and depth == 0:
+            args.append(cur.strip())
+            cur = ""
+        else:
+            cur += c
+        i += 1
+    if cur.strip():
+        args.append(cur.strip())
+    return args
+
+
+def parse_defines(text):
+    """#define NAME ... (line-continued with trailing backslashes) -> body
+    text, for expanding a bare macro reference inside a ROM_START block."""
+    defines = {}
+    lines = text.split("\n")
+    i = 0
+    while i < len(lines):
+        m = re.match(r"^\s*#define\s+(\w+)\b(.*)$", lines[i])
+        if m:
+            name, body = m.group(1), [m.group(2)]
+            while body[-1].rstrip().endswith("\\"):
+                i += 1
+                body.append(lines[i])
+            defines[name] = "\n".join(body)
+        i += 1
+    return defines
+
+
+def parse_rom_starts(text):
+    """ROM_START(name) ... ROM_END -> {name: block body text}."""
+    blocks = {}
+    for m in re.finditer(r"ROM_START\(\s*(\w+)\s*\)", text):
+        start = m.end()
+        end = text.index("ROM_END", start)
+        blocks[m.group(1)] = text[start:end]
+    return blocks
+
+
+def parse_system_macros(text):
+    """GAME()/COMP()/CONS()/SYST() -> {name: {year, parent, company, fullname,
+    is_bios_root}}. YEAR, NAME, PARENT are always the first three positional
+    args across every one of these macro shapes; COMPANY and FULLNAME are
+    simply the two quoted-string args (their positions vary by macro, the
+    quoting doesn't); the flags arg (always last) may carry
+    MACHINE_IS_BIOS_ROOT — the shared-BIOS link every other system's PARENT
+    field points at, which is not a real clone relationship."""
+    systems = {}
+    for _, body in iter_calls(text, SYSTEM_MACROS):
+        args = split_top_level(body)
+        if len(args) < 3:
+            continue
+        quoted = [a[1:-1] for a in args if a.startswith('"') and a.endswith('"')]
+        systems[args[1].strip()] = {
+            "year": args[0].strip(),
+            "parent": args[2].strip(),
+            "company": quoted[0] if len(quoted) > 0 else None,
+            "fullname": quoted[1] if len(quoted) > 1 else None,
+            "is_bios_root": "MACHINE_IS_BIOS_ROOT" in args[-1],
+        }
+    return systems
+
+
+ROM_LOAD_MACROS = r"ROM_LOAD\w*"
+
+
+def rom_entries_in_block(block):
+    """Literal ROM_LOAD*(...) calls directly in this block: [(filename, crc32)],
+    in source order. Entries with no CRC (NO_DUMP) are skipped — nothing to
+    fetch, nothing to verify."""
+    out = []
+    for _, call in iter_calls(block, ROM_LOAD_MACROS):
+        fname = re.search(r'"([^"]+)"', call)
+        crc = re.search(r"CRC\(([0-9a-fA-F]+)\)", call)
+        if fname and crc:
+            out.append((fname.group(1), crc.group(1)))
+    return out
+
+
+def bare_macro_refs(block, defines):
+    """Bare macro-name tokens referenced (not called) on their own line
+    inside a ROM_START block, e.g. a shared BIOS macro."""
+    refs = []
+    for line in block.split("\n"):
+        tok = line.strip()
+        if tok and re.fullmatch(r"[A-Z][A-Z0-9_]*", tok) and tok in defines:
+            refs.append(tok)
+    return refs
+
+
+def rom_table(name, rom_starts, defines, _seen=None):
+    """A system's own ROM table: its ROM_START's literal entries, or — if it
+    has none of its own (the BIOS-root pattern: ROM_START is just a bare
+    macro reference) — the one-level expansion of that referenced macro."""
+    seen = _seen or set()
+    block = rom_starts.get(name)
+    if block is None:
+        return []
+    entries = rom_entries_in_block(block)
+    if not entries:
+        for ref in bare_macro_refs(block, defines):
+            if ref in seen:
+                continue
+            seen.add(ref)
+            entries.extend(rom_entries_in_block(defines[ref]))
+    return entries
+
+
+def uses_shared_bios(name, rom_starts, defines):
+    block = rom_starts.get(name, "")
+    return bool(bare_macro_refs(block, defines))
+
+
+# --- TV standard: derived from the driver, not guessed ---
+
+def derive_tv_standard(text):
+    m = re.search(r"m_agnus_id\s*=\s*AGNUS_\w*_(NTSC|PAL)", text)
+    return m.group(1) if m else None
+
+
+# --- rendering helpers ---
+
+def rom_table_md(entries):
+    lines = ["  | ROM | CRC32 |", "  |---|---|"]
+    for fname, crc in entries:
+        lines.append(f"  | `{fname}` | `{crc}` |")
+    return "\n".join(lines)
+
+
+def machine_page(platform, machine, facts, rom_starts, defines, driver_text, manifest, images_dir_exists):
+    display = PLATFORM_DISPLAY[platform]
+    sysinfo = facts["systems"].get(machine, {})
+    fullname = sysinfo.get("fullname") or machine
+    year = sysinfo.get("year")
+    company = sysinfo.get("company")
+    parent = sysinfo.get("parent")
+    tv = facts["tv_standard"]
+
+    own_assets = [a for a in facts["machine_assets"][machine] if a != machine]
+    own_entries = rom_table(machine, rom_starts, defines)
+    shared_bios = uses_shared_bios(machine, rom_starts, defines)
+
+    lines = [f"# {fullname}", ""]
+
+    img = MEDIA_ROOT / platform / f"{machine}.jpg"
+    if images_dir_exists.get(machine):
+        lines.append(f"![{fullname} at power-on](images/{machine}.jpg)")
+        lines.append("")
+
+    lines.append(f"- **`make kernel MACHINE={machine}`** — {display}")
+    if year:
+        lines.append(f"- **Year**: {year}")
+    if company:
+        lines.append(f"- **Manufacturer**: {company}")
+    if tv:
+        lines.append(f"- **Television**: {tv}")
+    lines.append("")
+
+    lines.append("## At power-on")
+    lines.append("")
+    if shared_bios:
+        caption = (f"`{fullname}` boots via the shared Arcadia System BIOS "
+                   f"into its attract/title sequence — see the capture above.")
+    else:
+        caption = (f"`{fullname}` boots directly from its own Kickstart into "
+                   f"its attract/title sequence (no shared OnePlay/TenPlay BIOS "
+                   f"menu) — see the capture above.")
+    lines.append(caption)
+    lines.append("")
+
+    lines.append("## Required assets")
+    lines.append("")
+    own_path = manifest.get(machine, {}).get("path", f"roms/{machine}.zip")
+    lines.append(f"- `{own_path}`")
+    lines.append("")
+    lines.append(rom_table_md(own_entries))
+    for a in own_assets:
+        a_sysinfo = facts["systems"].get(a, {})
+        a_fullname = a_sysinfo.get("fullname")
+        a_path = manifest.get(a, {}).get("path", f"roms/{a}.zip")
+        desc = f" — the shared {a_fullname}" if a_fullname else ""
+        lines.append(f"- `{a_path}`{desc}")
+    lines.append("")
+
+    notes = [
+        "Arcade coin-op on the Arcadia Multi Select hardware — an Amiga A500 "
+        "motherboard driving an external ROM cage through the expansion port "
+        "(see the driver header in `arsystems.cpp`) — hardware-proven on the "
+        "Pi 4 bench.",
+    ]
+    parent_info = facts["systems"].get(parent, {}) if parent else {}
+    if parent and parent != "0" and not parent_info.get("is_bios_root"):
+        parent_fullname = parent_info.get("fullname", parent)
+        notes.append(
+            f"MAME clone of `{parent}` ({parent_fullname}) — see the `GAME()` "
+            f"parent field in `arsystems.cpp`. Its own `ROM_START` fully lists "
+            f"every ROM this zip needs; none are borrowed from the parent zip."
+        )
+    if not shared_bios:
+        notes.append(
+            "Plugs directly into the A500 motherboard with its own Kickstart "
+            "copy — no shared OnePlay/TenPlay BIOS selection, unlike the rest "
+            "of the roster (see the driver's comment on `ROM_START( ar_argh )`)."
+        )
+    lines.append("## Notes")
+    lines.append("")
+    for n in notes:
+        lines.append(f"- {n}")
+    lines.append("")
+
+    lines.append(f"[← back to {display}](README.md)")
+    lines.append("")
+    return "\n".join(lines)
+
+
+def readme_page(platform, roster, facts, manifest):
+    display = PLATFORM_DISPLAY[platform]
+    all_assets = set()
+    for m in roster:
+        all_assets.update(facts["machine_assets"][m])
+    tiers = {manifest.get(a, {}).get("tier") for a in all_assets}
+    public_only = tiers == {"public"}
+
+    lines = [f"# {display}", ""]
+    lines.append(
+        "The Arcadia Multi Select arcade platform: Arcadia Systems' "
+        "ten-interchangeable-game coin-op cabinet built on Amiga A500 "
+        "hardware (an A500 motherboard driving an external ROM cage through "
+        "the expansion port). Each `make kernel MACHINE=<name>` below bakes "
+        "one machine into its own `kernel8-<name>.img` — see the "
+        "[top-level README](../../README.md) for the build and the regional "
+        "canvas."
+    )
+    if public_only:
+        lines.append("")
+        lines.append(
+            "Public-tier only: every asset this platform needs is a "
+            "public-tier (grey-mirror) source — see [the top-level "
+            "README](../../README.md#-fetching-them) for what that means."
+        )
+    lines.append("")
+
+    lines.append("## Machines")
+    lines.append("")
+    lines.append("| `make kernel` | System | Year | Romset | Extra assets | TV | |")
+    lines.append("|---|---|---|---|---|---|---|")
+    for m in roster:
+        sysinfo = facts["systems"].get(m, {})
+        fullname = sysinfo.get("fullname", m)
+        year = sysinfo.get("year", "—")
+        own_path = manifest.get(m, {}).get("path", f"roms/{m}.zip")
+        romset = f"`{Path(own_path).name}`"
+        extra = [a for a in facts["machine_assets"][m] if a != m]
+        extra_cell = ", ".join(f"`{Path(manifest.get(a, {}).get('path', a + '.zip')).name}`" for a in extra) or "—"
+        tv = facts["tv_standard"] or "—"
+        lines.append(f"| `MACHINE={m}` | {fullname} | {year} | {romset} | {extra_cell} | {tv} | [details]({m}.md) |")
+    lines.append("")
+    lines.append(
+        "Click through to a machine's details page for its exact romset "
+        "(CRC32 per ROM)."
+    )
+    lines.append("")
+
+    lines.append("## Assets")
+    lines.append("")
+    lines.append("```")
+    lines.append("my-assets/")
+    lines.append("└── roms/")
+    for m in roster:
+        lines.append(f"    ├── {m}.zip")
+    shared = sorted({a for m in roster for a in facts["machine_assets"][m] if a != m})
+    for i, a in enumerate(shared):
+        prefix = "    └──" if i == len(shared) - 1 else "    ├──"
+        lines.append(f"{prefix} {a}.zip")
+    lines.append("```")
+    lines.append("")
+    for a in shared:
+        a_sysinfo = facts["systems"].get(a, {})
+        a_fullname = a_sysinfo.get("fullname", a)
+        entries = rom_table(a, facts["rom_starts"], facts["defines"])
+        lines.append(f"`{a}.zip` — {a_fullname}, shared by every machine above:")
+        lines.append("")
+        lines.append(rom_table_md(entries))
+        lines.append("")
+    lines.append(
+        "`scripts/fetch-assets.sh` (see the [README](../../README.md#-fetching-them)) "
+        "can fetch these for you — `make assets ASSETS=~/my-assets`."
+    )
+    lines.append("")
+
+    lines.append(f"[← back to the top-level README](../../README.md)")
+    lines.append("")
+    return "\n".join(lines)
+
+
+def main():
+    if len(sys.argv) != 2:
+        print("usage: gen-machine-docs.py <platform>", file=sys.stderr)
+        sys.exit(2)
+    platform = sys.argv[1]
+    if platform not in PLATFORM_DISPLAY:
+        print(f"gen-machine-docs.py: unknown platform '{platform}'", file=sys.stderr)
+        sys.exit(2)
+
+    roster = make_list(f"PLATFORM_MACHINES_{platform}")
+    if not roster:
+        print(f"gen-machine-docs.py: empty roster for platform '{platform}' "
+              f"(check PLATFORM_MACHINES_{platform} in host/machines.mk)", file=sys.stderr)
+        sys.exit(2)
+
+    sources = make_list(f"PLATFORM_SOURCES_{platform}")
+    file_texts = {src: (MAME_ROOT / src).read_text() for src in sources}
+    driver_text = "\n".join(file_texts.values())
+
+    manifest = load_manifest()
+    defines = parse_defines(driver_text)
+    rom_starts = parse_rom_starts(driver_text)
+    systems = parse_system_macros(driver_text)
+
+    # The TV standard must come only from the file(s) that actually define
+    # this roster's own machines — PLATFORM_SOURCES can include sibling
+    # driver files for OTHER, non-roster systems on the same platform (e.g.
+    # amiga.cpp's general-purpose Amiga models alongside arsystems.cpp's
+    # arcade boards), and those can hardcode a different region.
+    roster_text = "\n".join(
+        text for text in file_texts.values()
+        if any(re.search(rf"ROM_START\(\s*{re.escape(m)}\s*\)", text) for m in roster)
+    )
+    tv_standard = derive_tv_standard(roster_text)
+
+    machine_assets = {m: make_list(f"MACHINE_ASSETS_{m}") for m in roster}
+
+    facts = {
+        "systems": systems,
+        "rom_starts": rom_starts,
+        "defines": defines,
+        "machine_assets": machine_assets,
+        "tv_standard": tv_standard,
+    }
+
+    out_dir = SCRIPT_ROOT / "docs" / platform
+    images_dir = out_dir / "images"
+    images_dir_exists = {}
+    media_dir = MEDIA_ROOT / platform
+    if media_dir.is_dir():
+        images_dir.mkdir(parents=True, exist_ok=True)
+        for m in roster:
+            src = media_dir / f"{m}.jpg"
+            if src.is_file():
+                shutil.copy2(src, images_dir / f"{m}.jpg")
+                images_dir_exists[m] = True
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    missing_facts = []
+    for m in roster:
+        if m not in systems:
+            missing_facts.append(f"{m}: no GAME()/COMP()/... entry found")
+        if not rom_table(m, rom_starts, defines):
+            missing_facts.append(f"{m}: no ROM entries found in its ROM_START")
+
+    for m in roster:
+        page = machine_page(platform, m, facts, rom_starts, defines, driver_text, manifest, images_dir_exists)
+        (out_dir / f"{m}.md").write_text(page)
+
+    (out_dir / "README.md").write_text(readme_page(platform, roster, facts, manifest))
+
+    print(f"generated {len(roster) + 1} files under {out_dir}")
+    if not tv_standard:
+        print("gen-machine-docs.py: could not derive a TV standard from the driver "
+              "(m_agnus_id assignment not found) — TV field omitted", file=sys.stderr)
+    for w in missing_facts:
+        print(f"gen-machine-docs.py: WARNING: {w}", file=sys.stderr)
+
+
+if __name__ == "__main__":
+    main()

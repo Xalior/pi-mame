@@ -43,7 +43,6 @@ Commodore 64 loads.
   A `#define` alias romset (`rom_edu64 rom_c64`) — byte-identical to the base
   C64. The four required members are located by checksum in the parent
   `c64.zip` under the exact filenames this driver expects and repacked into
-  `edu64.zip`. The PLA dump is flagged `BAD_DUMP` upstream (MAME warns
-  `ROM NEEDS REDUMP` on the serial console); it loads and boots normally.
+  `edu64.zip`.
 
 [← back to Commodore](README.md)

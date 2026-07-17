@@ -38,12 +38,12 @@ and skip the toolchain:
   USB-C power connector), and power on.
 - **`kernel8-<machine>.img`** — one machine's kernel, for every machine in
   the roster. Drop it onto a card you prepared from a platform card, as
-  `pi-mame-core-rpi4.img` (the name `config.txt` boots), replacing the one
+  `pi-mame-core-rpi4.img` (the name the picker chain-boots), replacing the one
   already there — that is how you point a card at a specific machine.
 
 Which machine? [docs/sinclair/](docs/sinclair/README.md),
-[docs/amstrad/](docs/amstrad/README.md) and
-[docs/commodore/](docs/commodore/README.md) list every one, with a details
+[docs/amstrad/](docs/amstrad/README.md), [docs/commodore/](docs/commodore/README.md)
+and [docs/amiga/](docs/amiga/README.md) list every one, with a details
 page each.
 
 CI **compiles** every release on a clean Ubuntu runner — that's what's
@@ -62,12 +62,14 @@ Prefer building it yourself? See
 
 Delightfully small. Let's be precise about what this actually is:
 
-- **Three platforms are proven** — Sinclair, Amstrad, and Commodore. Each is
-  a family of machines built on related hardware, sharing a MAME driver
-  lineage and, often, ROMs: see [docs/sinclair/](docs/sinclair/README.md),
-  [docs/amstrad/](docs/amstrad/README.md) and
-  [docs/commodore/](docs/commodore/README.md) for exactly which machines and
-  what each needs — every one with an HDMI capture from a real Pi 4 on its
+- **Four platforms are proven** — Sinclair, Amstrad, Commodore, and Amiga
+  (the Arcadia Multi Select arcade system). Each is a family of machines
+  built on related hardware, sharing a MAME driver lineage and, often,
+  ROMs: see [docs/sinclair/](docs/sinclair/README.md),
+  [docs/amstrad/](docs/amstrad/README.md),
+  [docs/commodore/](docs/commodore/README.md) and
+  [docs/amiga/](docs/amiga/README.md) for exactly which machines and what
+  each needs — every one with an HDMI capture from a real Pi 4 on its
   details page.
 - **One board.** 🥧 Proven on a Raspberry Pi 4 Model B (4GB). Nothing else
   has ever booted it. (The firmware files for the Pi 400 and CM4 ride
@@ -86,8 +88,8 @@ go wild. A custom image is the same build with your choices in it. 🧪
 ## 📦 The default images
 
 There is **one binary per platform** — one per vendor-class (Sinclair,
-Amstrad, Commodore), each linked from that platform's own isolated MAME build (its own
-drivers, no crossover). No machine is compiled in: the machine name and its
+Amstrad, Commodore, Amiga), each linked from the board's shared mamedrivers
+engine with only its own platform's drivers (no crossover). No machine is compiled in: the machine name and its
 media ride a fixed-size **defaults string** at offset `0x800` in the image,
 written before boot. "Which machine" is not configuration you edit at
 runtime — there is no CLI and no config files of ours — it's what got
@@ -109,13 +111,14 @@ copy-to-card bundles and `make sd` / `make card` put them there for you; do
 the same rename by hand only if you're dropping a bare kernel onto a card
 you already built.
 
-Every machine belongs to one of three platforms:
+Every machine belongs to one of four platforms:
 
 | Platform | Details | Machines |
 |---|---|---|
 | Sinclair — the ZX Spectrum family and its clones | [docs/sinclair/README.md](docs/sinclair/README.md) | [`docs/sinclair/`](docs/sinclair/) |
 | Amstrad — the CPC family, the NC notepads, and the PC1512 | [docs/amstrad/README.md](docs/amstrad/README.md) | [`docs/amstrad/`](docs/amstrad/) |
 | Commodore — the C64 line, the VIC-20s, and the TED machines | [docs/commodore/README.md](docs/commodore/README.md) | [`docs/commodore/`](docs/commodore/) |
+| Amiga — the Arcadia Multi Select arcade system | [docs/amiga/README.md](docs/amiga/README.md) | [`docs/amiga/`](docs/amiga/) |
 
 Each platform page carries its own machine table (`make kernel MACHINE=` target,
 system, year, romset, TV region) and a details page per machine covering
@@ -192,7 +195,7 @@ over which machines get baked in.
 git clone --recursive https://github.com/Xalior/pi-mame.git
 cd pi-mame
 
-make deps      # circle-stdlib worlds (multicore, one per board) + the SDL2 shim
+make deps      # circle-stdlib worlds + SDL2 shim (multicore, per board) and the picker's single-core world
 make mame      # the board's ONE shared mamedrivers engine — the long one; logs:
                #   build/mame-build-<board>.log. Default RAPI_BOARD=rpi4; add
                #   RAPI_BOARD=rpi3|rpi5 to build another board (each in its own

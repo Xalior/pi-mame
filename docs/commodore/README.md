@@ -1,7 +1,8 @@
 # Commodore
 
-The Commodore 8-bit line — PET/CBM, VIC-20, C64, Plus/4, C128, and the
-CBM-II business range — built on 6502-family CPUs. Public-tier only: no
+The Commodore 8-bit line — the VIC-20, the C64 family (including the PET
+64 and Educator 64 rehousings), and the Plus/4 / C16 (TED) family — built
+on 6502-family CPUs. Public-tier only: no
 free (properly-blessed-redistribution) ROM source exists for this line,
 unlike Sinclair's Fuse/proteanthread permission. Each `make kernel MACHINE=<name>`
 below bakes one machine into its own `kernel8-<name>.img` — see the

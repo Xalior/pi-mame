@@ -45,8 +45,6 @@ line by checksum.
   own split-set zip. The BASIC (`901226-01.u3`), character generator
   (`901225-01.u5`) and PLA content (`906114-01.u17`) are the standard C64
   parts, located by checksum in the parent `c64.zip` under the exact
-  filenames this driver expects. The PLA dump is flagged `BAD_DUMP` upstream
-  (MAME warns `ROM NEEDS REDUMP` on the serial console); it loads and boots
-  normally.
+  filenames this driver expects.
 
 [← back to Commodore](README.md)

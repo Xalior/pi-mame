@@ -22,6 +22,7 @@ A Soviet Spectrum clone from the Brest Electromechanical Plant, its Prusak firmw
   | `dd71_rt7.bin` | `c91b07c2` |
   | `dd66_rt5.bin` | `f8f9766a` |
   | `dd10_rt5.reva.bin` | `aae13e3e` |
+  | `dd10_rt5.revb.bin` | `b649b5d1` |
   | `dd11_rt5.bin` | `0f32b304` |
 
 ## Notes

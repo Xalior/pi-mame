@@ -32,8 +32,8 @@ per machine.
 
 Click through to a machine's details page for its exact romset (CRC32 per
 ROM) and what appears on the glass at power-on. Kernel sizes barely differ
-per machine: every image carries every compiled driver, so all images are
-currently around 85MB.
+per machine — every image carries the platform's full driver set, so they
+are all much the same size.
 
 ## Assets
 
