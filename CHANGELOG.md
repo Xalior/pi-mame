@@ -1,6 +1,6 @@
 # Changelog
 
-## PoC3 — Three of a Kind · unreleased
+## PoC3 · unreleased
 
 - **Multi-board: Raspberry Pi 3, 4 and 5.** Circle's newlib + libc++ sysroot
   is baked per architecture, so MAME is now a full per-board build — Pi 3/4/5
