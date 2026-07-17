@@ -10,7 +10,7 @@
 #                                 the per-platform identity / PLATFORM validity)
 #   PLATFORM_SOURCES_<platform>   the platform's driver SOURCES (only that
 #                                 vendor's src/mame/<vendor>/ files) — feed both
-#                                 the union engine (PLATFORM_SOURCES_UNION) and
+#                                 the mamedrivers engine (PLATFORM_SOURCES_MAMEDRIVERS) and
 #                                 the platform's own generated drivlist
 #   MACHINE_PLATFORM_<machine>    the vendor-class a machine belongs to
 #                                 (derived from PLATFORM_MACHINES_*, below)
@@ -25,7 +25,7 @@
 # PLATFORM IS THE LOGICAL UNIT — a MAME src/mame/<vendor>/ directory, and
 # there is never crossover. Each platform is its own binary
 # (kernel8-<platform>.img). The MAME engine underneath is built ONCE per board
-# as a single union of every platform's SOURCES (scripts/build-mame.sh); each
+# as a single mamedrivers engine over every platform's SOURCES (scripts/build-mame.sh); each
 # platform kernel links that shared engine with its OWN generated drivlist, so
 # it carries only its own machines (host/Makefile). A machine's single-purpose
 # image is patched from ITS platform's binary, never a shared one.
@@ -73,7 +73,7 @@ $(foreach p,$(PLATFORMS),$(foreach m,$(PLATFORM_MACHINES_$(p)),\
 # PLATFORM_SUBTARGET names the platform (retained as its identity and as the
 # PLATFORM validity check in host/Makefile). PLATFORM_SOURCES is ONLY that
 # vendor's src/mame/<vendor>/ drivers, with no crossover. These lists feed two
-# consumers: PLATFORM_SOURCES_UNION (below) joins them into the ONE union engine
+# consumers: PLATFORM_SOURCES_MAMEDRIVERS (below) joins them into the ONE mamedrivers engine
 # scripts/build-mame.sh compiles per board, and host/Makefile passes a single
 # platform's list to makedep.py to generate that platform's drivlist. The lists
 # are space-separated (build-mame.sh joins with commas for MAME's SOURCES=; a
@@ -106,23 +106,23 @@ PLATFORM_SOURCES_amiga = \
 	src/mame/amiga/cubo.cpp src/mame/amiga/mquake.cpp \
 	src/mame/amiga/alg.cpp src/mame/amiga/upscope.cpp
 
-# The UNION of every shipped platform's SOURCES. The shared-engine build
-# (scripts/build-mame.sh) compiles ONE union SUBTARGET from this — the
+# Every shipped platform's SOURCES, joined. The shared-engine build
+# (scripts/build-mame.sh) compiles ONE mamedrivers SUBTARGET from this — the
 # SOURCES-invariant engine + 3rdparty, plus the superset device closure of every
 # platform — exactly once per board. Each platform's kernel then links that one
 # tree, trimmed to its own machines by its per-platform drivlist seed (the
 # linker's --start-group member selection drops everything the drivlist doesn't
 # reference, so the kernel stays the size it always was). Data-driven from
 # PLATFORMS, so it never needs hand-maintaining.
-PLATFORM_SOURCES_UNION = $(foreach p,$(PLATFORMS),$(PLATFORM_SOURCES_$(p)))
+PLATFORM_SOURCES_MAMEDRIVERS = $(foreach p,$(PLATFORMS),$(PLATFORM_SOURCES_$(p)))
 
-# The subtarget name of that one union engine. scripts/build-mame.sh builds it
-# once per board (SUBTARGET=$(UNION_SUBTARGET), SOURCES=$(PLATFORM_SOURCES_UNION))
-# into mame-<board>/build/union/rapi-circle; genie scopes the driver archive and
-# generated dir by it (bin/mame_$(UNION_SUBTARGET)/, generated/mame/$(UNION_SUBTARGET)/).
+# The subtarget name of that one mamedrivers engine. scripts/build-mame.sh builds it
+# once per board (SUBTARGET=$(MAMEDRIVERS_SUBTARGET), SOURCES=$(PLATFORM_SOURCES_MAMEDRIVERS))
+# into mame-<board>/build/mamedrivers/rapi-circle; genie scopes the driver archive and
+# generated dir by it (bin/mame_$(MAMEDRIVERS_SUBTARGET)/, generated/mame/$(MAMEDRIVERS_SUBTARGET)/).
 # host/Makefile links that shared engine and swaps in a per-PLATFORM drivlist it
 # generates itself, so each kernel carries only its own platform's machines.
-UNION_SUBTARGET = union
+MAMEDRIVERS_SUBTARGET = mamedrivers
 
 # --- Sinclair defaults strings ---
 MACHINE_STRING_spectrum     = spectrum

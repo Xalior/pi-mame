@@ -8,8 +8,8 @@
 # half — the engine framework (libemu, libutil, the OSD core) and all of
 # 3rdparty (bgfx, zlib, expat, flac, …) — is byte-identical across every
 # platform we ship, so it is compiled exactly ONCE per board here, as a single
-# UNION subtarget (SUBTARGET=union, SOURCES = every shipped platform's drivers
-# together). The union's device/driver archives hold the SUPERSET device closure
+# mamedrivers subtarget (SUBTARGET=mamedrivers, SOURCES = every shipped platform's drivers
+# together). The mamedrivers device/driver archives hold the SUPERSET device closure
 # of all platforms; host/Makefile then links each platform kernel against that
 # one shared engine with a per-platform drivlist it generates itself, so the
 # linker keeps only that platform's machines and the kernel stays its usual size.
@@ -61,21 +61,21 @@ command -v aarch64-none-elf-ar >/dev/null || {
 # Read a machines.mk fact without pulling in the Circle build.
 q() { make -s -f "$MACHINES_MK" "print-$1"; }
 
-SUBTARGET="$(q UNION_SUBTARGET)"
-SOURCES="$(q PLATFORM_SOURCES_UNION | tr -s ' ' ',')"
+SUBTARGET="$(q MAMEDRIVERS_SUBTARGET)"
+SOURCES="$(q PLATFORM_SOURCES_MAMEDRIVERS | tr -s ' ' ',')"
 [ -n "$SUBTARGET" ] && [ -n "$SOURCES" ] || {
-    echo "build-mame.sh: UNION_SUBTARGET / PLATFORM_SOURCES_UNION empty in machines.mk" >&2
+    echo "build-mame.sh: MAMEDRIVERS_SUBTARGET / PLATFORM_SOURCES_MAMEDRIVERS empty in machines.mk" >&2
     exit 2
 }
 
 mkdir -p "$ROOT/build"
 cd "$MAMETREE"
 
-echo "=== building $BOARD union engine (subtarget=$SUBTARGET, tree=mame-$BOARD, build-dir=build/union) ==="
-# BUILDDIR=build/union: the board tree's single build. genie appends the TARGETOS
-# subdir, so archives land in mame-$BOARD/build/union/rapi-circle/.
+echo "=== building $BOARD mamedrivers engine (subtarget=$SUBTARGET, tree=mame-$BOARD, build-dir=build/mamedrivers) ==="
+# BUILDDIR=build/mamedrivers: the board tree's single build. genie appends the TARGETOS
+# subdir, so archives land in mame-$BOARD/build/mamedrivers/rapi-circle/.
 make -j"$(getconf _NPROCESSORS_ONLN)" \
-    BUILDDIR="build/union" \
+    BUILDDIR="build/mamedrivers" \
     TARGETOS=rapi-circle \
     PLATFORM=arm64 \
     OSD=sdl \

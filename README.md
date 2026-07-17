@@ -193,14 +193,14 @@ git clone --recursive https://github.com/Xalior/pi-mame.git
 cd pi-mame
 
 make deps      # circle-stdlib worlds (multicore, one per board) + the SDL2 shim
-make mame      # the board's ONE shared union MAME engine — the long one; logs:
+make mame      # the board's ONE shared mamedrivers engine — the long one; logs:
                #   build/mame-build-<board>.log. Default RAPI_BOARD=rpi4; add
                #   RAPI_BOARD=rpi3|rpi5 to build another board (each in its own
                #   mame-<board> tree). (genie's final host-style link fails by
                #   design; the archives are the product and the kernel links itself)
 make kernels   # every platform binary + every machine's kernel8-<machine>.img
                #   + the boot picker — each platform kernel links the shared
-               #   union engine with its own drivlist. See docs/sinclair/,
+               #   mamedrivers engine with its own drivlist. See docs/sinclair/,
                #   docs/amstrad/ and docs/commodore/ for the full list, or
                #   `make kernel MACHINE=<name>` for one
 
