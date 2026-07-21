@@ -1,24 +1,28 @@
 #!/bin/sh
-# mkcard.sh — assemble a platform card tree in build/card-<platform>-<tier>/.
+# mkcard.sh — assemble a platform card tree in build/card-<platform>-<tier>-<board>/.
 #
 # Usage: scripts/mkcard.sh <platform> <free|public> [assets-dir]
+#        board comes from $RAPI_BOARD (rpi3|rpi4|rpi5; default rpi4).
 #
-# A platform card is one card per vendor-class (sinclair, amstrad, …): the boot
-# picker is the front door, and one platform binary serves every machine the
-# card can run. The FREE/PUBLIC split is a CARD split, not a build split — the
-# free and public cards carry the IDENTICAL platform binary and differ only in
-# two generated things: the bootmenu.cfg (free lists only all-free machines;
-# public the full roster) and the asset bundle.
+# A platform card is one card per vendor-class (sinclair, amstrad, …) AND per
+# board: pi-mame ships PER-BOARD cards, so each card carries exactly ONE board's
+# firmware, picker and core. The boot picker is the front door; one platform
+# binary serves every machine the card can run. The FREE/PUBLIC split is a CARD
+# split, not a build split — the free and public cards carry the IDENTICAL
+# platform binary and differ only in two generated things: the bootmenu.cfg
+# (free lists only all-free machines; public the full roster) and the asset
+# bundle.
 #
 # The tree is a complete FAT-root layout:
-#   pi-mame-boot-rpi4.img  the boot picker (what the Pi firmware boots)
-#   pi-mame-core-rpi4.img  the platform binary — the MAME core (what the picker
-#                          chain-boots and patches per pick; board token rpi4
-#                          matches SYSTEMBIT, see rapi-bootloader/menu-loader/kernel.h)
+#   pi-mame-boot-<board>.img  the boot picker (what the Pi firmware boots)
+#   kernel-<board>.img        the platform binary — the MAME core. The picker
+#                             chain-boots it by this GENERIC name (the bootloader
+#                             is board-generic and carries no pi-mame refs;
+#                             menu-loader/kernel.h bakes SD:/kernel-<board>.img).
 #   bootmenu.cfg       generated for this platform + tier (gen-bootmenu.sh)
-#   config.txt         our host/config-card.txt ([pi4] boots the picker)
+#   config.txt         our host/config-card.txt (firmware boots the picker)
 #   cmdline.txt        the card's regional canvas (see the note below)
-#   firmware           start4.elf, fixups, dtbs, armstub — Circle's pinned revision
+#   firmware           this board's Foundation firmware set + DTBs (Circle's boot/)
 #   roms/ next/ carts/ the tier's assets, if an assets dir is given
 #
 # Regional canvas: cmdline.txt is per-CARD, not per-machine, and a platform can
@@ -37,38 +41,64 @@ case "$TIER" in
     *) echo "mkcard.sh: tier must be 'free' or 'public', got '$TIER'" >&2; exit 2 ;;
 esac
 
-# On-card board token: the picker's compile-time SYSTEMBIT (rapi-bootloader/menu-loader/kernel.h)
-# and Circle's image suffix. PoC3 parameterizes this per board.
-BOARD=rpi4
+# One card per board. RAPI_BOARD selects the picker image, the core, the circle
+# world (for firmware) and the on-card board token in every filename.
+BOARD="${RAPI_BOARD:-rpi4}"
+case "$BOARD" in
+    rpi3|rpi4|rpi5) ;;
+    *) echo "mkcard.sh: unknown RAPI_BOARD '$BOARD' (rpi3|rpi4|rpi5)" >&2; exit 2 ;;
+esac
 
-PICKER="$ROOT/rapi-bootloader/menu-loader/kernel8-rpi4.img"
-BINARY="$ROOT/host/kernel8-$PLATFORM.img"
-SD="$ROOT/build/card-$PLATFORM-$TIER"
+# The picker image Circle names per board (RASPPI baked into its world):
+#   rpi3 -> kernel8.img   rpi4 -> kernel8-rpi4.img   rpi5 -> kernel_2712.img
+case "$BOARD" in
+    rpi3) PICKER_IMG=kernel8.img ;;
+    rpi4) PICKER_IMG=kernel8-rpi4.img ;;
+    rpi5) PICKER_IMG=kernel_2712.img ;;
+esac
 
-[ -f "$PICKER" ] || { echo "mkcard.sh: $PICKER not built (make picker)" >&2; exit 1; }
-[ -f "$BINARY" ] || { echo "mkcard.sh: $BINARY not built (make -C host PLATFORM=$PLATFORM)" >&2; exit 1; }
+PICKER="$ROOT/rapi-bootloader/menu-loader/build/$BOARD/$PICKER_IMG"
+BINARY="$ROOT/host/build/$BOARD/kernel8-$PLATFORM.img"
+SD="$ROOT/build/card-$PLATFORM-$TIER-$BOARD"
 
-# Firmware + ARM stub via Circle's own boot makefile (pinned revision). The
-# circle world is per-board (circle-stdlib-rpi3/rpi4/rpi5); the card is a Pi 4
-# artifact, so its firmware comes from the rpi4 world.
+[ -f "$PICKER" ] || { echo "mkcard.sh: $PICKER not built (make -C rapi-bootloader menu-loader-$BOARD)" >&2; exit 1; }
+[ -f "$BINARY" ] || { echo "mkcard.sh: $BINARY not built (make -C host RAPI_BOARD=$BOARD PLATFORM=$PLATFORM)" >&2; exit 1; }
+
+# Firmware + ARM stub via Circle's own boot makefile (pinned revision). Firmware
+# is board-agnostic Foundation firmware; the board's own circle world carries it.
 BOOTDIR="$ROOT/circle-libsdl2/circle-stdlib-$BOARD/libs/circle/boot"
-make -C "$BOOTDIR" firmware armstub64
+make -C "$BOOTDIR" firmware
+[ "$BOARD" = rpi4 ] && make -C "$BOOTDIR" armstub64 || true
+
+# Per-board Foundation firmware set. Pi 4 loads a secondary-core armstub; Pi 3
+# loads its stage-1 bootcode.bin + start.elf; Pi 5 boots from EEPROM firmware
+# (no start*.elf) and needs the d0-stepping overlay.
+case "$BOARD" in
+    rpi3) FW="bootcode.bin start.elf fixup.dat bcm2710-rpi-zero-2-w.dtb bcm2710-rpi-cm0.dtb" ;;
+    rpi4) FW="start4.elf fixup4.dat armstub8-rpi4.bin bcm2711-rpi-4-b.dtb bcm2711-rpi-400.dtb bcm2711-rpi-cm4.dtb" ;;
+    rpi5) FW="bcm2712-rpi-5-b.dtb bcm2712-rpi-500.dtb bcm2712d0-rpi-5-b.dtb" ;;
+esac
+FW="$FW LICENCE.broadcom COPYING.linux"
 
 rm -rf "$SD"
 mkdir -p "$SD"
 
-for f in start4.elf fixup4.dat bcm2711-rpi-4-b.dtb bcm2711-rpi-400.dtb \
-         bcm2711-rpi-cm4.dtb LICENCE.broadcom COPYING.linux \
-         armstub8-rpi4.bin; do
-    cp "$BOOTDIR/$f" "$SD/"
+for f in $FW; do
+    if [ -f "$BOOTDIR/$f" ]; then cp "$BOOTDIR/$f" "$SD/"; \
+    else echo "mkcard.sh: warning: firmware file $f not in $BOOTDIR" >&2; fi
 done
+if [ "$BOARD" = rpi5 ]; then
+    mkdir -p "$SD/overlays"
+    [ -f "$BOOTDIR/bcm2712d0.dtbo" ] && cp "$BOOTDIR/bcm2712d0.dtbo" "$SD/overlays/" \
+        || echo "mkcard.sh: warning: bcm2712d0.dtbo not in $BOOTDIR" >&2
+fi
 
-# Our config.txt boots pi-mame-boot-rpi4.img (the PICKER) on a Pi 4; the picker
-# then chain-boots pi-mame-core-rpi4.img (the platform binary — the MAME core).
+# Firmware boots pi-mame-boot-<board>.img (the PICKER); the picker chain-boots
+# kernel-<board>.img (the platform binary — the MAME core).
 cp "$ROOT/host/config-card.txt" "$SD/config.txt"
 cp "$ROOT/host/cmdline-pal.txt" "$SD/cmdline.txt"
 cp "$PICKER" "$SD/pi-mame-boot-$BOARD.img"
-cp "$BINARY" "$SD/pi-mame-core-$BOARD.img"
+cp "$BINARY" "$SD/kernel-$BOARD.img"
 
 # The tier's menu, generated fresh from the manifest.
 "$ROOT/scripts/gen-bootmenu.sh" "$PLATFORM" "$TIER" > "$SD/bootmenu.cfg"
@@ -81,5 +111,5 @@ else
     echo "mkcard.sh: no assets dir given — add roms/ (and next/, carts/) to the card yourself" >&2
 fi
 
-echo "platform card ready: $SD"
+echo "platform card ready ($BOARD): $SD"
 find "$SD" -maxdepth 2 | sort

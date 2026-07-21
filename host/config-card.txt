@@ -1,27 +1,53 @@
 # OUR card boot config — a platform card. The Raspberry Pi firmware reads this
-# at power-on and boots the kernel named for the board it finds itself on.
+# at power-on and boots the picker image named for the board it finds itself on.
 #
 # Two vocabularies meet here, and they are NOT the same word:
 #   - the [pi4] SECTION name is the Foundation firmware's board filter. It is
 #     fixed by the boot firmware (the firmware chooses which section applies) —
 #     not ours to rename.
-#   - the `rpi4` in the kernel FILENAME is Circle's image-suffix vocabulary
-#     (Circle's own images are kernel8-rpi4.img), which also reads as "RPi".
-#     It is the on-card board token, matching the picker's compile-time
-#     SYSTEMBIT (rapi-bootloader/menu-loader/kernel.h).
+#   - the `rpi4` in the picker FILENAME (pi-mame-boot-rpi4.img) is our on-card
+#     board token, matching the payload named kernel-rpi4.img the picker then
+#     chain-boots and the per-board build tree (build/rpi4).
 #
-# On a platform card the firmware boots the picker, which then chain-boots the
-# MAME core (pi-mame-core-rpi4.img).
+# On a platform card the firmware boots the picker (pi-mame-boot-<board>.img),
+# which reads bootmenu.cfg and chain-boots the MAME core (kernel-<board>.img —
+# the generic name the picker bakes; the generic bootloader carries no pi-mame
+# references, so its payload is named by board alone).
 #
-# PoC3 adds a [pi5] section here pointing at that board's kernel; a section
-# fans multiple firmware filters (e.g. [pi02], [pi3], [pi3+]) into one Circle
-# build-family core as boards are added.
+# This is a multi-section router, but pi-mame ships PER-BOARD cards: a given
+# card carries only its own board's firmware and images, so only its section
+# ever resolves. The other sections are inert (their kernels are not on the
+# card) and simply document the full board routing.
 
 arm_64bit=1
 kernel_address=0x80000
 initial_turbo=0
 
+# --- RASPPI 3 world (BCM2837): pi-mame-boot-rpi3.img ---
+[pi02]
+kernel=pi-mame-boot-rpi3.img
+[pi2]
+kernel=pi-mame-boot-rpi3.img
+[pi3]
+kernel=pi-mame-boot-rpi3.img
+[pi3+]
+kernel=pi-mame-boot-rpi3.img
+[cm3]
+kernel=pi-mame-boot-rpi3.img
+
+# --- RASPPI 4 world (BCM2711): pi-mame-boot-rpi4.img ---
 [pi4]
 armstub=armstub8-rpi4.bin
 kernel=pi-mame-boot-rpi4.img
 max_framebuffers=2
+[cm4]
+otg_mode=1
+armstub=armstub8-rpi4.bin
+kernel=pi-mame-boot-rpi4.img
+max_framebuffers=2
+
+# --- RASPPI 5 world (BCM2712): pi-mame-boot-rpi5.img ---
+[pi5]
+kernel=pi-mame-boot-rpi5.img
+[cm5]
+kernel=pi-mame-boot-rpi5.img

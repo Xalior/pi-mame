@@ -18,19 +18,22 @@
 # circle-libsdl2 + circle-stdlib once, carrying the 0x800 defaults block; the
 # machine name and its media ride that block as plain text, written before boot.
 #
-#   make PLATFORM=<p>        -> kernel8-<p>.img — the platform binary.
-#                               Unpatched (empty block) it IS that platform's
-#                               no-options kernel: MAME boots its own system-
-#                               selection list. Ships on the platform card as
-#                               pi-mame-core-rpi4.img, chain-booted by the picker.
+# Every image lands under build/<board>/ (RAPI_BOARD, default rpi4), so the
+# three boards' outputs never collide:
+#   make PLATFORM=<p>        -> build/<board>/kernel8-<p>.img — the platform
+#                               binary. Unpatched (empty block) it IS that
+#                               platform's no-options kernel: MAME boots its own
+#                               system-selection list. Ships on the platform card
+#                               as pi-mame-core-<board>.img, chain-booted by the picker.
 #   make PLATFORM=<p> machines
-#                            -> kernel8-<machine>.img for every machine of that
-#                               platform, each a copy of kernel8-<p>.img with
-#                               the machine's defaults string patched in at
-#                               0x800 (host tool patch-defaults). ONE link per
-#                               platform, then one byte-patch per machine — no
-#                               per-machine compile.
-#   make PLATFORM=<p> kernel8-<machine>.img  -> that single machine's image.
+#                            -> build/<board>/kernel8-<machine>.img for every
+#                               machine of that platform, each a copy of
+#                               build/<board>/kernel8-<p>.img with the machine's
+#                               defaults string patched in at 0x800 (host tool
+#                               patch-defaults). ONE link per platform, then one
+#                               byte-patch per machine — no per-machine compile.
+#   make PLATFORM=<p> build/<board>/kernel8-<machine>.img -> that single image.
+#   make clean-board         -> drop just this board's build/<board>/ tree.
 #
 # The per-machine facts (which platform a machine belongs to, its defaults
 # string, its asset dependencies) are data in machines.mk, not compile-time
@@ -58,6 +61,18 @@ include machines.mk
 
 ROOT = ..
 
+# Board-scoped build directory. EVERY artifact this invocation generates —
+# the fixed-name objects (kernel.o, main.o, …), the per-platform driver
+# archives and drivlist, the host patch tool, and the final .elf/.map/.lst/.img
+# — lands under build/<board>/. The fixed-name objects are board-specific
+# (compiled against a per-board circle world, -mcpu and -DRASPPI) yet share one
+# name across boards, so a flat build dir silently relinks one board's stale
+# objects into another board's kernel (a corrupt image, no build error). A dir
+# per board keeps all three boards' outputs isolated: no `make clean` between
+# boards, each board its own cacheable unit, and building one never touches a
+# sibling board's images. Mirrors circle-libsdl2's build/<board>/ isolation.
+OBJDIR = build/$(RAPI_BOARD)
+
 # The platform this invocation links. Every driver-scoped path below is scoped
 # to it; the ENGINE it links against is the board's shared mamedrivers tree.
 PLATFORM ?= sinclair
@@ -73,12 +88,12 @@ endif
 MAMESRC   = $(ROOT)/mame-$(RAPI_BOARD)
 MAMEBUILD = $(MAMESRC)/build/mamedrivers/rapi-circle
 
-TARGET = kernel8-$(PLATFORM)
+TARGET = $(OBJDIR)/kernel8-$(PLATFORM)
 
 # No machine is baked: the kernel object is the same for every image and every
 # platform. The defaults receiver (defaults.o) carries the 0x800 block and the
-# entry trampoline the linker script pins.
-OBJS = main.o kernel.o defaults.o mamemain.o circlefile.o circle_stubs.o xthreading.o
+# entry trampoline the linker script pins. All board-scoped, under $(OBJDIR).
+OBJS = $(addprefix $(OBJDIR)/,main.o kernel.o defaults.o mamemain.o circlefile.o circle_stubs.o xthreading.o)
 
 STANDARD = -std=gnu++23 -Wno-volatile
 
@@ -102,8 +117,8 @@ MAME_OBJS = \
 #    and must not touch FatFs directly).
 # Both are local copies with the member deleted, named per platform so the
 # platforms' copies never collide in this shared build directory.
-LIBOSD_NOMAIN   = libosd_sdl-nomain-$(PLATFORM).a
-LIBOCORE_NOFILE = libocore_sdl-nofile-$(PLATFORM).a
+LIBOSD_NOMAIN   = $(OBJDIR)/libosd_sdl-nomain-$(PLATFORM).a
+LIBOCORE_NOFILE = $(OBJDIR)/libocore_sdl-nofile-$(PLATFORM).a
 
 # libprecompile.a is excluded (PCH carrier, nothing to link). libqtdbg_sdl.a
 # stays in: built with USE_QTDEBUG=0 it holds only the not-supported debugger
@@ -149,13 +164,13 @@ endif
 
 INCLUDE := -I $(ROOT)/circle-libsdl2/include $(CIRCLE_STDLIB_INCLUDES) $(INCLUDE)
 
-$(LIBOSD_NOMAIN): $(MAMEBUILD)/bin/libosd_sdl.a
+$(LIBOSD_NOMAIN): $(MAMEBUILD)/bin/libosd_sdl.a | $(OBJDIR)
 	@echo "  AR    $@ (libosd_sdl.a minus sdlmain.o)"
 	@cp $< $@
 	@chmod u+w $@
 	@$(AR) d $@ sdlmain.o
 
-$(LIBOCORE_NOFILE): $(MAMEBUILD)/bin/libocore_sdl.a
+$(LIBOCORE_NOFILE): $(MAMEBUILD)/bin/libocore_sdl.a | $(OBJDIR)
 	@echo "  AR    $@ (libocore_sdl.a minus posixfile.o posixdir.o)"
 	@cp $< $@
 	@chmod u+w $@
@@ -202,29 +217,29 @@ MAME_WARNINGS = -Wall -Wno-cast-align -Wno-conversion -Wno-nonnull \
 	-Wno-sign-compare -Wno-stringop-overflow -Wno-stringop-overread \
 	-Wno-unknown-pragmas -Wno-xor-used-as-pow
 
-mamemain.o: mamemain.cpp
+$(OBJDIR)/mamemain.o: mamemain.cpp | $(OBJDIR)
 	@echo "  CPP   $@ (MAME env)"
 	@$(MAME_CXX) $(MAME_DEFINES) $(MAME_INCLUDES) \
 		-O3 -fno-strict-aliasing $(MAME_WARNINGS) \
 		-c -o $@ $<
 
 # Overrides Rules.mk's %.d rule, whose Circle flags can't see MAME headers.
-mamemain.d: mamemain.cpp
+$(OBJDIR)/mamemain.d: mamemain.cpp | $(OBJDIR)
 	@$(MAME_CXX) $(MAME_DEFINES) $(MAME_INCLUDES) \
-		-M -MT mamemain.o -MT $@ -MF $@ $<
+		-M -MT $(OBJDIR)/mamemain.o -MT $@ -MF $@ $<
 
 # circlefile.cpp is MAME's osd_file/osd::directory surface reimplemented over
 # the shim's core-0 I/O service, so it compiles in the same MAME environment
 # as the code it replaces (posixfile.cpp), not the Circle one.
-circlefile.o: circlefile.cpp
+$(OBJDIR)/circlefile.o: circlefile.cpp | $(OBJDIR)
 	@echo "  CPP   $@ (MAME env)"
 	@$(MAME_CXX) $(MAME_DEFINES) $(MAME_INCLUDES) \
 		-O3 -fno-strict-aliasing $(MAME_WARNINGS) \
 		-c -o $@ $<
 
-circlefile.d: circlefile.cpp
+$(OBJDIR)/circlefile.d: circlefile.cpp | $(OBJDIR)
 	@$(MAME_CXX) $(MAME_DEFINES) $(MAME_INCLUDES) \
-		-M -MT circlefile.o -MT $@ -MF $@ $<
+		-M -MT $(OBJDIR)/circlefile.o -MT $@ -MF $@ $<
 
 # --- Per-platform drivlist, generated against the shared mamedrivers engine ---
 # The board's mamedrivers build compiled every platform's drivers into shared
@@ -238,16 +253,16 @@ circlefile.d: circlefile.cpp
 PYTHON  ?= python3
 MAKEDEP  = $(MAMESRC)/scripts/build/makedep.py
 MAMELST  = $(MAMESRC)/src/mame/mame.lst
-DRIVLIST_FLT = drivlist-$(PLATFORM).flt
-DRIVLIST_SRC = drivlist-$(PLATFORM).cpp
-DRIVLIST_OBJ = drivlist-$(PLATFORM).o
+DRIVLIST_FLT = $(OBJDIR)/drivlist-$(PLATFORM).flt
+DRIVLIST_SRC = $(OBJDIR)/drivlist-$(PLATFORM).cpp
+DRIVLIST_OBJ = $(OBJDIR)/drivlist-$(PLATFORM).o
 
-$(DRIVLIST_FLT): machines.mk $(MAMELST)
+$(DRIVLIST_FLT): machines.mk $(MAMELST) | $(OBJDIR)
 	@echo "  FLT   $@ ($(PLATFORM) sources)"
 	@$(PYTHON) $(MAKEDEP) -r $(MAMESRC) sourcesfilter -l $(MAMELST) \
 		$(PLATFORM_SOURCES_$(PLATFORM)) > $@
 
-$(DRIVLIST_SRC): $(DRIVLIST_FLT) $(MAMELST)
+$(DRIVLIST_SRC): $(DRIVLIST_FLT) $(MAMELST) | $(OBJDIR)
 	@echo "  DRVL  $@"
 	@$(PYTHON) $(MAKEDEP) -r $(MAMESRC) driverlist $(MAMELST) -f $(DRIVLIST_FLT) > $@
 
@@ -255,11 +270,27 @@ $(DRIVLIST_SRC): $(DRIVLIST_FLT) $(MAMELST)
 # generated MAME source: emu.h + the driver_list array). Board-specific tuning
 # (-mcpu, -DRASPPI) rides the cross wrapper via RAPI_BOARD, so switching boards
 # in this dir needs a clean first, exactly as the fixed-name Circle objects do.
-$(DRIVLIST_OBJ): $(DRIVLIST_SRC)
+$(DRIVLIST_OBJ): $(DRIVLIST_SRC) | $(OBJDIR)
 	@echo "  CPP   $@ (MAME env, $(PLATFORM) drivlist)"
 	@$(MAME_CXX) $(MAME_DEFINES) $(MAME_INCLUDES) \
 		-O3 -fno-strict-aliasing $(MAME_WARNINGS) \
 		-c -o $@ $<
+
+# Board-scoped compile into $(OBJDIR) for the plain (Circle-env) objects and
+# their deps — kernel.o, main.o, defaults.o, circle_stubs.o, xthreading.o. These
+# more-specific pattern rules win over Rules.mk's in-place %.o/%.d (GNU make
+# prefers the shortest stem), so nothing lands in the source dir. The MAME-env
+# objects (mamemain.o, circlefile.o, the drivlist) have explicit rules above
+# that override these for their targets.
+$(OBJDIR)/%.o: %.cpp | $(OBJDIR)
+	@echo "  CPP   $@"
+	@$(CPP) $(CPPFLAGS) -c -o $@ $<
+
+$(OBJDIR)/%.d: %.cpp | $(OBJDIR)
+	@$(CPP) $(CPPFLAGS) -M -MG -MT $(@:.d=.o) -MT $@ -MF $@ $<
+
+$(OBJDIR):
+	@mkdir -p $(OBJDIR)
 
 -include $(DEPS)
 
@@ -280,8 +311,9 @@ include ../mk/ld/circle-app.mk
 # patch-defaults is host-native (it edits an image on the build host, it never
 # runs on the Pi), so it compiles with the host toolchain, not the cross one.
 HOST_CXX ?= c++
-patch-defaults: patch-defaults.cpp ../rapi-bootloader/defaultsblock/defaultsblock.cpp \
-		../rapi-bootloader/defaultsblock/defaultsblock.h
+PATCH_DEFAULTS = $(OBJDIR)/patch-defaults
+$(PATCH_DEFAULTS): patch-defaults.cpp ../rapi-bootloader/defaultsblock/defaultsblock.cpp \
+		../rapi-bootloader/defaultsblock/defaultsblock.h | $(OBJDIR)
 	@echo "  HOSTCXX $@"
 	@$(HOST_CXX) -std=c++17 -I $(CIRCLEHOME)/include \
 		-o $@ patch-defaults.cpp ../rapi-bootloader/defaultsblock/defaultsblock.cpp
@@ -291,29 +323,36 @@ patch-defaults: patch-defaults.cpp ../rapi-bootloader/defaultsblock/defaultsbloc
 # machine is patched from ITS platform's binary ($(TARGET).img, this invocation's
 # platform); a machine belonging to another platform is refused, because its
 # defaults must never be stamped into the wrong vendor's engine.
-kernel8-%.img: $(TARGET).img patch-defaults machines.mk
+$(OBJDIR)/kernel8-%.img: $(TARGET).img $(PATCH_DEFAULTS) machines.mk | $(OBJDIR)
 	@if [ -z "$(MACHINE_STRING_$*)" ]; then \
 		echo "unknown machine '$*' — not in machines.mk MACHINE_STRING_*"; \
 		exit 1; \
 	fi
 	@if [ "$(MACHINE_PLATFORM_$*)" != "$(PLATFORM)" ]; then \
 		echo "machine '$*' belongs to platform '$(MACHINE_PLATFORM_$*)', not '$(PLATFORM)'"; \
-		echo "  build it with: make -C host PLATFORM=$(MACHINE_PLATFORM_$*) $@"; \
+		echo "  build it with: make -C host RAPI_BOARD=$(RAPI_BOARD) PLATFORM=$(MACHINE_PLATFORM_$*) $@"; \
 		exit 1; \
 	fi
 	@echo '  PATCH $@ <= [$(MACHINE_STRING_$*)]'
 	@cp $(TARGET).img $@
-	@./patch-defaults $@ '$(MACHINE_STRING_$*)'
+	@$(PATCH_DEFAULTS) $@ '$(MACHINE_STRING_$*)'
 
 # This platform's machines, each patched from this platform's binary. (The top
 # Makefile invokes `machines` once per platform, so the full roster is covered.)
-MACHINE_IMAGES = $(patsubst %,kernel8-%.img,$(PLATFORM_MACHINES_$(PLATFORM)))
+MACHINE_IMAGES = $(patsubst %,$(OBJDIR)/kernel8-%.img,$(PLATFORM_MACHINES_$(PLATFORM)))
 
 .PHONY: machines
 machines: $(MACHINE_IMAGES)
 
 .PHONY: clean-machines
 clean-machines:
-	rm -f $(MACHINE_IMAGES) patch-defaults \
+	rm -f $(MACHINE_IMAGES) $(PATCH_DEFAULTS) \
 		$(DRIVLIST_FLT) $(DRIVLIST_SRC) $(DRIVLIST_OBJ) \
 		$(LIBOSD_NOMAIN) $(LIBOCORE_NOFILE)
+
+# Board-scoped clean: drop just THIS board's entire build tree (build/<board>/),
+# leaving the sibling boards' images and objects untouched. The whole reason for
+# the per-board dir — rebuild one board from scratch without disturbing another.
+.PHONY: clean-board
+clean-board:
+	rm -rf $(OBJDIR)

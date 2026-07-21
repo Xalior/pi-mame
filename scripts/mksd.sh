@@ -1,50 +1,69 @@
 #!/bin/sh
-# mksd.sh — assemble a copy-to-card SD tree in build/sd/.
+# mksd.sh — assemble a copy-to-card SD tree in build/sd-<machine>-<board>/.
 #
 # Usage: scripts/mksd.sh <machine> [assets-dir]
+#        board comes from $RAPI_BOARD (rpi3|rpi4|rpi5; default rpi4).
 #
-# One machine's single-purpose card. For a platform card (the boot picker plus
-# a menu of a platform's machines) use scripts/mkcard.sh instead.
+# One machine's single-purpose card, for ONE board (pi-mame ships per-board
+# cards). For a platform card (the boot picker plus a menu of a platform's
+# machines) use scripts/mkcard.sh instead.
 #
-# The tree is a complete FAT-root layout: Raspberry Pi firmware (fetched at
-# the revision pinned by circle/boot/Makefile, using Circle's own download
-# mechanism), our host/config-machine.txt as config.txt (firmware boots the MAME
-# core directly, no picker), the machine's regional canvas as cmdline.txt, the
-# chosen kernel image as pi-mame-core-rpi4.img, and — if an assets directory is
-# given — roms/, next/, and carts/ copied from it. ROMs, disk images, and
-# cartridges are yours to provide; they are not part of this repository.
+# The tree is a complete FAT-root layout: this board's Raspberry Pi firmware
+# (fetched at the revision pinned by circle/boot/Makefile, using Circle's own
+# download mechanism), our host/config-machine.txt as config.txt (firmware boots
+# the MAME core directly, no picker), the machine's regional canvas as
+# cmdline.txt, the chosen kernel image as kernel-<board>.img, and — if an assets
+# directory is given — roms/, next/, and carts/ copied from it. ROMs, disk
+# images, and cartridges are yours to provide; not part of this repository.
 
 set -e
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 MACHINE="${1:?usage: mksd.sh <machine> [assets-dir]}"
 ASSETS="$2"
-SD="$ROOT/build/sd"
-IMG="$ROOT/host/kernel8-$MACHINE.img"
 
-# On-card board token: the core's board suffix (Circle's image-suffix vocab,
-# matching the picker's SYSTEMBIT). PoC3 parameterizes this per board.
-BOARD=rpi4
+# One card per board. RAPI_BOARD selects the core, the circle world (firmware)
+# and the on-card board token in every filename.
+BOARD="${RAPI_BOARD:-rpi4}"
+case "$BOARD" in
+    rpi3|rpi4|rpi5) ;;
+    *) echo "mksd.sh: unknown RAPI_BOARD '$BOARD' (rpi3|rpi4|rpi5)" >&2; exit 2 ;;
+esac
 
-[ -f "$IMG" ] || { echo "mksd.sh: $IMG not built (make -C host MACHINE=$MACHINE)" >&2; exit 1; }
+SD="$ROOT/build/sd-$MACHINE-$BOARD"
+IMG="$ROOT/host/build/$BOARD/kernel8-$MACHINE.img"
 
-# Firmware + ARM stub via Circle's own boot makefile (pinned revision). The
-# circle world is per-board (circle-stdlib-rpi3/rpi4/rpi5); the card is a Pi 4
-# artifact, so its firmware comes from the rpi4 world.
+[ -f "$IMG" ] || { echo "mksd.sh: $IMG not built (make -C host RAPI_BOARD=$BOARD MACHINE=$MACHINE)" >&2; exit 1; }
+
+# Firmware + ARM stub via Circle's own boot makefile (pinned revision). Firmware
+# is board-agnostic Foundation firmware; the board's own circle world carries it.
 BOOTDIR="$ROOT/circle-libsdl2/circle-stdlib-$BOARD/libs/circle/boot"
-make -C "$BOOTDIR" firmware armstub64
+make -C "$BOOTDIR" firmware
+[ "$BOARD" = rpi4 ] && make -C "$BOOTDIR" armstub64 || true
+
+# Per-board Foundation firmware set (see mkcard.sh for the per-board rationale).
+case "$BOARD" in
+    rpi3) FW="bootcode.bin start.elf fixup.dat bcm2710-rpi-zero-2-w.dtb bcm2710-rpi-cm0.dtb" ;;
+    rpi4) FW="start4.elf fixup4.dat armstub8-rpi4.bin bcm2711-rpi-4-b.dtb bcm2711-rpi-400.dtb bcm2711-rpi-cm4.dtb" ;;
+    rpi5) FW="bcm2712-rpi-5-b.dtb bcm2712-rpi-500.dtb bcm2712d0-rpi-5-b.dtb" ;;
+esac
+FW="$FW LICENCE.broadcom COPYING.linux"
 
 rm -rf "$SD"
 mkdir -p "$SD"
 
-for f in start4.elf fixup4.dat bcm2711-rpi-4-b.dtb bcm2711-rpi-400.dtb \
-         bcm2711-rpi-cm4.dtb LICENCE.broadcom COPYING.linux \
-         armstub8-rpi4.bin; do
-    cp "$BOOTDIR/$f" "$SD/"
+for f in $FW; do
+    if [ -f "$BOOTDIR/$f" ]; then cp "$BOOTDIR/$f" "$SD/"; \
+    else echo "mksd.sh: warning: firmware file $f not in $BOOTDIR" >&2; fi
 done
+if [ "$BOARD" = rpi5 ]; then
+    mkdir -p "$SD/overlays"
+    [ -f "$BOOTDIR/bcm2712d0.dtbo" ] && cp "$BOOTDIR/bcm2712d0.dtbo" "$SD/overlays/" \
+        || echo "mksd.sh: warning: bcm2712d0.dtbo not in $BOOTDIR" >&2
+fi
 
-# Our config.txt boots pi-mame-core-rpi4.img (the MAME core) directly on a Pi 4.
+# Firmware boots kernel-<board>.img (the MAME core) directly on this board.
 cp "$ROOT/host/config-machine.txt" "$SD/config.txt"
-cp "$IMG" "$SD/pi-mame-core-$BOARD.img"
+cp "$IMG" "$SD/kernel-$BOARD.img"
 
 # The regional canvas: a machine's region picks its television. The American
 # 60Hz machines fill the NTSC tube (720x480); everything else fills PAL
@@ -66,5 +85,5 @@ else
     echo "mksd.sh: no assets dir given — add roms/ (and next/ for tbblue) to the card yourself" >&2
 fi
 
-echo "SD tree ready: $SD"
+echo "SD tree ready ($BOARD): $SD"
 find "$SD" -maxdepth 2 | sort

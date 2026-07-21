@@ -26,14 +26,18 @@
 #   make verify-kernels [RAPI_BOARD=<b>]  truth-gate: every kernel image exists,
 #                                each under the 256MB ceiling
 #   make bootmenu PLATFORM=<p> TIER=<free|public>   a card's bootmenu.cfg -> stdout
-#   make card PLATFORM=<p> TIER=<free|public> [ASSETS=<dir>]
-#                                a platform card tree: the picker on-card as
-#                                pi-mame-boot-rpi4.img (firmware boots it), the
-#                                platform binary as pi-mame-core-rpi4.img,
+#   make card PLATFORM=<p> TIER=<free|public> [RAPI_BOARD=<b>] [ASSETS=<dir>]
+#                                a per-board platform card tree
+#                                (build/card-<p>-<tier>-<board>/): the picker
+#                                on-card as pi-mame-boot-<board>.img (firmware
+#                                boots it), the platform binary as the generic
+#                                kernel-<board>.img (the picker chain-boots it),
 #                                a generated bootmenu.cfg, and the tier's assets
-#   make sd MACHINE=<m> [ASSETS=<dir>]   single-purpose copy-to-card tree
-#   make dist [TAG=<t>]          the whole release: every platform-card zip into
-#                                dist/ (pi-mame-<TAG>-<platform>-<tier>.zip)
+#   make sd MACHINE=<m> [RAPI_BOARD=<b>] [ASSETS=<dir>]  single-purpose per-board
+#                                copy-to-card tree (build/sd-<m>-<board>/)
+#   make dist [TAG=<t>] [BOARDS="rpi3 rpi4 rpi5"]   the whole release: one
+#                                platform-card zip per board × platform × tier
+#                                into dist/ (pi-mame-<TAG>-<platform>-<tier>-<board>.zip)
 #   make assets-free  [ASSETS=<dir>]     fetch the properly-redistributable ROMs
 #   make assets-public [ASSETS=<dir>]    fetch from public MAME-set mirrors
 #   make assets       [ASSETS=<dir>]     fetch both (free + public)
@@ -56,9 +60,17 @@ ASSETS     ?= ./my-assets
 # (sinclair/amstrad/commodore stay hand-maintained until PoC4 ports them on).
 DOCS_PLATFORM ?= amiga
 # Which board this build targets: rpi3 | rpi4 | rpi5. Selects the MAME source
-# tree (mame-<board>), the circle world, RASPPI and -mcpu. One board per
-# invocation; CI dispatches a job per board. Default rpi4 (the proven board).
+# tree (mame-<board>), the circle world, RASPPI and -mcpu, and the board-scoped
+# build tree every artifact lands in (host/build/<board>/, the picker's
+# menu-loader/build/<board>/). One board per invocation; CI dispatches a job per
+# board. Default rpi4 (the proven board). Exported so the card/sd/dist scripts
+# and the host sub-make all see the same board.
 RAPI_BOARD ?= rpi4
+export RAPI_BOARD
+# Every board pi-mame targets. `make dist` fans the whole card matrix across
+# these (board × platform × tier); override to build a subset (BOARDS=rpi4).
+BOARDS ?= rpi3 rpi4 rpi5
+export BOARDS
 # Release tag naming the card zips (pi-mame-<TAG>-<platform>-<tier>.zip). CI
 # passes the ref name; locally it defaults to `git describe` (else "dev").
 TAG ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
@@ -94,9 +106,12 @@ mame:
 platform:
 	@for p in $(PLATFORMS); do $(MAKE) -C host RAPI_BOARD=$(RAPI_BOARD) PLATFORM=$$p || exit 1; done
 
-# The platform card's front door (single-core boot world).
+# The platform card's front door (single-core boot world), built for this
+# board. The bootloader owns the per-board build (menu-loader/build/<board>/,
+# Circle-named image per RASPPI); it is board-generic and chain-boots the
+# generic kernel-<board>.img the card carries the core as.
 picker:
-	$(MAKE) -C rapi-bootloader/menu-loader
+	$(MAKE) -C rapi-bootloader menu-loader-$(RAPI_BOARD)
 
 # One single-purpose image: the machine's PLATFORM binary patched with <m>'s
 # defaults string.

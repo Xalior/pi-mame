@@ -5,23 +5,47 @@
 #   - the [pi4] SECTION name is the Foundation firmware's board filter. It is
 #     fixed by the boot firmware (the firmware chooses which section applies) —
 #     not ours to rename.
-#   - the `rpi4` in the kernel FILENAME is Circle's image-suffix vocabulary
-#     (Circle's own images are kernel8-rpi4.img), which also reads as "RPi".
-#     It is the on-card board token, matching the picker's compile-time
-#     SYSTEMBIT (rapi-bootloader/menu-loader/kernel.h).
+#   - the `rpi4` in the kernel FILENAME (kernel-rpi4.img) is our on-card board
+#     token, matching the per-board build tree (build/rpi4) and — on a platform
+#     card — the generic name the picker chain-boots.
 #
 # A single-machine card has no picker: the firmware boots the MAME core
-# (pi-mame-core-rpi4.img) directly.
+# (kernel-<board>.img) directly.
 #
-# PoC3 adds a [pi5] section here pointing at that board's kernel; a section
-# fans multiple firmware filters (e.g. [pi02], [pi3], [pi3+]) into one Circle
-# build-family core as boards are added.
+# This is a multi-section router, but pi-mame ships PER-BOARD cards: a given
+# card carries only its own board's firmware and image, so only its section
+# ever resolves. The other sections are inert (their kernels are not on the
+# card) and simply document the full board routing.
 
 arm_64bit=1
 kernel_address=0x80000
 initial_turbo=0
 
+# --- RASPPI 3 world (BCM2837): kernel-rpi3.img ---
+[pi02]
+kernel=kernel-rpi3.img
+[pi2]
+kernel=kernel-rpi3.img
+[pi3]
+kernel=kernel-rpi3.img
+[pi3+]
+kernel=kernel-rpi3.img
+[cm3]
+kernel=kernel-rpi3.img
+
+# --- RASPPI 4 world (BCM2711): kernel-rpi4.img ---
 [pi4]
 armstub=armstub8-rpi4.bin
-kernel=pi-mame-core-rpi4.img
+kernel=kernel-rpi4.img
 max_framebuffers=2
+[cm4]
+otg_mode=1
+armstub=armstub8-rpi4.bin
+kernel=kernel-rpi4.img
+max_framebuffers=2
+
+# --- RASPPI 5 world (BCM2712): kernel-rpi5.img ---
+[pi5]
+kernel=kernel-rpi5.img
+[cm5]
+kernel=kernel-rpi5.img

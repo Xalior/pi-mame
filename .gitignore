@@ -1,16 +1,22 @@
 build/
+# All host build artifacts are now board-scoped under host/build/<board>/
+# (objects, per-platform archives, the drivlist, the patch tool, and every
+# .elf/.map/.lst/.img). One directory to ignore instead of a pattern per type.
+host/build/
+# Legacy flat-layout artifacts (pre board-scoped-build-dir). No new build
+# writes here; these patterns keep any leftover flat artifacts from a prior
+# checkout ignored until they are swept. Safe to remove the files and these
+# lines once no flat host/*.img etc. remain.
 host/*.o
 host/*.d
 host/*.elf
 host/*.img
 host/*.lst
 host/*.map
-host/libosd_sdl-nomain.a
-assets/
-.DS_Store
 host/libosd_sdl-nomain-*.a
 host/libocore_sdl-nofile-*.a
 host/patch-defaults
-# Per-platform drivlist generated at host-link time (makedep.py output).
 host/drivlist-*.flt
 host/drivlist-*.cpp
+assets/
+.DS_Store
