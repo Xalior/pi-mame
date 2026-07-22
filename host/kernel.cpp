@@ -13,8 +13,13 @@
 // An empty (or absent) block appends nothing, so MAME boots its own
 // system-selection list — the degenerate "no-options" personality is just
 // the unpatched platform binary. The only other boot-time knobs are Circle's
-// FAT-root cmdline.txt options (framebuffer geometry via width=/height=,
-// socmaxtemp=) — platform boot config, not application configuration.
+// FAT-root cmdline.txt options (width=/height=, socmaxtemp=) — platform boot
+// config, not application configuration. What width=/height= MEANS is
+// per-board: on Pi 3/4 the firmware outputs that geometry as the video
+// signal, so the card sets the machine's raster (the PAL canvas) and the
+// panel does any stretching; on Pi 5 the firmware ignores mode requests
+// (every kernel inherits one native-EDID-mode surface), so the card sets
+// the native mode and MAME scales — see the per-board aspect flag below.
 //
 // The law/policy line is physical: the evergreen decrees below stay compiled
 // C, unreachable by any patcher. The string carries only what a machine is
@@ -62,12 +67,23 @@ void CSplitCores::Run(unsigned nCore)
 static const char *MameArgv[] = {
     "mame",
     "-video", "soft",
+#if RASPPI >= 5
+    // The Pi 5 firmware cannot output the machine's raster as the video
+    // signal (every kernel inherits one native-EDID-mode surface), so the
+    // boot-config geometry is that native mode and MAME's soft scaler
+    // stretches the frame to it, aspect preserved (pillarboxed). The
+    // scale is affordable on the Pi 5's CPU only — which is why this is
+    // baked per-board and never on the PAL boards below.
+    "-keepaspect",
+#else
     // keepaspect is desktop application surface; the appliance bakes it
     // off. The framebuffer IS the driver's raster (boot-config width=/
-    // height=), so the soft renderer blits 1:1 — MAME's assumed-4:3 CRT
-    // fit (a scale, glyph-destroying when it shrinks) never engages.
-    // Physical aspect is the GPU scaler's business.
+    // height=) and the firmware outputs it as the video signal, so the
+    // soft renderer blits 1:1 — MAME's assumed-4:3 CRT fit (a scale,
+    // glyph-destroying when it shrinks, CPU these boards cannot spare)
+    // never engages. Physical aspect is the panel's business.
     "-nokeepaspect",
+#endif
     "-numprocessors", "1",
     "-rompath", "/roms",
     "-cfg_directory", "/mame/cfg",
