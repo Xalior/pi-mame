@@ -52,6 +52,30 @@ PLATFORM_DISPLAY = {
     "amstrad": "Amstrad",
     "commodore": "Commodore",
     "amiga": "Amiga",
+    "atari": "Atari",
+}
+
+# Per-platform README intro paragraph. The machines table, assets tree and
+# shared-asset tables below it are fully generic; this paragraph is the one
+# hand-authored fact block per platform.
+PLATFORM_INTRO = {
+    "amiga": (
+        "The Arcadia Multi Select arcade platform: Arcadia Systems' "
+        "ten-interchangeable-game coin-op cabinet built on Amiga A500 "
+        "hardware (an A500 motherboard driving an external ROM cage through "
+        "the expansion port). Each `make kernel MACHINE=<name>` below bakes "
+        "one machine into its own `kernel8-<name>.img` — see the "
+        "[top-level README](../../README.md) for the build and the regional "
+        "canvas."
+    ),
+    "atari": (
+        "The 8-bit Atari computer line: the 400/800 originals and the "
+        "XL/XE range that followed them (MOS 6502C SALLY + ANTIC/GTIA/POKEY, "
+        "`atari400.cpp` in MAME). Each `make kernel MACHINE=<name>` below "
+        "bakes one machine into its own `kernel8-<name>.img` — see the "
+        "[top-level README](../../README.md) for the build and the regional "
+        "canvas."
+    ),
 }
 
 SYSTEM_MACROS = r"GAME|GAMEL|COMP|COMPX|COMPB|CONS|CONSX|SYST"
@@ -187,7 +211,12 @@ def parse_system_macros(text):
     return systems
 
 
-ROM_LOAD_MACROS = r"ROM_LOAD\w*"
+# ROM_LOAD and its width variants (ROM_LOAD16_BYTE, ...), plus ROMX_LOAD —
+# the BIOS-alternate loader. Multi-BIOS romsets (the BBC line's MOS
+# revisions, Kickstart alternates) carry members ONLY via ROMX_LOAD, so
+# omitting it drops those members from the table; MAME's own -listroms
+# lists every BIOS alternate's members, and so does this.
+ROM_LOAD_MACROS = r"ROM_LOAD\w*|ROMX_LOAD"
 
 
 def rom_entries_in_block(block):
@@ -217,10 +246,19 @@ def bare_macro_refs(block, defines):
 def rom_table(name, rom_starts, defines, _seen=None):
     """A system's own ROM table: its ROM_START's literal entries, or — if it
     has none of its own (the BIOS-root pattern: ROM_START is just a bare
-    macro reference) — the one-level expansion of that referenced macro."""
+    macro reference) — the one-level expansion of that referenced macro.
+    A clone with no ROM_START at all may instead alias its parent's block
+    (`#define rom_<clone> rom_<parent>`, e.g. atari400.cpp's a800xlp): the
+    alias is followed, because MAME resolves the clone's romset to exactly
+    the parent's members."""
     seen = _seen or set()
     block = rom_starts.get(name)
     if block is None:
+        alias = defines.get(f"rom_{name}", "").strip()
+        m = re.fullmatch(r"rom_(\w+)", alias)
+        if m and m.group(1) != name and name not in (_seen or set()):
+            return rom_table(m.group(1), rom_starts, defines,
+                             (_seen or set()) | {name})
         return []
     entries = rom_entries_in_block(block)
     if not entries:
@@ -284,13 +322,28 @@ def machine_page(platform, machine, facts, rom_starts, defines, driver_text, man
 
     lines.append("## At power-on")
     lines.append("")
-    if shared_bios:
-        caption = (f"`{fullname}` boots via the shared Arcadia System BIOS "
-                   f"into its attract/title sequence — see the capture above.")
+    if platform == "amiga":
+        # Arcadia-specific boot description — every amiga roster machine is
+        # hardware-proven, so the caption may describe the capture.
+        if shared_bios:
+            caption = (f"`{fullname}` boots via the shared Arcadia System BIOS "
+                       f"into its attract/title sequence — see the capture above.")
+        else:
+            caption = (f"`{fullname}` boots directly from its own Kickstart into "
+                       f"its attract/title sequence (no shared OnePlay/TenPlay BIOS "
+                       f"menu) — see the capture above.")
+    elif images_dir_exists.get(machine):
+        # A hardware-proof capture exists (copied from the meta bench media):
+        # the screenshot is the claim, the caption just points at it.
+        caption = (f"`{fullname}` at power-on on the real board — see the "
+                   f"capture above.")
     else:
-        caption = (f"`{fullname}` boots directly from its own Kickstart into "
-                   f"its attract/title sequence (no shared OnePlay/TenPlay BIOS "
-                   f"menu) — see the capture above.")
+        # No capture yet: compile-stage truth only. The platform kernel
+        # builds and links; nothing is claimed about boot behaviour until
+        # the bench capture lands and this page regenerates.
+        caption = ("Built into the platform kernel, awaiting hardware "
+                   "verification — no boot capture yet, so no boot behaviour "
+                   "is claimed here.")
     lines.append(caption)
     lines.append("")
 
@@ -308,21 +361,33 @@ def machine_page(platform, machine, facts, rom_starts, defines, driver_text, man
         lines.append(f"- `{a_path}`{desc}")
     lines.append("")
 
-    notes = [
-        "Arcade coin-op on the Arcadia Multi Select hardware — an Amiga A500 "
-        "motherboard driving an external ROM cage through the expansion port "
-        "(see the driver header in `arsystems.cpp`) — hardware-proven on the "
-        "Pi 4 bench.",
-    ]
+    if platform == "amiga":
+        notes = [
+            "Arcade coin-op on the Arcadia Multi Select hardware — an Amiga A500 "
+            "motherboard driving an external ROM cage through the expansion port "
+            "(see the driver header in `arsystems.cpp`) — hardware-proven on the "
+            "Pi 4 bench.",
+        ]
+    else:
+        driver_files = ", ".join(f"`{Path(s).name}`" for s in facts.get("sources", []))
+        notes = [f"MAME driver: {driver_files}." if driver_files else
+                 "See the platform's MAME driver source."]
     parent_info = facts["systems"].get(parent, {}) if parent else {}
     if parent and parent != "0" and not parent_info.get("is_bios_root"):
         parent_fullname = parent_info.get("fullname", parent)
-        notes.append(
-            f"MAME clone of `{parent}` ({parent_fullname}) — see the `GAME()` "
-            f"parent field in `arsystems.cpp`. Its own `ROM_START` fully lists "
-            f"every ROM this zip needs; none are borrowed from the parent zip."
-        )
-    if not shared_bios:
+        if platform == "amiga":
+            notes.append(
+                f"MAME clone of `{parent}` ({parent_fullname}) — see the `GAME()` "
+                f"parent field in `arsystems.cpp`. Its own `ROM_START` fully lists "
+                f"every ROM this zip needs; none are borrowed from the parent zip."
+            )
+        else:
+            notes.append(
+                f"MAME clone of `{parent}` ({parent_fullname}) — the system "
+                f"macro's parent field in the driver source. The ROM table "
+                f"above lists every member this machine's own zip needs."
+            )
+    if platform == "amiga" and not shared_bios:
         notes.append(
             "Plugs directly into the A500 motherboard with its own Kickstart "
             "copy — no shared OnePlay/TenPlay BIOS selection, unlike the rest "
@@ -348,15 +413,7 @@ def readme_page(platform, roster, facts, manifest):
     public_only = tiers == {"public"}
 
     lines = [f"# {display}", ""]
-    lines.append(
-        "The Arcadia Multi Select arcade platform: Arcadia Systems' "
-        "ten-interchangeable-game coin-op cabinet built on Amiga A500 "
-        "hardware (an A500 motherboard driving an external ROM cage through "
-        "the expansion port). Each `make kernel MACHINE=<name>` below bakes "
-        "one machine into its own `kernel8-<name>.img` — see the "
-        "[top-level README](../../README.md) for the build and the regional "
-        "canvas."
-    )
+    lines.append(PLATFORM_INTRO[platform])
     if public_only:
         lines.append("")
         lines.append(
@@ -392,9 +449,10 @@ def readme_page(platform, roster, facts, manifest):
     lines.append("```")
     lines.append("my-assets/")
     lines.append("└── roms/")
-    for m in roster:
-        lines.append(f"    ├── {m}.zip")
     shared = sorted({a for m in roster for a in facts["machine_assets"][m] if a != m})
+    for i, m in enumerate(roster):
+        last = not shared and i == len(roster) - 1
+        lines.append(f"    {'└──' if last else '├──'} {m}.zip")
     for i, a in enumerate(shared):
         prefix = "    └──" if i == len(shared) - 1 else "    ├──"
         lines.append(f"{prefix} {a}.zip")
@@ -426,6 +484,14 @@ def main():
     platform = sys.argv[1]
     if platform not in PLATFORM_DISPLAY:
         print(f"gen-machine-docs.py: unknown platform '{platform}'", file=sys.stderr)
+        sys.exit(2)
+    if platform not in PLATFORM_INTRO:
+        # A platform without generator coverage has hand-maintained pages
+        # (sinclair/amstrad/commodore) — refusing here keeps a stray run from
+        # clobbering them with half-generic output.
+        print(f"gen-machine-docs.py: platform '{platform}' has no PLATFORM_INTRO "
+              f"— its docs are hand-maintained; add an intro to generate them",
+              file=sys.stderr)
         sys.exit(2)
 
     roster = make_list(f"PLATFORM_MACHINES_{platform}")
@@ -462,6 +528,7 @@ def main():
         "defines": defines,
         "machine_assets": machine_assets,
         "tv_standard": tv_standard,
+        "sources": sources,
     }
 
     out_dir = SCRIPT_ROOT / "docs" / platform

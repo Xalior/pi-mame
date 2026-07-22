@@ -1,0 +1,25 @@
+# Atari 800XL (PAL)
+
+- **`make kernel MACHINE=a800xlp`** — Atari
+- **Year**: 1983
+- **Manufacturer**: Atari
+
+## At power-on
+
+Built into the platform kernel, awaiting hardware verification — no boot capture yet, so no boot behaviour is claimed here.
+
+## Required assets
+
+- `roms/a800xlp.zip`
+
+  | ROM | CRC32 |
+  |---|---|
+  | `co60302a.rom` | `f0202fb3` |
+  | `co61598b.rom` | `1f9cd270` |
+
+## Notes
+
+- MAME driver: `atari400.cpp`.
+- MAME clone of `a800xl` (Atari 800XL (NTSC)) — the system macro's parent field in the driver source. The ROM table above lists every member this machine's own zip needs.
+
+[← back to Atari](README.md)

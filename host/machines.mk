@@ -42,7 +42,7 @@
 # Next boards share tbblue.zip + next.img, sprinter needs kb_ms_natural.zip,
 # pc1512 needs pc1512kb.zip, and the CPC+ range needs only sysukpd.bin.
 
-PLATFORMS = sinclair amstrad commodore amiga
+PLATFORMS = sinclair amstrad commodore amiga atari
 
 PLATFORM_MACHINES_sinclair = spectrum spec128 specpls2 specpl2a specpls3 \
 	tbblue specnext_ks1 specnext_ks2 specnext_ks3 zx80 zx81 tc2048 ts2068 \
@@ -58,6 +58,13 @@ PLATFORM_MACHINES_commodore = c64 c64p c64_jp c64_se c64c c64cp c64g c64c_es \
 PLATFORM_MACHINES_amiga = ar_blast ar_airh ar_bowl ar_dart ar_fast ar_fasta \
 	ar_ldrb ar_ldrba ar_ldrbb ar_ninj ar_rdwr ar_sdwr ar_socc ar_spot \
 	ar_sprg ar_xeon ar_pm ar_dlta ar_argh
+
+# The 8-bit Atari computer line (src/mame/atari/atari400.cpp): the A400/A800/
+# XL/XE family. Excluded as MACHINE_NOT_WORKING: a1200xl, a65xea, a130xe. The
+# a5200/a5200a consoles share the driver file (their code rides in the binary)
+# but are not computer-line machines and are not rostered.
+PLATFORM_MACHINES_atari = a400 a400pal a800 a800pal a600xl a800xl a800xlp \
+	a65xe a800xe xegs
 
 # All machines, every platform — the roster `make kernels` bakes and CI verifies.
 MACHINES = $(foreach p,$(PLATFORMS),$(PLATFORM_MACHINES_$(p)))
@@ -83,7 +90,7 @@ PLATFORM_SUBTARGET_sinclair  = sinclair
 PLATFORM_SUBTARGET_amstrad   = amstrad
 PLATFORM_SUBTARGET_commodore = commodore
 PLATFORM_SUBTARGET_amiga     = amiga
-
+PLATFORM_SUBTARGET_atari     = atari
 PLATFORM_SOURCES_sinclair = \
 	src/mame/sinclair/spectrum.cpp src/mame/sinclair/spec128.cpp \
 	src/mame/sinclair/next/specnext.cpp src/mame/sinclair/specpls3.cpp \
@@ -105,6 +112,11 @@ PLATFORM_SOURCES_amiga = \
 	src/mame/amiga/amiga.cpp src/mame/amiga/arsystems.cpp \
 	src/mame/amiga/cubo.cpp src/mame/amiga/mquake.cpp \
 	src/mame/amiga/alg.cpp src/mame/amiga/upscope.cpp
+
+# atari400.cpp alone: makedep's split-driver sibling scan pulls the
+# atari400_m/_v companions (and antic/gtia via their headers) automatically.
+PLATFORM_SOURCES_atari = \
+	src/mame/atari/atari400.cpp
 
 # Every shipped platform's SOURCES, joined. The shared-engine build
 # (scripts/build-mame.sh) compiles ONE mamedrivers SUBTARGET from this — the
@@ -356,6 +368,23 @@ MACHINE_STRING_ar_pm        = ar_pm
 MACHINE_STRING_ar_dlta      = ar_dlta
 MACHINE_STRING_ar_argh      = ar_argh
 
+# --- Atari defaults strings ---
+# The A8SIO bus defaults to "fdc" (ATARI_FDC, MAME's high-level 810/1050 FDC —
+# no device ROMs). It models an EXTERNAL SIO drive; whether to bake it empty
+# (the commodore -iec8 "" precedent was ruled for the IEC lines only) is
+# staged for D.'s ruling — until then MAME's defaults stand unmodified.
+# Cart slots default empty (nullptr, no must_be_loaded); no media is baked.
+MACHINE_STRING_a400         = a400
+MACHINE_STRING_a400pal      = a400pal
+MACHINE_STRING_a800         = a800
+MACHINE_STRING_a800pal      = a800pal
+MACHINE_STRING_a600xl       = a600xl
+MACHINE_STRING_a800xl       = a800xl
+MACHINE_STRING_a800xlp      = a800xlp
+MACHINE_STRING_a65xe        = a65xe
+MACHINE_STRING_a800xe       = a800xe
+MACHINE_STRING_xegs         = xegs
+
 # --- Sinclair asset dependencies (manifest asset names) ---
 MACHINE_ASSETS_spectrum     = spectrum
 MACHINE_ASSETS_spec128      = spec128
@@ -444,6 +473,20 @@ MACHINE_ASSETS_ar_xeon      = ar_bios ar_xeon
 MACHINE_ASSETS_ar_pm        = ar_bios ar_pm
 MACHINE_ASSETS_ar_dlta      = ar_bios ar_dlta
 MACHINE_ASSETS_ar_argh      = ar_bios ar_argh
+
+# --- Atari asset dependencies (manifest asset names) ---
+# One romset per machine; a800xlp aliases rom_a800xl in the driver but keeps
+# its own zip name. The SIO fdc default is ROM-less, so no device assets.
+MACHINE_ASSETS_a400         = a400
+MACHINE_ASSETS_a400pal      = a400pal
+MACHINE_ASSETS_a800         = a800
+MACHINE_ASSETS_a800pal      = a800pal
+MACHINE_ASSETS_a600xl       = a600xl
+MACHINE_ASSETS_a800xl       = a800xl
+MACHINE_ASSETS_a800xlp      = a800xlp
+MACHINE_ASSETS_a65xe        = a65xe
+MACHINE_ASSETS_a800xe       = a800xe
+MACHINE_ASSETS_xegs         = xegs
 
 # Query helper: `make -f machines.mk -s print-MACHINE_STRING_spectrum`.
 # Lets scripts read these facts without pulling in the Circle build.
