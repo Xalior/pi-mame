@@ -17,6 +17,7 @@ Built into the platform kernel, awaiting hardware verification — no boot captu
   | `mos511.ic49` | `8708803c` |
   | `international16.rom` | `0ef527b1` |
   | `arabian-c22.rom` | `4f3aadff` |
+- `roms/saa5050.zip`
 
 ## Notes
 

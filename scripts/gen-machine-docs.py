@@ -328,7 +328,7 @@ def rom_table_md(entries):
     return "\n".join(lines)
 
 
-def machine_page(platform, machine, facts, rom_starts, defines, driver_text, manifest, images_dir_exists):
+def machine_page(platform, machine, facts, rom_starts, defines, driver_text, manifest, images_dir_exists, parked):
     display = PLATFORM_DISPLAY[platform]
     sysinfo = facts["systems"].get(machine, {})
     fullname = sysinfo.get("fullname") or machine
@@ -369,6 +369,13 @@ def machine_page(platform, machine, facts, rom_starts, defines, driver_text, man
             caption = (f"`{fullname}` boots directly from its own Kickstart into "
                        f"its attract/title sequence (no shared OnePlay/TenPlay BIOS "
                        f"menu) — see the capture above.")
+    elif machine in parked:
+        # The bench observed MAME's blocking known-problems box (or another
+        # documented stop): the capture shows the stop, and the page says
+        # PARKED — a capture is a boot RESULT, never by itself a pass.
+        caption = (f"**PARKED** — {parked[machine]} The capture above shows "
+                   f"the observed stop; the machine is not offered until the "
+                   f"park is lifted by a policy ruling.")
     elif images_dir_exists.get(machine):
         # A hardware-proof capture exists (copied from the meta bench media):
         # the screenshot is the claim, the caption just points at it.
@@ -590,6 +597,19 @@ def main():
             if src.is_file():
                 shutil.copy2(src, images_dir / f"{m}.jpg")
                 images_dir_exists[m] = True
+    # Bench verdicts ride beside the captures: PARKED.txt lists
+    # "<machine>: <reason>" lines for machines whose capture shows an
+    # observed stop (MAME's blocking known-problems box) rather than the
+    # machine's own face. A capture is a boot RESULT — the verdict file
+    # is what distinguishes park from proud on the generated page.
+    parked = {}
+    parked_file = media_dir / "PARKED.txt"
+    if parked_file.is_file():
+        for line in parked_file.read_text().splitlines():
+            line = line.strip()
+            if line and not line.startswith("#") and ":" in line:
+                m, reason = line.split(":", 1)
+                parked[m.strip()] = reason.strip()
     out_dir.mkdir(parents=True, exist_ok=True)
 
     missing_facts = []
@@ -600,7 +620,7 @@ def main():
             missing_facts.append(f"{m}: no ROM entries found in its ROM_START")
 
     for m in roster:
-        page = machine_page(platform, m, facts, rom_starts, defines, driver_text, manifest, images_dir_exists)
+        page = machine_page(platform, m, facts, rom_starts, defines, driver_text, manifest, images_dir_exists, parked)
         (out_dir / f"{m}.md").write_text(page)
 
     (out_dir / "README.md").write_text(readme_page(platform, roster, facts, manifest))

@@ -2,6 +2,8 @@
 
 The EACA Colour Genie EG2000 line (`cgenie.cpp` in MAME): EACA's 1982 Z80 home computer (HD6845 video, AY-3-8910 sound), in its European original and New Zealand variants. Each `make kernel MACHINE=<name>` below bakes one machine into its own `kernel8-<name>.img` — see the [top-level README](../../README.md) for the build and the regional canvas.
 
+Public-tier only: every asset this platform needs is a public-tier (grey-mirror) source — see [the top-level README](../../README.md#-fetching-them) for what that means.
+
 ## Machines
 
 | `make kernel` | System | Year | Romset | Extra assets | TV | |

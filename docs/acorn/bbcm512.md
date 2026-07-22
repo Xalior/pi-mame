@@ -24,6 +24,7 @@ Built into the platform kernel, awaiting hardware verification — no boot captu
   | `anfs425-2201351.rom` | `c2a6655e` |
   | `mos320.cmos` | `c7f9e85a` |
   | `mos350.cmos` | `e84c1854` |
+- `roms/saa5050.zip`
 
 ## Notes
 

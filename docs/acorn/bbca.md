@@ -20,6 +20,7 @@ Built into the platform kernel, awaiting hardware verification — no boot captu
   | `os01.rom` | `45ee0980` |
   | `basic2.rom` | `79434781` |
   | `basic1.rom` | `b3364108` |
+- `roms/saa5050.zip`
 
 ## Notes
 

@@ -16,6 +16,8 @@ Built into the platform kernel, awaiting hardware verification — no boot captu
   |---|---|
   | `basic.rom` | `79434781` |
   | `elk_036.rom` | `dd1a99c3` |
+- `roms/electron_plus3.zip`
+- `roms/electron_plus1.zip`
 
 ## Notes
 

@@ -16,6 +16,7 @@ Built into the platform kernel, awaiting hardware verification — no boot captu
   |---|---|
   | `mos400.ic24` | `81729034` |
   | `mos400.cmos` | `fff41cc5` |
+- `roms/saa5050.zip`
 
 ## Notes
 

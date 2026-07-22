@@ -19,6 +19,7 @@ Built into the platform kernel, awaiting hardware verification — no boot captu
   | `viewa210.rom` | `4345359f` |
   | `usdnfs10.rom` | `7e367e8c` |
   | `vm61002.bin` | `bf4b3b64` |
+- `roms/saa5050.zip`
 
 ## Notes
 

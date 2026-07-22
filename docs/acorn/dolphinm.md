@@ -16,6 +16,7 @@ Built into the platform kernel, awaiting hardware verification — no boot captu
   |---|---|
   | `hope_os_basic.rom` | `8b30f9e5` |
   | `hope_dfs.rom` | `5d404973` |
+- `roms/saa5050.zip`
 
 ## Notes
 

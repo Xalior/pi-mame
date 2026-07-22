@@ -570,36 +570,41 @@ MACHINE_STRING_atombbc      = atombbc
 MACHINE_STRING_prophet2     = prophet2
 
 # --- Acorn asset dependencies (manifest asset names) ---
-# Each machine's own romset only, so far. The default-slot DEVICE romsets the
-# bbcb line pulls in (acorn8271 DFS board, speech upgrade) and the Electron's
-# plus3 are NOT listed yet: which device romsets ship rides on D.'s slot/DFS
-# policy ruling (see the defaults-strings comment above), and the manifest
-# stanzas for all of these await the ROM-sourcing parcel.
-MACHINE_ASSETS_bbcb         = bbcb
-MACHINE_ASSETS_bbca         = bbca
-MACHINE_ASSETS_bbcb_de      = bbcb_de
-MACHINE_ASSETS_bbcb_no      = bbcb_no
-MACHINE_ASSETS_bbcb_us      = bbcb_us
-MACHINE_ASSETS_dolphinm     = dolphinm
-MACHINE_ASSETS_torchf       = torchf
-MACHINE_ASSETS_torchh       = torchh
-MACHINE_ASSETS_bbcbp        = bbcbp
-MACHINE_ASSETS_bbcbp128     = bbcbp128
-MACHINE_ASSETS_ltmpbp       = ltmpbp
-MACHINE_ASSETS_bbcm         = bbcm
-MACHINE_ASSETS_bbcmt        = bbcmt
-MACHINE_ASSETS_bbcmet       = bbcmet
-MACHINE_ASSETS_bbcm512      = bbcm512
-MACHINE_ASSETS_ltmpm        = ltmpm
-MACHINE_ASSETS_bbcmc        = bbcmc
-MACHINE_ASSETS_bbcmc_ar     = bbcmc_ar
-MACHINE_ASSETS_pro128s      = pro128s
-MACHINE_ASSETS_electron     = electron
-MACHINE_ASSETS_electront    = electront
-MACHINE_ASSETS_electron64   = electron64
-MACHINE_ASSETS_electronsp   = electronsp
-MACHINE_ASSETS_atom         = atom
-MACHINE_ASSETS_atombbc      = atombbc
+# Each machine lists every romset MAME's stock config REQUIRES to boot:
+# its own, plus device romsets that are either hardwired (saa5050 — the
+# Teletext character generator wired unconditionally into every BBC
+# Micro/Master/Compact video path; booting without it is a fatal
+# missing-ROM stop) or MAME's own slot defaults (bbcb's acorn8271 DFS
+# board, atom's discpack, electron's plus3 with its nested plus1). The
+# country-variant and Torch BBCs bake their DFS into their own romset
+# (set_insert_rom(false)) and need no board asset. Whether any slot is
+# instead baked EMPTY is a policy ruling — until then MAME's defaults
+# stand, and these lines name what those defaults load.
+MACHINE_ASSETS_bbcb         = bbcb bbc_acorn8271 saa5050
+MACHINE_ASSETS_bbca         = bbca saa5050
+MACHINE_ASSETS_bbcb_de      = bbcb_de saa5050
+MACHINE_ASSETS_bbcb_no      = bbcb_no saa5050
+MACHINE_ASSETS_bbcb_us      = bbcb_us saa5050
+MACHINE_ASSETS_dolphinm     = dolphinm saa5050
+MACHINE_ASSETS_torchf       = torchf saa5050
+MACHINE_ASSETS_torchh       = torchh saa5050
+MACHINE_ASSETS_bbcbp        = bbcbp saa5050
+MACHINE_ASSETS_bbcbp128     = bbcbp128 saa5050
+MACHINE_ASSETS_ltmpbp       = ltmpbp saa5050
+MACHINE_ASSETS_bbcm         = bbcm saa5050
+MACHINE_ASSETS_bbcmt        = bbcmt saa5050
+MACHINE_ASSETS_bbcmet       = bbcmet saa5050
+MACHINE_ASSETS_bbcm512      = bbcm512 saa5050
+MACHINE_ASSETS_ltmpm        = ltmpm saa5050
+MACHINE_ASSETS_bbcmc        = bbcmc saa5050
+MACHINE_ASSETS_bbcmc_ar     = bbcmc_ar saa5050
+MACHINE_ASSETS_pro128s      = pro128s saa5050
+MACHINE_ASSETS_electron     = electron electron_plus3 electron_plus1
+MACHINE_ASSETS_electront    = electront electron_plus3 electron_plus1
+MACHINE_ASSETS_electron64   = electron64 electron_plus3 electron_plus1
+MACHINE_ASSETS_electronsp   = electronsp electron_plus3 electron_plus1
+MACHINE_ASSETS_atom         = atom atom_discpack
+MACHINE_ASSETS_atombbc      = atombbc atom_discpack
 MACHINE_ASSETS_prophet2     = prophet2
 
 # --- EACA defaults strings ---

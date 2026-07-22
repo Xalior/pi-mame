@@ -18,6 +18,7 @@ Built into the platform kernel, awaiting hardware verification — no boot captu
   | `basic2.rom` | `79434781` |
   | `dnfs120-201666.rom` | `8ccd2157` |
   | `vm61002.bin` | `bf4b3b64` |
+- `roms/saa5050.zip`
 
 ## Notes
 

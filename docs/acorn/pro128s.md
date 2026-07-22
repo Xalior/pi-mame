@@ -15,6 +15,7 @@ Built into the platform kernel, awaiting hardware verification — no boot captu
   | ROM | CRC32 |
   |---|---|
   | `mos510o.ic49` | `c16858d3` |
+- `roms/saa5050.zip`
 
 ## Notes
 

@@ -16,6 +16,8 @@ Built into the platform kernel, awaiting hardware verification — no boot captu
   |---|---|
   | `basic.rom` | `79434781` |
   | `os_300.rom` | `f80a0cea` |
+- `roms/electron_plus3.zip`
+- `roms/electron_plus1.zip`
 
 ## Notes
 

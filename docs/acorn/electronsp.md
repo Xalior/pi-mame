@@ -21,6 +21,8 @@ Built into the platform kernel, awaiting hardware verification — no boot captu
   | `sp64_100.rom` | `4918221c` |
   | `sp64_100_1.rom` | `6053e5a0` |
   | `sp64_100_2.rom` | `25d11d8e` |
+- `roms/electron_plus3.zip`
+- `roms/electron_plus1.zip`
 
 ## Notes
 

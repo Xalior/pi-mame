@@ -1,12 +1,14 @@
 # BBC Micro Model B
 
+![BBC Micro Model B at power-on](images/bbcb.jpg)
+
 - **`make kernel MACHINE=bbcb`** — Acorn
 - **Year**: 1981
 - **Manufacturer**: Acorn Computers
 
 ## At power-on
 
-Built into the platform kernel, awaiting hardware verification — no boot capture yet, so no boot behaviour is claimed here.
+**PARKED** — stops at MAME's known-problems box (imperfectly emulated graphics). The capture above shows the observed stop; the machine is not offered until the park is lifted by a policy ruling.
 
 ## Required assets
 
@@ -21,6 +23,8 @@ Built into the platform kernel, awaiting hardware verification — no boot captu
   | `basic2.rom` | `79434781` |
   | `basic1.rom` | `b3364108` |
   | `cm62024.bin` | `98e1bf9e` |
+- `roms/bbc_acorn8271.zip`
+- `roms/saa5050.zip`
 
 ## Notes
 

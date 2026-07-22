@@ -16,6 +16,7 @@ Built into the platform kernel, awaiting hardware verification — no boot captu
   |---|---|
   | `mos510.ic49` | `9a2a6086` |
   | `mos500.ic49` | `f6170023` |
+- `roms/saa5050.zip`
 
 ## Notes
 

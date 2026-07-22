@@ -1,12 +1,14 @@
 # Atom with BBC Basic
 
+![Atom with BBC Basic at power-on](images/atombbc.jpg)
+
 - **`make kernel MACHINE=atombbc`** — Acorn
 - **Year**: 1982
 - **Manufacturer**: Acorn Computers
 
 ## At power-on
 
-Built into the platform kernel, awaiting hardware verification — no boot capture yet, so no boot behaviour is claimed here.
+`Atom with BBC Basic` at power-on on the real board — see the capture above.
 
 ## Required assets
 
@@ -18,6 +20,7 @@ Built into the platform kernel, awaiting hardware verification — no boot captu
   | `afloat.ic21` | `81d86af7` |
   | `mos3.rom` | `20158bd8` |
   | `bbcbasic.rom` | `79434781` |
+- `roms/atom_discpack.zip`
 
 ## Notes
 

@@ -1,12 +1,14 @@
 # SAM Coupé
 
+![SAM Coupé at power-on](images/samcoupe.jpg)
+
 - **`make kernel MACHINE=samcoupe`** — SAM Coupé
 - **Year**: 1989
 - **Manufacturer**: Miles Gordon Technology plc
 
 ## At power-on
 
-Built into the platform kernel, awaiting hardware verification — no boot capture yet, so no boot behaviour is claimed here.
+`SAM Coupé` at power-on on the real board — see the capture above.
 
 ## Required assets
 

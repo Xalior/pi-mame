@@ -1,12 +1,14 @@
 # Acorn Electron
 
+![Acorn Electron at power-on](images/electron.jpg)
+
 - **`make kernel MACHINE=electron`** — Acorn
 - **Year**: 1983
 - **Manufacturer**: Acorn Computers
 
 ## At power-on
 
-Built into the platform kernel, awaiting hardware verification — no boot capture yet, so no boot behaviour is claimed here.
+**PARKED** — stops at MAME's known-problems box (imperfectly emulated graphics). The capture above shows the observed stop; the machine is not offered until the park is lifted by a policy ruling.
 
 ## Required assets
 
@@ -15,6 +17,8 @@ Built into the platform kernel, awaiting hardware verification — no boot captu
   | ROM | CRC32 |
   |---|---|
   | `os_basic.ic2` | `b997f9cb` |
+- `roms/electron_plus3.zip`
+- `roms/electron_plus1.zip`
 
 ## Notes
 
