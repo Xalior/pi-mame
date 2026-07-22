@@ -27,12 +27,10 @@ IFS="$_saved_ifs"
     echo "aarch64-circle-g++: aarch64-none-elf-g++ not on PATH" >&2; exit 1; }
 TC="$(cd "$(dirname "$REAL")/.." && pwd)"
 
-# ccache automatically, NO `source build/ccache.sh` needed: if ccache is on
-# PATH, run the real compiler THROUGH it. Because we invoke $REAL explicitly
-# (not a PATH masquerade), this is the single ccache layer — it never wraps
-# ccache-around-ccache. Honors any CCACHE_DIR already set (e.g. the RAM disk).
-CCACHE=""
-command -v ccache >/dev/null 2>&1 && CCACHE=ccache
+# ccache via ${CCACHE:-} from build/ccache.sh (mandatory source; it sets
+# CCACHE=ccache and CCACHE_DIR=/Volumes/ccache). Skipping the masquerade above
+# keeps -isystem $TCINC correct; exec'ing $REAL behind ccache is the single
+# ccache layer, never ccache-on-ccache.
 
 # Board is selected by RAPI_BOARD (rpi3/rpi4/rpi5); build-mame.sh and host/Makefile
 # export it. Each maps to its Circle RASPPI, CPU tuning, and the matching per-board
@@ -49,7 +47,7 @@ STDLIB=$ROOT/circle-libsdl2/circle-stdlib-$RAPI_BOARD
 INSTALL=$STDLIB/install/aarch64-none-circle
 TCINC="$(echo "$TC"/lib/gcc/aarch64-none-elf/*/include)"
 
-exec $CCACHE "$REAL" "$@" \
+exec ${CCACHE:-} "$REAL" "$@" \
     -mcpu=$RAPI_MCPU -mlittle-endian \
     -std=gnu++23 -Wno-volatile \
     -Wno-alloc-size-larger-than \
