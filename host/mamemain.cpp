@@ -13,7 +13,11 @@
 #include "main.h"
 #include "config.h"
 #include "fileio.h"
+#include "mame.h"
+#include "ui/ui.h"
 #include "ui/uimain.h"
+
+#include "defaults.h"
 
 #include "corestr.h"
 #include "strconv.h"
@@ -106,6 +110,15 @@ public:
         if (m.phase() != machine_phase::RUNNING)
             return;
 
+        // --rapi-fps (bench switch, defaults.cpp): light MAME's own
+        // FPS/speed readout once the machine runs, via the public
+        // mame_ui_manager::set_show_fps setter.
+        if (rapi_show_fps && !m_fps_applied)
+        {
+            mame_machine_manager::instance()->ui().set_show_fps(true);
+            m_fps_applied = true;
+        }
+
         const bool menu = m.ui().is_menu_active();
         if (m_prev_menu_active && !menu)
         {
@@ -117,6 +130,7 @@ public:
 
 private:
     bool m_prev_menu_active = false;
+    bool m_fps_applied = false;
 };
 
 extern "C" int mame_circle_main(int argc, char **argv)

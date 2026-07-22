@@ -200,6 +200,7 @@ MAME_INCLUDES = \
 	-I $(MAMESRC)/3rdparty/bx/include \
 	-I $(MAMESRC)/3rdparty/rapidjson/include \
 	-I $(MAMESRC)/src/emu \
+	-I $(MAMESRC)/src/frontend/mame \
 	-I $(MAMESRC)/src/devices \
 	-I $(MAMESRC)/src/lib \
 	-I $(MAMESRC)/src/lib/util \
