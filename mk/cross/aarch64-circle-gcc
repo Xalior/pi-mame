@@ -6,9 +6,32 @@
 # Requires the Arm GNU aarch64-none-elf toolchain on PATH.
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
-REAL="$(command -v aarch64-none-elf-gcc)" || {
+
+# Resolve the REAL Arm GNU compiler, skipping any ccache masquerade on PATH.
+# ccache is auto-wired here (see the exec below) rather than via a PATH
+# masquerade, so `command -v` could otherwise return a ccache symlink and make
+# TC — and thus the builtin-include dir -isystem $TCINC — resolve to the wrong
+# place (an empty glob -> "stddef.h: No such file"). Walk PATH and take the
+# first aarch64-none-elf-gcc that is NOT a symlink into ccache.
+REAL=""
+_saved_ifs="$IFS"; IFS=:
+for _d in $PATH; do
+    _c="$_d/aarch64-none-elf-gcc"
+    [ -x "$_c" ] || continue
+    case "$(readlink "$_c" 2>/dev/null)" in *ccache*) continue ;; esac
+    REAL="$_c"; break
+done
+IFS="$_saved_ifs"
+[ -n "$REAL" ] || {
     echo "aarch64-circle-gcc: aarch64-none-elf-gcc not on PATH" >&2; exit 1; }
 TC="$(cd "$(dirname "$REAL")/.." && pwd)"
+
+# ccache automatically, NO `source build/ccache.sh` needed: if ccache is on
+# PATH, run the real compiler THROUGH it. Because we invoke $REAL explicitly
+# (not a PATH masquerade), this is the single ccache layer — it never wraps
+# ccache-around-ccache. Honors any CCACHE_DIR already set (e.g. the RAM disk).
+CCACHE=""
+command -v ccache >/dev/null 2>&1 && CCACHE=ccache
 
 # Board is selected by RAPI_BOARD (rpi3/rpi4/rpi5); build-mame.sh and host/Makefile
 # export it. Each maps to its Circle RASPPI, CPU tuning, and the matching per-board
@@ -25,7 +48,7 @@ STDLIB=$ROOT/circle-libsdl2/circle-stdlib-$RAPI_BOARD
 INSTALL=$STDLIB/install/aarch64-none-circle
 TCINC="$(echo "$TC"/lib/gcc/aarch64-none-elf/*/include)"
 
-exec "$REAL" "$@" \
+exec $CCACHE "$REAL" "$@" \
     -mcpu=$RAPI_MCPU -mlittle-endian \
     -nostdinc \
     -isystem "$ROOT/mk/cross/compat" \
