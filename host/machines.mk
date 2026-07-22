@@ -42,7 +42,7 @@
 # Next boards share tbblue.zip + next.img, sprinter needs kb_ms_natural.zip,
 # pc1512 needs pc1512kb.zip, and the CPC+ range needs only sysukpd.bin.
 
-PLATFORMS = sinclair amstrad commodore amiga atari acorn eaca samcoupe
+PLATFORMS = sinclair amstrad commodore amiga atari acorn eaca samcoupe camputers
 
 PLATFORM_MACHINES_sinclair = spectrum spec128 specpls2 specpl2a specpls3 \
 	tbblue specnext_ks1 specnext_ks2 specnext_ks3 zx80 zx81 tc2048 ts2068 \
@@ -92,6 +92,12 @@ PLATFORM_MACHINES_eaca = cgenie cgenienz
 # the roster.
 PLATFORM_MACHINES_samcoupe = samcoupe
 
+# Camputers Lynx (src/mame/camputers/): one driver (camplynx.cpp), three
+# machines — the 48k original and its 96k/128k siblings. All three carry
+# MACHINE_SUPPORTS_SAVE only — no MACHINE_NOT_WORKING, no IMPERFECT flags —
+# so nothing is excluded: the driver directory's whole catalog is the roster.
+PLATFORM_MACHINES_camputers = lynx48k lynx96k lynx128k
+
 # All machines, every platform — the roster `make kernels` bakes and CI verifies.
 MACHINES = $(foreach p,$(PLATFORMS),$(PLATFORM_MACHINES_$(p)))
 
@@ -120,6 +126,7 @@ PLATFORM_SUBTARGET_atari     = atari
 PLATFORM_SUBTARGET_acorn     = acorn
 PLATFORM_SUBTARGET_eaca      = eaca
 PLATFORM_SUBTARGET_samcoupe  = samcoupe
+PLATFORM_SUBTARGET_camputers = camputers
 
 PLATFORM_SOURCES_sinclair = \
 	src/mame/sinclair/spectrum.cpp src/mame/sinclair/spec128.cpp \
@@ -163,6 +170,11 @@ PLATFORM_SOURCES_eaca = \
 # The whole samcoupe directory is this one driver file.
 PLATFORM_SOURCES_samcoupe = \
 	src/mame/samcoupe/samcoupe.cpp
+
+# The whole camputers directory is this one driver file.
+PLATFORM_SOURCES_camputers = \
+	src/mame/camputers/camplynx.cpp
+
 
 # Every shipped platform's SOURCES, joined. The shared-engine build
 # (scripts/build-mame.sh) compiles ONE mamedrivers SUBTARGET from this — the
@@ -643,6 +655,33 @@ MACHINE_STRING_samcoupe     = samcoupe
 # images (ROM_SYSTEM_BIOS v0.1..v3.1 + the ATOM HDD auto-boot ROM), default
 # BIOS v3.1. The manifest stanza awaits the ROM-sourcing parcel.
 MACHINE_ASSETS_samcoupe     = samcoupe
+
+# --- Camputers Lynx defaults strings ---
+# Bare machine names: every machine boots to Lynx BASIC from ROM with no
+# must_be_loaded slot anywhere (no media is mandatory). MAME's slot defaults
+# stand untouched: the cassette deck defaults to CASSETTE_PLAY with no image
+# mounted, and the 96k/128k models wire both floppy connectors with the
+# ROM-less generic "525qd" module (camplynx.cpp's lynx_disk config; the drive
+# was an optional add-on on the real machines — a drive-less Lynx existed).
+# Whether the floppy-connector defaults get baked empty is D.'s policy call,
+# staged as an open question, not decided here. No camputers device carries a
+# ROM_START, so no device romset rides on any of these defaults. PAL-only
+# machines (50Hz raster) — no mksd.sh NTSC case entry.
+MACHINE_STRING_lynx48k      = lynx48k
+MACHINE_STRING_lynx96k      = lynx96k
+MACHINE_STRING_lynx128k     = lynx128k
+
+# --- Camputers Lynx asset dependencies (manifest asset names) ---
+# One self-contained romset per machine: lynx96k and lynx128k are clones of
+# lynx48k in MAME's tree, but each ROM_START loads only its own uniquely-named
+# members (no member falls through to the parent zip), so no cross-zip
+# dependency. lynx48k.zip carries two BIOS-alternate ROM pairs (default Set1);
+# lynx96k.zip carries three alternate ic44 EXT ROMs (default Original) plus
+# dosrom.rom; lynx128k.zip shares that same dosrom.rom image by content. The
+# manifest stanzas await the ROM-sourcing parcel.
+MACHINE_ASSETS_lynx48k      = lynx48k
+MACHINE_ASSETS_lynx96k      = lynx96k
+MACHINE_ASSETS_lynx128k     = lynx128k
 
 # Query helper: `make -f machines.mk -s print-MACHINE_STRING_spectrum`.
 # Lets scripts read these facts without pulling in the Circle build.
