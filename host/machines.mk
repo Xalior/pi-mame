@@ -42,7 +42,7 @@
 # Next boards share tbblue.zip + next.img, sprinter needs kb_ms_natural.zip,
 # pc1512 needs pc1512kb.zip, and the CPC+ range needs only sysukpd.bin.
 
-PLATFORMS = sinclair amstrad commodore amiga atari
+PLATFORMS = sinclair amstrad commodore amiga atari acorn
 
 PLATFORM_MACHINES_sinclair = spectrum spec128 specpls2 specpl2a specpls3 \
 	tbblue specnext_ks1 specnext_ks2 specnext_ks3 zx80 zx81 tc2048 ts2068 \
@@ -65,6 +65,20 @@ PLATFORM_MACHINES_amiga = ar_blast ar_airh ar_bowl ar_dart ar_fast ar_fasta \
 # but are not computer-line machines and are not rostered.
 PLATFORM_MACHINES_atari = a400 a400pal a800 a800pal a600xl a800xl a800xlp \
 	a65xe a800xe xegs
+
+# Acorn's 8-bit line (src/mame/acorn/): the BBC Micro family (bbcb/bbcbp/
+# bbcm/bbcmc.cpp), the Electron (electron.cpp) and the Atom (atom.cpp).
+# Excluded as MACHINE_NOT_WORKING: torch301 torch725 sist1 (bbcb.cpp);
+# abc110 acw443 abc310 econx25 cfa3000bp (bbcbp.cpp); bbcmaiv bbcmarm
+# mpc800 mpc900 mpc900gx se3010 discmon discmate daisy cfa3000 ht280
+# (bbcm.cpp); autoc15 (bbcmc.cpp, also carries the roster's only NO_DUMP
+# member); btm2105 (electron.cpp); atomes atomrr (atom.cpp); and the whole
+# reutapm.cpp driver (its sole machine reutapm is MACHINE_NOT_WORKING, so
+# the driver is not in PLATFORM_SOURCES_acorn at all).
+PLATFORM_MACHINES_acorn = bbcb bbca bbcb_de bbcb_no bbcb_us dolphinm \
+	torchf torchh bbcbp bbcbp128 ltmpbp bbcm bbcmt bbcmet bbcm512 ltmpm \
+	bbcmc bbcmc_ar pro128s electron electront electron64 electronsp \
+	atom atombbc prophet2
 
 # All machines, every platform — the roster `make kernels` bakes and CI verifies.
 MACHINES = $(foreach p,$(PLATFORMS),$(PLATFORM_MACHINES_$(p)))
@@ -91,6 +105,8 @@ PLATFORM_SUBTARGET_amstrad   = amstrad
 PLATFORM_SUBTARGET_commodore = commodore
 PLATFORM_SUBTARGET_amiga     = amiga
 PLATFORM_SUBTARGET_atari     = atari
+PLATFORM_SUBTARGET_acorn     = acorn
+
 PLATFORM_SOURCES_sinclair = \
 	src/mame/sinclair/spectrum.cpp src/mame/sinclair/spec128.cpp \
 	src/mame/sinclair/next/specnext.cpp src/mame/sinclair/specpls3.cpp \
@@ -117,6 +133,14 @@ PLATFORM_SOURCES_amiga = \
 # atari400_m/_v companions (and antic/gtia via their headers) automatically.
 PLATFORM_SOURCES_atari = \
 	src/mame/atari/atari400.cpp
+
+# Driver files only: makedep's sibling scan pulls the support files (bbc.h ->
+# bbc_m.cpp/bbc_v.cpp via the _m/_v aspect scan; bbc_kbd/electron_ula/
+# acorn_serproc via their same-stem headers) automatically.
+PLATFORM_SOURCES_acorn = \
+	src/mame/acorn/bbcb.cpp src/mame/acorn/bbcbp.cpp \
+	src/mame/acorn/bbcm.cpp src/mame/acorn/bbcmc.cpp \
+	src/mame/acorn/electron.cpp src/mame/acorn/atom.cpp
 
 # Every shipped platform's SOURCES, joined. The shared-engine build
 # (scripts/build-mame.sh) compiles ONE mamedrivers SUBTARGET from this — the
@@ -487,6 +511,74 @@ MACHINE_ASSETS_a800xlp      = a800xlp
 MACHINE_ASSETS_a65xe        = a65xe
 MACHINE_ASSETS_a800xe       = a800xe
 MACHINE_ASSETS_xegs         = xegs
+
+# --- Acorn defaults strings ---
+# Bare machine names, no media, no slot overrides: no Acorn roster machine has
+# a must_be_loaded slot, so every one boots to its own firmware prompt. MAME's
+# slot defaults stand untouched (the bbcb line wires an acorn8271 FDC board and
+# a speech upgrade by default; the Electron wires the Plus 3 expansion) —
+# whether any of those external add-on defaults gets baked empty, and which DFS
+# ROM configuration ships, are D.'s policy calls, staged as open questions, not
+# decided here.
+MACHINE_STRING_bbcb         = bbcb
+MACHINE_STRING_bbca         = bbca
+MACHINE_STRING_bbcb_de      = bbcb_de
+MACHINE_STRING_bbcb_no      = bbcb_no
+MACHINE_STRING_bbcb_us      = bbcb_us
+MACHINE_STRING_dolphinm     = dolphinm
+MACHINE_STRING_torchf       = torchf
+MACHINE_STRING_torchh       = torchh
+MACHINE_STRING_bbcbp        = bbcbp
+MACHINE_STRING_bbcbp128     = bbcbp128
+MACHINE_STRING_ltmpbp       = ltmpbp
+MACHINE_STRING_bbcm         = bbcm
+MACHINE_STRING_bbcmt        = bbcmt
+MACHINE_STRING_bbcmet       = bbcmet
+MACHINE_STRING_bbcm512      = bbcm512
+MACHINE_STRING_ltmpm        = ltmpm
+MACHINE_STRING_bbcmc        = bbcmc
+MACHINE_STRING_bbcmc_ar     = bbcmc_ar
+MACHINE_STRING_pro128s      = pro128s
+MACHINE_STRING_electron     = electron
+MACHINE_STRING_electront    = electront
+MACHINE_STRING_electron64   = electron64
+MACHINE_STRING_electronsp   = electronsp
+MACHINE_STRING_atom         = atom
+MACHINE_STRING_atombbc      = atombbc
+MACHINE_STRING_prophet2     = prophet2
+
+# --- Acorn asset dependencies (manifest asset names) ---
+# Each machine's own romset only, so far. The default-slot DEVICE romsets the
+# bbcb line pulls in (acorn8271 DFS board, speech upgrade) and the Electron's
+# plus3 are NOT listed yet: which device romsets ship rides on D.'s slot/DFS
+# policy ruling (see the defaults-strings comment above), and the manifest
+# stanzas for all of these await the ROM-sourcing parcel.
+MACHINE_ASSETS_bbcb         = bbcb
+MACHINE_ASSETS_bbca         = bbca
+MACHINE_ASSETS_bbcb_de      = bbcb_de
+MACHINE_ASSETS_bbcb_no      = bbcb_no
+MACHINE_ASSETS_bbcb_us      = bbcb_us
+MACHINE_ASSETS_dolphinm     = dolphinm
+MACHINE_ASSETS_torchf       = torchf
+MACHINE_ASSETS_torchh       = torchh
+MACHINE_ASSETS_bbcbp        = bbcbp
+MACHINE_ASSETS_bbcbp128     = bbcbp128
+MACHINE_ASSETS_ltmpbp       = ltmpbp
+MACHINE_ASSETS_bbcm         = bbcm
+MACHINE_ASSETS_bbcmt        = bbcmt
+MACHINE_ASSETS_bbcmet       = bbcmet
+MACHINE_ASSETS_bbcm512      = bbcm512
+MACHINE_ASSETS_ltmpm        = ltmpm
+MACHINE_ASSETS_bbcmc        = bbcmc
+MACHINE_ASSETS_bbcmc_ar     = bbcmc_ar
+MACHINE_ASSETS_pro128s      = pro128s
+MACHINE_ASSETS_electron     = electron
+MACHINE_ASSETS_electront    = electront
+MACHINE_ASSETS_electron64   = electron64
+MACHINE_ASSETS_electronsp   = electronsp
+MACHINE_ASSETS_atom         = atom
+MACHINE_ASSETS_atombbc      = atombbc
+MACHINE_ASSETS_prophet2     = prophet2
 
 # Query helper: `make -f machines.mk -s print-MACHINE_STRING_spectrum`.
 # Lets scripts read these facts without pulling in the Circle build.

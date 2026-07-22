@@ -53,6 +53,7 @@ PLATFORM_DISPLAY = {
     "commodore": "Commodore",
     "amiga": "Amiga",
     "atari": "Atari",
+    "acorn": "Acorn",
 }
 
 # Per-platform README intro paragraph. The machines table, assets tree and
@@ -75,6 +76,15 @@ PLATFORM_INTRO = {
         "bakes one machine into its own `kernel8-<name>.img` — see the "
         "[top-level README](../../README.md) for the build and the regional "
         "canvas."
+    ),
+    "acorn": (
+        "The Acorn 8-bit line: the BBC Micro family — Model A/B, B+, Master, "
+        "Master Compact and their rehousings (`bbcb`/`bbcbp`/`bbcm`/"
+        "`bbcmc.cpp` in MAME) — plus the Electron (`electron.cpp`) and the "
+        "Atom (`atom.cpp`), all built on the 6502. Each `make kernel "
+        "MACHINE=<name>` below bakes one machine into its own "
+        "`kernel8-<name>.img` — see the [top-level README](../../README.md) "
+        "for the build and the regional canvas."
     ),
 }
 
@@ -228,7 +238,12 @@ def rom_entries_in_block(block):
         fname = re.search(r'"([^"]+)"', call)
         crc = re.search(r"CRC\(([0-9a-fA-F]+)\)", call)
         if fname and crc:
-            out.append((fname.group(1), crc.group(1)))
+            entry = (fname.group(1), crc.group(1))
+            # A romset may load the same physical file more than once (a
+            # BIOS-alternate set reusing one BASIC image at two addresses):
+            # one zip member, one table row.
+            if entry not in out:
+                out.append(entry)
     return out
 
 
@@ -369,7 +384,9 @@ def machine_page(platform, machine, facts, rom_starts, defines, driver_text, man
             "Pi 4 bench.",
         ]
     else:
-        driver_files = ", ".join(f"`{Path(s).name}`" for s in facts.get("sources", []))
+        own_src = facts.get("machine_source", {}).get(machine)
+        driver_files = (f"`{Path(own_src).name}`" if own_src else
+                        ", ".join(f"`{Path(s).name}`" for s in facts.get("sources", [])))
         notes = [f"MAME driver: {driver_files}." if driver_files else
                  "See the platform's MAME driver source."]
     parent_info = facts["systems"].get(parent, {}) if parent else {}
@@ -522,6 +539,14 @@ def main():
 
     machine_assets = {m: make_list(f"MACHINE_ASSETS_{m}") for m in roster}
 
+    # Which single source file carries each machine's system macro, so a
+    # multi-driver-file platform (the BBC line spans four) can attribute a
+    # machine to ITS driver rather than listing the whole SOURCES set.
+    machine_source = {}
+    for src, text in file_texts.items():
+        for name in parse_system_macros(text):
+            machine_source.setdefault(name, src)
+
     facts = {
         "systems": systems,
         "rom_starts": rom_starts,
@@ -529,6 +554,7 @@ def main():
         "machine_assets": machine_assets,
         "tv_standard": tv_standard,
         "sources": sources,
+        "machine_source": machine_source,
     }
 
     out_dir = SCRIPT_ROOT / "docs" / platform
