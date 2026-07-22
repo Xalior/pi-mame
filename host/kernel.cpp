@@ -200,8 +200,9 @@ TShutdownMode CKernel::Run(void)
     }
 
     // Geometry evidence belongs on serial (the HDMI capture dongle is not
-    // pixel-faithful): what boot config handed us, next to the shim's
-    // "framebuffer WxH" line when the window is created.
+    // pixel-faithful): what boot config handed us, read next to the shim's
+    // framebuffer-grant line (size/pitch are the scanout truth on boards
+    // whose firmware ignores requests) when the window is created.
     m_Logger.Write(From, LogNotice, "boot config geometry: %ux%u",
                    m_Options.GetWidth(), m_Options.GetHeight());
 
@@ -242,7 +243,7 @@ TShutdownMode CKernel::Run(void)
                    CMachineInfo::Get()->GetClockRate(CLOCK_ID_CORE) / 1000000);
     m_Logger.Write(From, LogNotice, "MAME exited with %d, rebooting", res);
 
-    // Back to the chainloader: quitting the emulator returns the machine
-    // to its kernel-accepting state.
+    // Reboot to whatever the card boots — the dev bench's chainloader, a
+    // product card's picker: quitting the emulator hands the machine back.
     return ShutdownReboot;
 }
