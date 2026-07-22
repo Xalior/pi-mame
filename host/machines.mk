@@ -42,7 +42,7 @@
 # Next boards share tbblue.zip + next.img, sprinter needs kb_ms_natural.zip,
 # pc1512 needs pc1512kb.zip, and the CPC+ range needs only sysukpd.bin.
 
-PLATFORMS = sinclair amstrad commodore amiga atari acorn
+PLATFORMS = sinclair amstrad commodore amiga atari acorn eaca
 
 PLATFORM_MACHINES_sinclair = spectrum spec128 specpls2 specpl2a specpls3 \
 	tbblue specnext_ks1 specnext_ks2 specnext_ks3 zx80 zx81 tc2048 ts2068 \
@@ -80,6 +80,12 @@ PLATFORM_MACHINES_acorn = bbcb bbca bbcb_de bbcb_no bbcb_us dolphinm \
 	bbcmc bbcmc_ar pro128s electron electront electron64 electronsp \
 	atom atombbc prophet2
 
+# EACA (src/mame/eaca/): the Colour Genie EG2000 line, one driver
+# (cgenie.cpp), two machines — the European original and its New Zealand
+# sibling. Both carry flags 0 (no MACHINE_NOT_WORKING, no IMPERFECT), so
+# nothing is excluded: the driver directory's whole catalog is the roster.
+PLATFORM_MACHINES_eaca = cgenie cgenienz
+
 # All machines, every platform — the roster `make kernels` bakes and CI verifies.
 MACHINES = $(foreach p,$(PLATFORMS),$(PLATFORM_MACHINES_$(p)))
 
@@ -106,6 +112,7 @@ PLATFORM_SUBTARGET_commodore = commodore
 PLATFORM_SUBTARGET_amiga     = amiga
 PLATFORM_SUBTARGET_atari     = atari
 PLATFORM_SUBTARGET_acorn     = acorn
+PLATFORM_SUBTARGET_eaca      = eaca
 
 PLATFORM_SOURCES_sinclair = \
 	src/mame/sinclair/spectrum.cpp src/mame/sinclair/spec128.cpp \
@@ -141,6 +148,10 @@ PLATFORM_SOURCES_acorn = \
 	src/mame/acorn/bbcb.cpp src/mame/acorn/bbcbp.cpp \
 	src/mame/acorn/bbcm.cpp src/mame/acorn/bbcmc.cpp \
 	src/mame/acorn/electron.cpp src/mame/acorn/atom.cpp
+
+# The whole eaca directory is this one driver file.
+PLATFORM_SOURCES_eaca = \
+	src/mame/eaca/cgenie.cpp
 
 # Every shipped platform's SOURCES, joined. The shared-engine build
 # (scripts/build-mame.sh) compiles ONE mamedrivers SUBTARGET from this — the
@@ -579,6 +590,24 @@ MACHINE_ASSETS_electronsp   = electronsp
 MACHINE_ASSETS_atom         = atom
 MACHINE_ASSETS_atombbc      = atombbc
 MACHINE_ASSETS_prophet2     = prophet2
+
+# --- EACA defaults strings ---
+# Bare machine names: the cassette deck defaults empty (CASSETTE_STOPPED, not
+# must_be_loaded), and both option slots — the cartridge/expansion port
+# (CG_EXP_SLOT) and the parallel port (CG_PARALLEL_SLOT) — default to nullptr
+# in the driver, so there is nothing to bake and no device romset to ship.
+# Both machines are PAL (17.734470 MHz master crystal; ~50Hz raster), so the
+# regional canvas is the PAL one — no mksd.sh NTSC case entry.
+MACHINE_STRING_cgenie       = cgenie
+MACHINE_STRING_cgenienz     = cgenienz
+
+# --- EACA asset dependencies (manifest asset names) ---
+# Each machine's own romset only: cgenienz is a clone of cgenie but carries a
+# self-contained ROM_START (its own BASIC ROM alternates via ROM_SYSTEM_BIOS +
+# the shared character-set image by content), so no cross-zip dependency. The
+# manifest stanzas await the ROM-sourcing parcel.
+MACHINE_ASSETS_cgenie       = cgenie
+MACHINE_ASSETS_cgenienz     = cgenienz
 
 # Query helper: `make -f machines.mk -s print-MACHINE_STRING_spectrum`.
 # Lets scripts read these facts without pulling in the Circle build.
