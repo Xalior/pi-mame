@@ -57,6 +57,7 @@ PLATFORM_DISPLAY = {
     "eaca": "EACA",
     "samcoupe": "SAM Coupé",
     "camputers": "Camputers",
+    "tatung": "Tatung",
 }
 
 # Per-platform README intro paragraph. The machines table, assets tree and
@@ -111,6 +112,15 @@ PLATFORM_INTRO = {
         "in its 48k original and the 96k/128k models that followed it. "
         "Each `make kernel MACHINE=<name>` below bakes one machine into "
         "its own `kernel8-<name>.img` — see the "
+        "[top-level README](../../README.md) for the build and the regional "
+        "canvas."
+    ),
+    "tatung": (
+        "The Tatung Einstein line (`einstein.cpp` in MAME): Tatung's 1984 "
+        "Z80A floppy-CP/M machine, the Einstein TC-01 (TMS9129 video, "
+        "AY-3-8910 sound, built-in 3\" drive), and the 1986 Einstein 256 "
+        "(V9938 video). Each `make kernel MACHINE=<name>` below bakes one "
+        "machine into its own `kernel8-<name>.img` — see the "
         "[top-level README](../../README.md) for the build and the regional "
         "canvas."
     ),
@@ -213,6 +223,28 @@ def parse_defines(text):
             defines[name] = "\n".join(body)
         i += 1
     return defines
+
+
+def strip_disabled_blocks(text):
+    """Drop preprocessor-disabled `#if 0` ... `#endif` regions (tracking
+    nested conditionals) before any scan: a disabled ROM_LOAD is not part of
+    the romset MAME compiles (einstein.cpp fences its diagnostic ROM this
+    way), so it must never reach a docs ROM table."""
+    out, depth = [], 0
+    for line in text.split("\n"):
+        stripped = line.lstrip()
+        if depth == 0:
+            if re.match(r"#\s*if\s+0\b", stripped):
+                depth = 1
+                continue
+            out.append(line)
+        else:
+            if re.match(r"#\s*(if|ifdef|ifndef)\b", stripped):
+                depth += 1
+            elif re.match(r"#\s*endif\b", stripped):
+                depth -= 1
+            continue
+    return "\n".join(out)
 
 
 def parse_rom_starts(text):
@@ -557,7 +589,8 @@ def main():
         sys.exit(2)
 
     sources = make_list(f"PLATFORM_SOURCES_{platform}")
-    file_texts = {src: (MAME_ROOT / src).read_text() for src in sources}
+    file_texts = {src: strip_disabled_blocks((MAME_ROOT / src).read_text())
+                  for src in sources}
     driver_text = "\n".join(file_texts.values())
 
     manifest = load_manifest()

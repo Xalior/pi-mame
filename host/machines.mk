@@ -42,7 +42,7 @@
 # Next boards share tbblue.zip + next.img, sprinter needs kb_ms_natural.zip,
 # pc1512 needs pc1512kb.zip, and the CPC+ range needs only sysukpd.bin.
 
-PLATFORMS = sinclair amstrad commodore amiga atari acorn eaca samcoupe camputers
+PLATFORMS = sinclair amstrad commodore amiga atari acorn eaca samcoupe camputers tatung
 
 PLATFORM_MACHINES_sinclair = spectrum spec128 specpls2 specpl2a specpls3 \
 	tbblue specnext_ks1 specnext_ks2 specnext_ks3 zx80 zx81 tc2048 ts2068 \
@@ -98,6 +98,12 @@ PLATFORM_MACHINES_samcoupe = samcoupe
 # so nothing is excluded: the driver directory's whole catalog is the roster.
 PLATFORM_MACHINES_camputers = lynx48k lynx96k lynx128k
 
+# Tatung Einstein (src/mame/tatung/): one driver (einstein.cpp), two
+# machines — the Einstein TC-01 (1984) and the Einstein 256 (1986). Both
+# carry flags 0 — no MACHINE_NOT_WORKING, no IMPERFECT flags — so nothing
+# is excluded: the driver directory's whole catalog is the roster.
+PLATFORM_MACHINES_tatung = einstein einst256
+
 # All machines, every platform — the roster `make kernels` bakes and CI verifies.
 MACHINES = $(foreach p,$(PLATFORMS),$(PLATFORM_MACHINES_$(p)))
 
@@ -127,6 +133,7 @@ PLATFORM_SUBTARGET_acorn     = acorn
 PLATFORM_SUBTARGET_eaca      = eaca
 PLATFORM_SUBTARGET_samcoupe  = samcoupe
 PLATFORM_SUBTARGET_camputers = camputers
+PLATFORM_SUBTARGET_tatung    = tatung
 
 PLATFORM_SOURCES_sinclair = \
 	src/mame/sinclair/spectrum.cpp src/mame/sinclair/spec128.cpp \
@@ -175,6 +182,10 @@ PLATFORM_SOURCES_samcoupe = \
 PLATFORM_SOURCES_camputers = \
 	src/mame/camputers/camplynx.cpp
 
+# The whole tatung directory is this one driver file (the einstein bus
+# devices under src/devices/bus/einstein/ ride the device closure).
+PLATFORM_SOURCES_tatung = \
+	src/mame/tatung/einstein.cpp
 
 # Every shipped platform's SOURCES, joined. The shared-engine build
 # (scripts/build-mame.sh) compiles ONE mamedrivers SUBTARGET from this — the
@@ -682,6 +693,34 @@ MACHINE_STRING_lynx128k     = lynx128k
 MACHINE_ASSETS_lynx48k      = lynx48k
 MACHINE_ASSETS_lynx96k      = lynx96k
 MACHINE_ASSETS_lynx128k     = lynx128k
+
+# --- Tatung Einstein defaults strings ---
+# Bare machine names: no slot anywhere is must_be_loaded — with no disc both
+# machines boot from their MOS ROM to the machine's own face (the Einstein is
+# a floppy-CP/M machine; reaching Xtal DOS/CP/M needs a system disc in drive
+# 0, and whether a boot disc gets baked into the defaults string is D.'s
+# policy call, staged as an open question, not decided here). MAME's slot
+# defaults stand untouched: the TC-01 wires all four WD1770 floppy connectors
+# (0/1 as the 3" "3ss" TEAC FD-30A, 2/3 as "525qd" — the real machine had one
+# built-in 3" drive, the rest optional; all modules ROM-less), and the 256
+# keeps connectors 0/1 only. The pipe (tatung_pipe_cards), user port and
+# rs232 default to nullptr; centronics defaults to the ROM-less "printer".
+# No default slot device carries a ROM_START, so no device romset ships.
+# The TC-01 is PAL (TMS9129, 50Hz) — no mksd.sh NTSC case entry. The 256's
+# line standard is a dipswitch (S:1, 525/60 vs 625/50) whose MAME default is
+# "525 lines 60Hz" on its V9938: which regional canvas it fills is staged as
+# an open question — no mksd.sh entry until ruled.
+MACHINE_STRING_einstein     = einstein
+MACHINE_STRING_einst256     = einst256
+
+# --- Tatung Einstein asset dependencies (manifest asset names) ---
+# One self-contained romset per machine (einst256 is its own parent, not a
+# clone): einstein.zip carries the two BIOS-alternate MOS images (default
+# "mos12"); einst256.zip carries the single 16K MOS 2.1 image. The driver's
+# #if 0 diagnostic ROM is not compiled and is not a member. The manifest
+# stanzas await the ROM-sourcing parcel.
+MACHINE_ASSETS_einstein     = einstein
+MACHINE_ASSETS_einst256     = einst256
 
 # Query helper: `make -f machines.mk -s print-MACHINE_STRING_spectrum`.
 # Lets scripts read these facts without pulling in the Circle build.
