@@ -55,6 +55,7 @@ PLATFORM_DISPLAY = {
     "atari": "Atari",
     "acorn": "Acorn",
     "eaca": "EACA",
+    "samcoupe": "SAM Coupé",
 }
 
 # Per-platform README intro paragraph. The machines table, assets tree and
@@ -91,6 +92,14 @@ PLATFORM_INTRO = {
         "The EACA Colour Genie EG2000 line (`cgenie.cpp` in MAME): EACA's "
         "1982 Z80 home computer (HD6845 video, AY-3-8910 sound), in its "
         "European original and New Zealand variants. Each `make kernel "
+        "MACHINE=<name>` below bakes one machine into its own "
+        "`kernel8-<name>.img` — see the [top-level README](../../README.md) "
+        "for the build and the regional canvas."
+    ),
+    "samcoupe": (
+        "The MGT SAM Coupé (`samcoupe.cpp` in MAME): Miles Gordon "
+        "Technology's 1989 Z80 home computer (6 MHz Z80, custom ASIC "
+        "video, SAA1099 sound, two front drive bays). Each `make kernel "
         "MACHINE=<name>` below bakes one machine into its own "
         "`kernel8-<name>.img` — see the [top-level README](../../README.md) "
         "for the build and the regional canvas."
@@ -219,7 +228,11 @@ def parse_system_macros(text):
         args = split_top_level(body)
         if len(args) < 3:
             continue
-        quoted = [a[1:-1] for a in args if a.startswith('"') and a.endswith('"')]
+        # A string arg may be a u8"..." literal (samcoupe.cpp's fullname
+        # carries the accented Coupé that way): strip the encoding prefix so
+        # the quoted-string scan below still recognises it.
+        norm = [a[2:] if a.startswith('u8"') else a for a in args]
+        quoted = [a[1:-1] for a in norm if a.startswith('"') and a.endswith('"')]
         systems[args[1].strip()] = {
             "year": args[0].strip(),
             "parent": args[2].strip(),

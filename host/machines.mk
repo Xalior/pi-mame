@@ -42,7 +42,7 @@
 # Next boards share tbblue.zip + next.img, sprinter needs kb_ms_natural.zip,
 # pc1512 needs pc1512kb.zip, and the CPC+ range needs only sysukpd.bin.
 
-PLATFORMS = sinclair amstrad commodore amiga atari acorn eaca
+PLATFORMS = sinclair amstrad commodore amiga atari acorn eaca samcoupe
 
 PLATFORM_MACHINES_sinclair = spectrum spec128 specpls2 specpl2a specpls3 \
 	tbblue specnext_ks1 specnext_ks2 specnext_ks3 zx80 zx81 tc2048 ts2068 \
@@ -86,6 +86,12 @@ PLATFORM_MACHINES_acorn = bbcb bbca bbcb_de bbcb_no bbcb_us dolphinm \
 # nothing is excluded: the driver directory's whole catalog is the roster.
 PLATFORM_MACHINES_eaca = cgenie cgenienz
 
+# MGT SAM Coupé (src/mame/samcoupe/): one driver (samcoupe.cpp), one machine.
+# Its flags are MACHINE_SUPPORTS_SAVE only — no MACHINE_NOT_WORKING, no
+# IMPERFECT flags — so nothing is excluded: the directory's whole catalog is
+# the roster.
+PLATFORM_MACHINES_samcoupe = samcoupe
+
 # All machines, every platform — the roster `make kernels` bakes and CI verifies.
 MACHINES = $(foreach p,$(PLATFORMS),$(PLATFORM_MACHINES_$(p)))
 
@@ -113,6 +119,7 @@ PLATFORM_SUBTARGET_amiga     = amiga
 PLATFORM_SUBTARGET_atari     = atari
 PLATFORM_SUBTARGET_acorn     = acorn
 PLATFORM_SUBTARGET_eaca      = eaca
+PLATFORM_SUBTARGET_samcoupe  = samcoupe
 
 PLATFORM_SOURCES_sinclair = \
 	src/mame/sinclair/spectrum.cpp src/mame/sinclair/spec128.cpp \
@@ -152,6 +159,10 @@ PLATFORM_SOURCES_acorn = \
 # The whole eaca directory is this one driver file.
 PLATFORM_SOURCES_eaca = \
 	src/mame/eaca/cgenie.cpp
+
+# The whole samcoupe directory is this one driver file.
+PLATFORM_SOURCES_samcoupe = \
+	src/mame/samcoupe/samcoupe.cpp
 
 # Every shipped platform's SOURCES, joined. The shared-engine build
 # (scripts/build-mame.sh) compiles ONE mamedrivers SUBTARGET from this — the
@@ -608,6 +619,25 @@ MACHINE_STRING_cgenienz     = cgenienz
 # manifest stanzas await the ROM-sourcing parcel.
 MACHINE_ASSETS_cgenie       = cgenie
 MACHINE_ASSETS_cgenienz     = cgenienz
+
+# --- SAM Coupé defaults string ---
+# Bare machine name: the machine boots to SAM BASIC from ROM with no
+# must_be_loaded slot anywhere (no media is mandatory). MAME's slot defaults
+# stand untouched: the driver wires BOTH front drive bays with the "floppy"
+# module (samcoupe.cpp's SAMCOUPE_DRIVE_PORT defaults; the real machine's
+# drives were optional slide-in modules — a drive-less SAM existed), and the
+# mouse port and rear expansion port default empty. Whether the drive-bay
+# defaults get baked empty is D.'s policy call, staged as an open question,
+# not decided here. No samcoupe bus device carries a ROM_START, so no device
+# romset rides on any of these defaults. PAL-only machine (312-line raster) —
+# no mksd.sh NTSC case entry.
+MACHINE_STRING_samcoupe     = samcoupe
+
+# --- SAM Coupé asset dependencies (manifest asset names) ---
+# Its own romset only: samcoupe.zip carries the 15 BIOS-alternate 32K ROM
+# images (ROM_SYSTEM_BIOS v0.1..v3.1 + the ATOM HDD auto-boot ROM), default
+# BIOS v3.1. The manifest stanza awaits the ROM-sourcing parcel.
+MACHINE_ASSETS_samcoupe     = samcoupe
 
 # Query helper: `make -f machines.mk -s print-MACHINE_STRING_spectrum`.
 # Lets scripts read these facts without pulling in the Circle build.
