@@ -1,12 +1,14 @@
 # Laser 110
 
+![Laser 110 at power-on](images/laser110.jpg)
+
 - **`make kernel MACHINE=laser110`** — VTech
 - **Year**: 1983
 - **Manufacturer**: Video Technology
 
 ## At power-on
 
-Built into the platform kernel, awaiting hardware verification — no boot capture yet, so no boot behaviour is claimed here.
+`Laser 110` at power-on on the real board — see the capture above.
 
 ## Required assets
 

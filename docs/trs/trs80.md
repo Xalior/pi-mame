@@ -1,12 +1,14 @@
 # TRS-80 Model I (Level I Basic)
 
+![TRS-80 Model I (Level I Basic) at power-on](images/trs80.jpg)
+
 - **`make kernel MACHINE=trs80`** — TRS / Tandy
 - **Year**: 1977
 - **Manufacturer**: Tandy Radio Shack
 
 ## At power-on
 
-Built into the platform kernel, awaiting hardware verification — no boot capture yet, so no boot behaviour is claimed here.
+`TRS-80 Model I (Level I Basic)` at power-on on the real board — see the capture above.
 
 ## Required assets
 

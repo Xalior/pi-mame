@@ -1,12 +1,14 @@
 # Dragon 32
 
+![Dragon 32 at power-on](images/dragon32.jpg)
+
 - **`make kernel MACHINE=dragon32`** — TRS / Tandy
 - **Year**: 1982
 - **Manufacturer**: Dragon Data Ltd
 
 ## At power-on
 
-Built into the platform kernel, awaiting hardware verification — no boot capture yet, so no boot behaviour is claimed here.
+`Dragon 32` at power-on on the real board — see the capture above.
 
 ## Required assets
 

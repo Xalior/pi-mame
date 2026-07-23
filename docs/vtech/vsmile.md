@@ -1,12 +1,14 @@
 # V.Smile
 
+![V.Smile at power-on](images/vsmile.jpg)
+
 - **`make kernel MACHINE=vsmile`** — VTech
 - **Year**: 2005
 - **Manufacturer**: VTech
 
 ## At power-on
 
-Built into the platform kernel, awaiting hardware verification — no boot capture yet, so no boot behaviour is claimed here.
+**PARKED** — stops at MAME's known-problems box (imperfectly emulated graphics, sound). The capture above shows the observed stop; the machine is not offered until the park is lifted by a policy ruling.
 
 ## Required assets
 
