@@ -146,10 +146,9 @@ PLATFORM_MACHINES_sord = m5 m5p m5p_brno
 #    202002L while this port's cross wrappers force -std=gnu++23 (202302L,
 #    required by the circle libc++), and plib/ptypes.h also relies on
 #    libstdc++'s transitive <algorithm> include (std::copy) that circle
-#    libc++ doesn't provide. Netlist can never compile here without a mame
-#    rapi-circle patch (or upstream fix) — a ruling, not a port decision —
-#    so the driver is NOT in PLATFORM_SOURCES_vtech and gamemach/v4in1eg
-#    are not rostered until that ruling lands.
+#    libc++ doesn't provide. Netlist does not compile in this port, so
+#    the driver is NOT in PLATFORM_SOURCES_vtech and gamemach/v4in1eg are
+#    not rostered — PARKED.
 # The other 26 drivers are excluded WHOLE — every machine NOT_WORKING (the
 # reutapm precedent, so none is in PLATFORM_SOURCES_vtech): clickstart
 # geniuscolor geniusjr gkidabc glcx innotv_innotabmax inteladv iqunlim
@@ -172,10 +171,10 @@ PLATFORM_MACHINES_vtech = laser110 laser200 fellow tx8000 laser210 vz200 \
 #    by the driver) is the superset closure's ONLY user of MAME's discrete
 #    sound core, and src/devices/sound/discrete.cpp does not compile under
 #    this toolchain (GCC 15 -Werror=format-overflow at disc_sys.hxx:37/:83,
-#    sprintf "%s_%d.csv" into a 32-byte buffer). Exact unblock: a mame
-#    rapi-circle snprintf/buffer fix (or upstream) — a ruling, not a port
-#    decision (the vtech gamemachine netlist park precedent), so the driver
-#    is NOT in PLATFORM_SOURCES_trs until that ruling lands.
+#    sprintf "%s_%d.csv" into a 32-byte buffer). The discrete core does
+#    not compile in this port, so the driver is NOT in
+#    PLATFORM_SOURCES_trs and trs80m2 is not rostered — PARKED (the vtech
+#    gamemachine netlist park precedent).
 #  - trs80dt1.cpp (DT-1 data terminal), agvision.cpp (AgVision/Videotex),
 #    coco12.cpp (12 machines), coco3.cpp (4), dragon.cpp (8),
 #    dgnalpha.cpp, mc10.cpp (4), meritum.cpp (3), vis.cpp — nothing
