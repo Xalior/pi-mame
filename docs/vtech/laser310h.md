@@ -1,12 +1,14 @@
 # Laser 310 (SHRG)
 
+![Laser 310 (SHRG) at power-on](images/laser310h.jpg)
+
 - **`make kernel MACHINE=laser310h`** — VTech
 - **Year**: 1984
 - **Manufacturer**: Video Technology
 
 ## At power-on
 
-Built into the platform kernel, awaiting hardware verification — no boot capture yet, so no boot behaviour is claimed here.
+`Laser 310 (SHRG)` at power-on on the real board — see the capture above.
 
 ## Required assets
 

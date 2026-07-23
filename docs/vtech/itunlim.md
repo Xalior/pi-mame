@@ -1,12 +1,14 @@
 # VTech IT Unlimited (UK)
 
+![VTech IT Unlimited (UK) at power-on](images/itunlim.jpg)
+
 - **`make kernel MACHINE=itunlim`** — VTech
 - **Year**: 1998
 - **Manufacturer**: Video Technology
 
 ## At power-on
 
-Built into the platform kernel, awaiting hardware verification — no boot capture yet, so no boot behaviour is claimed here.
+**PARKED** — stops at MAME's known-problems box (MACHINE_NO_SOUND, sound completely unemulated); box held across two grabs 15s apart. Robot-hands dismissal confirms the core boots to its own "Desktop" learning-suite GUI and takes input, forensic only — verdict is parked, not promoted. The capture above shows the observed stop; the machine is not offered until the park is lifted by a policy ruling.
 
 ## Required assets
 

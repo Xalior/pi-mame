@@ -1,12 +1,14 @@
 # Fellow (Finland)
 
+![Fellow (Finland) at power-on](images/fellow.jpg)
+
 - **`make kernel MACHINE=fellow`** — VTech
 - **Year**: 1983
 - **Manufacturer**: Salora
 
 ## At power-on
 
-Built into the platform kernel, awaiting hardware verification — no boot capture yet, so no boot behaviour is claimed here.
+`Fellow (Finland)` at power-on on the real board — see the capture above.
 
 ## Required assets
 

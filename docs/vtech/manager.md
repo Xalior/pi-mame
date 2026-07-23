@@ -1,12 +1,14 @@
 # Manager (Finland)
 
+![Manager (Finland) at power-on](images/manager.jpg)
+
 - **`make kernel MACHINE=manager`** — VTech
 - **Year**: 1983
 - **Manufacturer**: Salora
 
 ## At power-on
 
-Built into the platform kernel, awaiting hardware verification — no boot capture yet, so no boot behaviour is claimed here.
+`Manager (Finland)` at power-on on the real board — see the capture above.
 
 ## Required assets
 
