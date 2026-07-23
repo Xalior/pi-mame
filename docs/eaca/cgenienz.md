@@ -1,12 +1,14 @@
 # Colour Genie EG2000 (New Zealand)
 
+![Colour Genie EG2000 (New Zealand) at power-on](images/cgenienz.jpg)
+
 - **`make kernel MACHINE=cgenienz`** — EACA
 - **Year**: 1982
 - **Manufacturer**: EACA
 
 ## At power-on
 
-Built into the platform kernel, awaiting hardware verification — no boot capture yet, so no boot behaviour is claimed here.
+`Colour Genie EG2000 (New Zealand)` at power-on on the real board — see the capture above.
 
 ## Required assets
 

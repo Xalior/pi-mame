@@ -1,12 +1,14 @@
 # Lynx 48k
 
+![Lynx 48k at power-on](images/lynx48k.jpg)
+
 - **`make kernel MACHINE=lynx48k`** — Camputers
 - **Year**: 1983
 - **Manufacturer**: Camputers
 
 ## At power-on
 
-Built into the platform kernel, awaiting hardware verification — no boot capture yet, so no boot behaviour is claimed here.
+`Lynx 48k` at power-on on the real board — see the capture above.
 
 ## Required assets
 

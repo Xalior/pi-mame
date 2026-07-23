@@ -1,12 +1,14 @@
 # Einstein TC-01
 
+![Einstein TC-01 at power-on](images/einstein.jpg)
+
 - **`make kernel MACHINE=einstein`** — Tatung
 - **Year**: 1984
 - **Manufacturer**: Tatung
 
 ## At power-on
 
-Built into the platform kernel, awaiting hardware verification — no boot capture yet, so no boot behaviour is claimed here.
+`Einstein TC-01` at power-on on the real board — see the capture above.
 
 ## Required assets
 
