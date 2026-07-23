@@ -42,7 +42,7 @@
 # Next boards share tbblue.zip + next.img, sprinter needs kb_ms_natural.zip,
 # pc1512 needs pc1512kb.zip, and the CPC+ range needs only sysukpd.bin.
 
-PLATFORMS = sinclair amstrad commodore amiga atari acorn eaca samcoupe camputers tatung memotech enterprise sord vtech
+PLATFORMS = sinclair amstrad commodore amiga atari acorn eaca samcoupe camputers tatung memotech enterprise sord vtech trs
 
 PLATFORM_MACHINES_sinclair = spectrum spec128 specpls2 specpl2a specpls3 \
 	tbblue specnext_ks1 specnext_ks2 specnext_ks3 zx80 zx81 tc2048 ts2068 \
@@ -161,6 +161,37 @@ PLATFORM_MACHINES_vtech = laser110 laser200 fellow tx8000 laser210 vz200 \
 	crvision fnvision crvisioj wizzard rameses vz2000 crvisio2 lasr2001 \
 	manager vsmile vsmilem itunlim
 
+# TRS / Tandy (src/mame/trs/): the Radio Shack catalog — the TRS-80 line,
+# the Color Computer family with its Dragon offshoots, the MC-10 line and
+# the VIS. 17 driver files carry machines (all via plain COMP); the roster
+# is what survives the MACHINE_NOT_WORKING rule (ruled), 38 machines:
+#  - trs80.cpp: trs80 only (Model I, Level I BASIC); excluded NOT_WORKING:
+#    trs80l2 eg3003 sys80 sys80p ht1080z ht1080z2 ht108064.
+#  - trs80m2.cpp: EXCLUDED WHOLE. trs80m16 is NOT_WORKING, and trs80m2 —
+#    though flagged working — is PARKED: its keyboard (trs80m2kb.h, ridden
+#    by the driver) is the superset closure's ONLY user of MAME's discrete
+#    sound core, and src/devices/sound/discrete.cpp does not compile under
+#    this toolchain (GCC 15 -Werror=format-overflow at disc_sys.hxx:37/:83,
+#    sprintf "%s_%d.csv" into a 32-byte buffer). Exact unblock: a mame
+#    rapi-circle snprintf/buffer fix (or upstream) — a ruling, not a port
+#    decision (the vtech gamemachine netlist park precedent), so the driver
+#    is NOT in PLATFORM_SOURCES_trs until that ruling lands.
+#  - trs80dt1.cpp (DT-1 data terminal), agvision.cpp (AgVision/Videotex),
+#    coco12.cpp (12 machines), coco3.cpp (4), dragon.cpp (8),
+#    dgnalpha.cpp, mc10.cpp (4), meritum.cpp (3), vis.cpp — nothing
+#    excluded.
+# Whole drivers excluded — every machine NOT_WORKING (the reutapm
+# precedent, so none is in PLATFORM_SOURCES_trs): dgn_beta.cpp (dgnbeta),
+# lnw80.cpp (lnw80), max80.cpp (max80), radionic.cpp (radionic),
+# tandy2k.cpp (tandy2k tandy2khd), trs80m3.cpp (trs80m3 trs80m4 trs80m4p
+# cp500).
+PLATFORM_MACHINES_trs = trs80 trs80dt1 agvision trsvidtx \
+	coco cocoh deluxecoco coco2b coco2bh cp400 cp400c2 mx1600 t4426 \
+	lzcolor64 cd6809 ms1600 coco3 coco3p coco3h msm3 \
+	dragon32 dragon64 dragon64h dragon200 dragon200e d64plus tanodr64 \
+	tanodr64h dgnalpha mc10 alice alice32 alice90 \
+	meritum1 meritum2 meritum_net vis
+
 # All machines, every platform — the roster `make kernels` bakes and CI verifies.
 MACHINES = $(foreach p,$(PLATFORMS),$(PLATFORM_MACHINES_$(p)))
 
@@ -195,6 +226,7 @@ PLATFORM_SUBTARGET_memotech  = memotech
 PLATFORM_SUBTARGET_enterprise = enterprise
 PLATFORM_SUBTARGET_sord      = sord
 PLATFORM_SUBTARGET_vtech     = vtech
+PLATFORM_SUBTARGET_trs       = trs
 
 PLATFORM_SOURCES_sinclair = \
 	src/mame/sinclair/spectrum.cpp src/mame/sinclair/spec128.cpp \
@@ -279,6 +311,26 @@ PLATFORM_SOURCES_vtech = \
 	src/mame/vtech/vtech1.cpp src/mame/vtech/vtech2.cpp \
 	src/mame/vtech/crvision.cpp src/mame/vtech/vsmile.cpp \
 	src/mame/vtech/geniusiq.cpp
+
+# The ten trs drivers in the build (the six all-NOT_WORKING drivers and the
+# parked trs80m2.cpp are covered in the roster comment above). makedep's
+# sibling scan
+# pulls the companions: trs80.h -> trs80_m.cpp/trs80_v.cpp via the _m/_v
+# aspect scan plus trs80_quik.cpp via its same-stem header; coco12.h/coco3.h
+# pull coco12_m.cpp/coco3_m.cpp and, via coco.h/gime.h/coco_vhd.h, the
+# coco.cpp base class, the GIME video device and the CoCo virtual hard
+# disk. The CoCo/Dragon cartridge-bus devices under src/devices/bus/coco/,
+# the MC-10 devices under src/devices/bus/mc10/ and vis's fixed ISA16
+# cards (pc_isa16_cards) ride the device closure. trs80m2.cpp is absent —
+# its trs80m2 machine is parked on the discrete-sound-core compile blocker
+# (see the roster comment above).
+PLATFORM_SOURCES_trs = \
+	src/mame/trs/trs80.cpp \
+	src/mame/trs/trs80dt1.cpp src/mame/trs/agvision.cpp \
+	src/mame/trs/coco12.cpp src/mame/trs/coco3.cpp \
+	src/mame/trs/dragon.cpp src/mame/trs/dgnalpha.cpp \
+	src/mame/trs/mc10.cpp src/mame/trs/meritum.cpp \
+	src/mame/trs/vis.cpp
 
 # Every shipped platform's SOURCES, joined. The shared-engine build
 # (scripts/build-mame.sh) compiles ONE mamedrivers SUBTARGET from this — the
@@ -977,6 +1029,119 @@ MACHINE_ASSETS_manager      = manager
 MACHINE_ASSETS_vsmile       = vsmile
 MACHINE_ASSETS_vsmilem      = vsmilem
 MACHINE_ASSETS_itunlim      = itunlim
+
+# --- TRS / Tandy defaults strings ---
+# Bare machine names: no slot anywhere is must_be_loaded — every machine
+# boots from its own ROM to its own face (vis's firmware runs without a CD
+# in its built-in drive).
+# MAME's slot defaults stand untouched, and several are EXTERNAL add-on
+# cartridges carrying their own device romset (the acorn precedent — the
+# assets lines below name what those defaults load): the CoCo lines'
+# cartridge slot defaults to the "fdc" CoCo FDC (cp400/cp400c2 override to
+# "cp450_fdc", cd6809 to "cd6809_fdc"), the Dragons default to
+# "dragon_fdc" (tanodr64/tanodr64h to "sdtandy_fdc"), and t4426's
+# cartridge is FIXED by the driver (set_options(..., true)) to the Terco
+# t4426 multi-cart — fixed hardware, never removed. Whether any external
+# FDC default gets baked empty is D.'s policy call, staged as an open
+# question, not decided here. Built-in hardware stands per the ruling:
+# dgnalpha's internal WD2797 (its cart slot defaults nullptr) and vis's
+# three fixed ISA cards (mcd/visaudio/visvga — all ROM-less, vis's
+# firmware lives in its own romset). The mc10/alice cart slots default
+# nullptr; cassette decks, centronics "printer" and the rs232 defaults
+# (agvision's "null_modem", mc10's "rs_printer") are all ROM-less.
+# NTSC (60Hz-raster) machines join the NTSC canvas case in
+# scripts/mksd.sh: everything here EXCEPT the PAL machines — dragon32/
+# dragon64/dragon64h/dragon200/dragon200e/d64plus/dgnalpha, coco3p and
+# the 50Hz meritum line. MAME models the French Alice family and the
+# Brazilian PAL-M clones at 60Hz, so those fill the NTSC canvas.
+MACHINE_STRING_trs80        = trs80
+MACHINE_STRING_trs80dt1     = trs80dt1
+MACHINE_STRING_agvision     = agvision
+MACHINE_STRING_trsvidtx     = trsvidtx
+MACHINE_STRING_coco         = coco
+MACHINE_STRING_cocoh        = cocoh
+MACHINE_STRING_deluxecoco   = deluxecoco
+MACHINE_STRING_coco2b       = coco2b
+MACHINE_STRING_coco2bh      = coco2bh
+MACHINE_STRING_cp400        = cp400
+MACHINE_STRING_cp400c2      = cp400c2
+MACHINE_STRING_mx1600       = mx1600
+MACHINE_STRING_t4426        = t4426
+MACHINE_STRING_lzcolor64    = lzcolor64
+MACHINE_STRING_cd6809       = cd6809
+MACHINE_STRING_ms1600       = ms1600
+MACHINE_STRING_coco3        = coco3
+MACHINE_STRING_coco3p       = coco3p
+MACHINE_STRING_coco3h       = coco3h
+MACHINE_STRING_msm3         = msm3
+MACHINE_STRING_dragon32     = dragon32
+MACHINE_STRING_dragon64     = dragon64
+MACHINE_STRING_dragon64h    = dragon64h
+MACHINE_STRING_dragon200    = dragon200
+MACHINE_STRING_dragon200e   = dragon200e
+MACHINE_STRING_d64plus      = d64plus
+MACHINE_STRING_tanodr64     = tanodr64
+MACHINE_STRING_tanodr64h    = tanodr64h
+MACHINE_STRING_dgnalpha     = dgnalpha
+MACHINE_STRING_mc10         = mc10
+MACHINE_STRING_alice        = alice
+MACHINE_STRING_alice32      = alice32
+MACHINE_STRING_alice90      = alice90
+MACHINE_STRING_meritum1     = meritum1
+MACHINE_STRING_meritum2     = meritum2
+MACHINE_STRING_meritum_net  = meritum_net
+MACHINE_STRING_vis          = vis
+
+# --- TRS / Tandy asset dependencies (manifest asset names) ---
+# Own romset first, then split-set fall-through parents (the m5p/pentagon
+# precedent) and the device romsets MAME's stock slot defaults load (the
+# acorn precedent): coco_fdc (the coco/coco3 lines' default cart),
+# cp450_fdc, cd6809_fdc, dragon_fdc, sdtandy_fdc, and t4426's fixed
+# coco_t4426 multi-cart. coco2b/coco2bh load the parent's extbas11.rom
+# (same name+hash), so they list coco too; every other set's members are
+# self-carried. The pure-alias ROM_STARTs keep their own zip names (the
+# a800xlp/mtx500 precedent): cocoh=coco, coco2bh=coco2b, coco3h=coco3,
+# dragon64h=dragon64, tanodr64h=tanodr64, alice90=alice32. alice32 (and
+# alias alice90) carry a BAD_DUMP charset.rom (borrowed from dcvg5k) — it
+# loads, and whether it shows a blocking box is per-machine, the glass
+# decides. The manifest stanzas await the ROM-sourcing parcel.
+MACHINE_ASSETS_trs80        = trs80
+MACHINE_ASSETS_trs80dt1     = trs80dt1
+MACHINE_ASSETS_agvision     = agvision
+MACHINE_ASSETS_trsvidtx     = trsvidtx
+MACHINE_ASSETS_coco         = coco coco_fdc
+MACHINE_ASSETS_cocoh        = cocoh coco_fdc
+MACHINE_ASSETS_deluxecoco   = deluxecoco coco_fdc
+MACHINE_ASSETS_coco2b       = coco2b coco coco_fdc
+MACHINE_ASSETS_coco2bh      = coco2bh coco coco_fdc
+MACHINE_ASSETS_cp400        = cp400 cp450_fdc
+MACHINE_ASSETS_cp400c2      = cp400c2 cp450_fdc
+MACHINE_ASSETS_mx1600       = mx1600 coco_fdc
+MACHINE_ASSETS_t4426        = t4426 coco_t4426
+MACHINE_ASSETS_lzcolor64    = lzcolor64 coco_fdc
+MACHINE_ASSETS_cd6809       = cd6809 cd6809_fdc
+MACHINE_ASSETS_ms1600       = ms1600 coco_fdc
+MACHINE_ASSETS_coco3        = coco3 coco_fdc
+MACHINE_ASSETS_coco3p       = coco3p coco_fdc
+MACHINE_ASSETS_coco3h       = coco3h coco_fdc
+MACHINE_ASSETS_msm3         = msm3 coco_fdc
+MACHINE_ASSETS_dragon32     = dragon32 dragon_fdc
+MACHINE_ASSETS_dragon64     = dragon64 dragon_fdc
+MACHINE_ASSETS_dragon64h    = dragon64h dragon_fdc
+MACHINE_ASSETS_dragon200    = dragon200 dragon_fdc
+MACHINE_ASSETS_dragon200e   = dragon200e dragon_fdc
+MACHINE_ASSETS_d64plus      = d64plus dragon_fdc
+MACHINE_ASSETS_tanodr64     = tanodr64 sdtandy_fdc
+MACHINE_ASSETS_tanodr64h    = tanodr64h sdtandy_fdc
+MACHINE_ASSETS_dgnalpha     = dgnalpha
+MACHINE_ASSETS_mc10         = mc10
+MACHINE_ASSETS_alice        = alice
+MACHINE_ASSETS_alice32      = alice32
+MACHINE_ASSETS_alice90      = alice90
+MACHINE_ASSETS_meritum1     = meritum1
+MACHINE_ASSETS_meritum2     = meritum2
+MACHINE_ASSETS_meritum_net  = meritum_net
+MACHINE_ASSETS_vis          = vis
 
 # Query helper: `make -f machines.mk -s print-MACHINE_STRING_spectrum`.
 # Lets scripts read these facts without pulling in the Circle build.
