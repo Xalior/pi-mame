@@ -1,12 +1,14 @@
 # Videotex
 
+![Videotex at power-on](images/trsvidtx.jpg)
+
 - **`make kernel MACHINE=trsvidtx`** — TRS / Tandy
 - **Year**: 1980
 - **Manufacturer**: Tandy Radio Shack
 
 ## At power-on
 
-Built into the platform kernel, awaiting hardware verification — no boot capture yet, so no boot behaviour is claimed here.
+**PARKED** — same box class as agvision — MACHINE_NO_SOUND_HW, box held across two grabs 15s apart. The capture above shows the observed stop; the machine is not offered until the park is lifted by a policy ruling.
 
 ## Required assets
 

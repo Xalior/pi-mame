@@ -1,12 +1,14 @@
 # Dragon 200
 
+![Dragon 200 at power-on](images/dragon200.jpg)
+
 - **`make kernel MACHINE=dragon200`** — TRS / Tandy
 - **Year**: 1985
 - **Manufacturer**: Eurohard S.A.
 
 ## At power-on
 
-Built into the platform kernel, awaiting hardware verification — no boot capture yet, so no boot behaviour is claimed here.
+`Dragon 200` at power-on on the real board — see the capture above.
 
 ## Required assets
 

@@ -1,12 +1,14 @@
 # TRS-80 DT-1 Data Terminal
 
+![TRS-80 DT-1 Data Terminal at power-on](images/trs80dt1.jpg)
+
 - **`make kernel MACHINE=trs80dt1`** — TRS / Tandy
 - **Year**: 1982
 - **Manufacturer**: Radio Shack
 
 ## At power-on
 
-Built into the platform kernel, awaiting hardware verification — no boot capture yet, so no boot behaviour is claimed here.
+`TRS-80 DT-1 Data Terminal` at power-on on the real board — see the capture above.
 
 ## Required assets
 

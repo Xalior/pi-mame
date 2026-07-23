@@ -1,12 +1,14 @@
 # Tano Dragon 64 (NTSC)
 
+![Tano Dragon 64 (NTSC) at power-on](images/tanodr64.jpg)
+
 - **`make kernel MACHINE=tanodr64`** — TRS / Tandy
 - **Year**: 1983
 - **Manufacturer**: Dragon Data Ltd / Tano Ltd
 
 ## At power-on
 
-Built into the platform kernel, awaiting hardware verification — no boot capture yet, so no boot behaviour is claimed here.
+`Tano Dragon 64 (NTSC)` at power-on on the real board — see the capture above.
 
 ## Required assets
 

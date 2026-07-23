@@ -1,12 +1,14 @@
 # Dragon 64
 
+![Dragon 64 at power-on](images/dragon64.jpg)
+
 - **`make kernel MACHINE=dragon64`** — TRS / Tandy
 - **Year**: 1983
 - **Manufacturer**: Dragon Data Ltd
 
 ## At power-on
 
-Built into the platform kernel, awaiting hardware verification — no boot capture yet, so no boot behaviour is claimed here.
+`Dragon 64` at power-on on the real board — see the capture above.
 
 ## Required assets
 

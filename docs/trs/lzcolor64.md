@@ -1,12 +1,14 @@
 # Color64
 
+![Color64 at power-on](images/lzcolor64.jpg)
+
 - **`make kernel MACHINE=lzcolor64`** — TRS / Tandy
 - **Year**: 1983
 - **Manufacturer**: Novo Tempo / LZ Equipamentos
 
 ## At power-on
 
-Built into the platform kernel, awaiting hardware verification — no boot capture yet, so no boot behaviour is claimed here.
+`Color64` at power-on on the real board — see the capture above.
 
 ## Required assets
 

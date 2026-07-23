@@ -1,12 +1,14 @@
 # Dragon Professional (Alpha)
 
+![Dragon Professional (Alpha) at power-on](images/dgnalpha.jpg)
+
 - **`make kernel MACHINE=dgnalpha`** — TRS / Tandy
 - **Year**: 1984
 - **Manufacturer**: Dragon Data Ltd
 
 ## At power-on
 
-Built into the platform kernel, awaiting hardware verification — no boot capture yet, so no boot behaviour is claimed here.
+`Dragon Professional (Alpha)` at power-on on the real board — see the capture above.
 
 ## Required assets
 

@@ -1,12 +1,14 @@
 # Meritum I (Model 1)
 
+![Meritum I (Model 1) at power-on](images/meritum1.jpg)
+
 - **`make kernel MACHINE=meritum1`** — TRS / Tandy
 - **Year**: 1983
 - **Manufacturer**: Mera-Elzab
 
 ## At power-on
 
-Built into the platform kernel, awaiting hardware verification — no boot capture yet, so no boot behaviour is claimed here.
+`Meritum I (Model 1)` at power-on on the real board — see the capture above.
 
 ## Required assets
 

@@ -1,12 +1,14 @@
 # Micro-Sep Model 3
 
+![Micro-Sep Model 3 at power-on](images/msm3.jpg)
+
 - **`make kernel MACHINE=msm3`** — TRS / Tandy
 - **Year**: 1987
 - **Manufacturer**: ILCE / SEP
 
 ## At power-on
 
-Built into the platform kernel, awaiting hardware verification — no boot capture yet, so no boot behaviour is claimed here.
+`Micro-Sep Model 3` at power-on on the real board — see the capture above.
 
 ## Required assets
 

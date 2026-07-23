@@ -1,12 +1,14 @@
 # Alice
 
+![Alice at power-on](images/alice.jpg)
+
 - **`make kernel MACHINE=alice`** — TRS / Tandy
 - **Year**: 1983
 - **Manufacturer**: Matra & Hachette
 
 ## At power-on
 
-Built into the platform kernel, awaiting hardware verification — no boot capture yet, so no boot behaviour is claimed here.
+`Alice` at power-on on the real board — see the capture above.
 
 ## Required assets
 

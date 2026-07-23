@@ -1,12 +1,14 @@
 # Alice 90
 
+![Alice 90 at power-on](images/alice90.jpg)
+
 - **`make kernel MACHINE=alice90`** — TRS / Tandy
 - **Year**: 1985
 - **Manufacturer**: Matra & Hachette
 
 ## At power-on
 
-Built into the platform kernel, awaiting hardware verification — no boot capture yet, so no boot behaviour is claimed here.
+**PARKED** — same box class as alice32 — #define rom_alice90 rom_alice32, identical BAD_DUMP charset.rom, condemned without a separate boot. The capture above shows the observed stop; the machine is not offered until the park is lifted by a policy ruling.
 
 ## Required assets
 

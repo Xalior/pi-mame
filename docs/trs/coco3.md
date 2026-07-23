@@ -1,12 +1,14 @@
 # Color Computer 3 (NTSC)
 
+![Color Computer 3 (NTSC) at power-on](images/coco3.jpg)
+
 - **`make kernel MACHINE=coco3`** — TRS / Tandy
 - **Year**: 1986
 - **Manufacturer**: Tandy Radio Shack
 
 ## At power-on
 
-Built into the platform kernel, awaiting hardware verification — no boot capture yet, so no boot behaviour is claimed here.
+`Color Computer 3 (NTSC)` at power-on on the real board — see the capture above.
 
 ## Required assets
 

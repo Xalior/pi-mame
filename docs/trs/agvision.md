@@ -1,12 +1,14 @@
 # AgVision
 
+![AgVision at power-on](images/agvision.jpg)
+
 - **`make kernel MACHINE=agvision`** — TRS / Tandy
 - **Year**: 1979
 - **Manufacturer**: Elanco
 
 ## At power-on
 
-Built into the platform kernel, awaiting hardware verification — no boot capture yet, so no boot behaviour is claimed here.
+**PARKED** — stops at MAME's known-problems box (MACHINE_NO_SOUND_HW, "expected behavior" wording); box held across two grabs 15s apart. Box=park rule applies regardless of the box's own wording. The capture above shows the observed stop; the machine is not offered until the park is lifted by a policy ruling.
 
 ## Required assets
 

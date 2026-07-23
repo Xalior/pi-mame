@@ -1,12 +1,14 @@
 # Dragon 64 (HD6309E)
 
+![Dragon 64 (HD6309E) at power-on](images/dragon64h.jpg)
+
 - **`make kernel MACHINE=dragon64h`** — TRS / Tandy
 - **Year**: 19??
 - **Manufacturer**: Dragon Data Ltd
 
 ## At power-on
 
-Built into the platform kernel, awaiting hardware verification — no boot capture yet, so no boot behaviour is claimed here.
+`Dragon 64 (HD6309E)` at power-on on the real board — see the capture above.
 
 ## Required assets
 

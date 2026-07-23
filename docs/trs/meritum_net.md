@@ -1,12 +1,14 @@
 # Meritum I (Model 2) (network)
 
+![Meritum I (Model 2) (network) at power-on](images/meritum_net.jpg)
+
 - **`make kernel MACHINE=meritum_net`** — TRS / Tandy
 - **Year**: 1985
 - **Manufacturer**: Mera-Elzab
 
 ## At power-on
 
-Built into the platform kernel, awaiting hardware verification — no boot capture yet, so no boot behaviour is claimed here.
+`Meritum I (Model 2) (network)` at power-on on the real board — see the capture above.
 
 ## Required assets
 

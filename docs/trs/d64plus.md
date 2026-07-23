@@ -1,12 +1,14 @@
 # Dragon 64 Plus
 
+![Dragon 64 Plus at power-on](images/d64plus.jpg)
+
 - **`make kernel MACHINE=d64plus`** — TRS / Tandy
 - **Year**: 1985
 - **Manufacturer**: Dragon Data Ltd / Compusense
 
 ## At power-on
 
-Built into the platform kernel, awaiting hardware verification — no boot capture yet, so no boot behaviour is claimed here.
+`Dragon 64 Plus` at power-on on the real board — see the capture above.
 
 ## Required assets
 

@@ -1,12 +1,14 @@
 # Color Computer 1/2
 
+![Color Computer 1/2 at power-on](images/coco.jpg)
+
 - **`make kernel MACHINE=coco`** — TRS / Tandy
 - **Year**: 1980
 - **Manufacturer**: Tandy Radio Shack
 
 ## At power-on
 
-Built into the platform kernel, awaiting hardware verification — no boot capture yet, so no boot behaviour is claimed here.
+`Color Computer 1/2` at power-on on the real board — see the capture above.
 
 ## Required assets
 

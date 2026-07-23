@@ -1,12 +1,14 @@
 # Deluxe Color Computer
 
+![Deluxe Color Computer at power-on](images/deluxecoco.jpg)
+
 - **`make kernel MACHINE=deluxecoco`** — TRS / Tandy
 - **Year**: 1983
 - **Manufacturer**: Tandy Radio Shack
 
 ## At power-on
 
-Built into the platform kernel, awaiting hardware verification — no boot capture yet, so no boot behaviour is claimed here.
+**PARKED** — hangs after MAME's own startup log (framebuffer init completes) with no fatal error, no "sdl2: pump alive" heartbeat, and no pump-stall deadman dump — total serial silence, confirmed reproducible across two independent boots. No MACHINE_NOT_WORKING flag on this driver; presumption is this port's world, not upstream emulation. Robot-hands input never registered (nothing was listening either time). Diagnosis, not fix, is this parcel's job — unblock is a future ruling. The capture above shows the observed stop; the machine is not offered until the park is lifted by a policy ruling.
 
 ## Required assets
 

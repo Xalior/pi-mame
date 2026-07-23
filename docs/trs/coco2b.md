@@ -1,12 +1,14 @@
 # Color Computer 2B
 
+![Color Computer 2B at power-on](images/coco2b.jpg)
+
 - **`make kernel MACHINE=coco2b`** — TRS / Tandy
 - **Year**: 1985?
 - **Manufacturer**: Tandy Radio Shack
 
 ## At power-on
 
-Built into the platform kernel, awaiting hardware verification — no boot capture yet, so no boot behaviour is claimed here.
+`Color Computer 2B` at power-on on the real board — see the capture above.
 
 ## Required assets
 

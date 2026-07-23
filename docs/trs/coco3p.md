@@ -1,12 +1,14 @@
 # Color Computer 3 (PAL)
 
+![Color Computer 3 (PAL) at power-on](images/coco3p.jpg)
+
 - **`make kernel MACHINE=coco3p`** — TRS / Tandy
 - **Year**: 1986
 - **Manufacturer**: Tandy Radio Shack
 
 ## At power-on
 
-Built into the platform kernel, awaiting hardware verification — no boot capture yet, so no boot behaviour is claimed here.
+`Color Computer 3 (PAL)` at power-on on the real board — see the capture above.
 
 ## Required assets
 

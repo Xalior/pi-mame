@@ -1,12 +1,14 @@
 # Video Information System MD-2500
 
+![Video Information System MD-2500 at power-on](images/vis.jpg)
+
 - **`make kernel MACHINE=vis`** — TRS / Tandy
 - **Year**: 1992
 - **Manufacturer**: Tandy/Memorex
 
 ## At power-on
 
-Built into the platform kernel, awaiting hardware verification — no boot capture yet, so no boot behaviour is claimed here.
+**PARKED** — stops at MAME's known-problems box (IMPERFECT_GRAPHICS | IMPERFECT_SOUND); box held across two grabs 15s apart. The capture above shows the observed stop; the machine is not offered until the park is lifted by a policy ruling.
 
 ## Required assets
 
