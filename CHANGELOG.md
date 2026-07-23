@@ -24,14 +24,38 @@
   joins Sinclair, Amstrad and Commodore — 19 shippable games sharing the
   Arcadia BIOS. Their ROMs are public-tier, fetched at build time, so the
   Amiga card is a public-tier card only.
-- **Per-platform SD cards, assembled by CI.** Every build now produces the
-  actual deliverable, not just bare kernels: one card zip per platform and
-  tier — the boot picker as the card's front door, the platform's
-  `mamedrivers`-linked kernel as the core, a generated `bootmenu.cfg` for the
-  tier, and the tier's ROMs fetched from their mirrors at build time (the repo
-  itself stays ROM-free). Per-platform kernels for all three boards upload as
-  individual images alongside. A tier with no bootable machine — an empty menu,
-  like commodore-free — ships no card.
+- **Eleven more platforms come aboard — 15 platforms, 195 roster machines.**
+  The Atari 8-bit computers, Acorn's 8-bit line, the EACA Colour Genie, the
+  MGT SAM Coupé, the Camputers Lynx, the Tatung Einstein, the Memotech MTX,
+  the Enterprise, the Sord m.5, VTech's Laser/VZ family and friends, and the
+  TRS catalogue (TRS-80, CoCo, Dragon, MC-10) each become a platform card.
+  Every romset is CRC32/SHA1-verified into `scripts/assets.manifest` before a
+  machine joins the roster, and every roster machine carries a bench verdict
+  in its platform's pages under `docs/` — proven on the glass, or parked with
+  its reason recorded: a blocking MAME warning box, media the driver refuses
+  to boot without, or a toolchain fault.
+- **The Pi 5 payload comes alive.** Chain-boot works on the BCM2712; serial
+  runs on the GPIO14/15 header UART on every board, Pi 5 included; and the
+  display path takes the Pi 5 firmware on its own terms — the firmware grants
+  one native-EDID surface, so the shim probes the display, sizes its window
+  from the grant, and presents through a shadow buffer, and the Pi 5 build
+  alone bakes `-keepaspect` (MAME soft-scales into the native mode, affordable
+  on that CPU only — Pi 3/4 keep their 1:1 blit onto the signal the firmware
+  outputs). The new-platform bench proofs above all ran on Pi 5 glass. On the
+  smallest board, the loader's staging allocator no longer crashes the
+  1&nbsp;GB Pi 3.
+- **Per-platform, per-board SD cards.** Every build produces the actual
+  deliverable, not just bare kernels. The release matrix is board × platform ×
+  tier, one single-board card zip per cell —
+  `pi-mame-<tag>-<platform>-<tier>-<board>.zip` — carrying that board's
+  Foundation firmware (sourced from its own Circle world), the boot picker as
+  the card's front door, the platform's `mamedrivers`-linked kernel as the
+  core, a generated `bootmenu.cfg` for the tier, and the tier's ROMs fetched
+  from their mirrors at build time (the repo itself stays ROM-free). A tier
+  with no bootable machine — an empty menu, like commodore-free — ships no
+  card. CI runs the identical `make` machinery a local user runs (`make dist`
+  is the release), so the release path is under test both ways; per-platform
+  kernels for all three boards upload as individual images alongside.
 
 ## PoC2 — Me and my Shadow core · 2026-07-14
 
