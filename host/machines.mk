@@ -42,7 +42,7 @@
 # Next boards share tbblue.zip + next.img, sprinter needs kb_ms_natural.zip,
 # pc1512 needs pc1512kb.zip, and the CPC+ range needs only sysukpd.bin.
 
-PLATFORMS = sinclair amstrad commodore amiga atari acorn eaca samcoupe camputers tatung memotech enterprise
+PLATFORMS = sinclair amstrad commodore amiga atari acorn eaca samcoupe camputers tatung memotech enterprise sord
 
 PLATFORM_MACHINES_sinclair = spectrum spec128 specpls2 specpl2a specpls3 \
 	tbblue specnext_ks1 specnext_ks2 specnext_ks3 zx80 zx81 tc2048 ts2068 \
@@ -118,6 +118,14 @@ PLATFORM_MACHINES_memotech = mtx512 mtx500 rs128
 # catalog is the roster.
 PLATFORM_MACHINES_enterprise = ep64 phc64 ep128
 
+# Sord (src/mame/sord/): two drivers. m5.cpp carries the m.5 line — the
+# m.5 Japan (m5, 1983, parent), the m.5 Europe (m5p, 1983) and the Czech
+# BRNO mod (m5p_brno, 1983) — all flags 0 (no MACHINE_NOT_WORKING, no
+# IMPERFECT), so all three are rostered. future32.cpp's sole machine
+# (future32a) is MACHINE_NOT_WORKING, so the whole driver is excluded and
+# not in PLATFORM_SOURCES_sord at all (the reutapm precedent).
+PLATFORM_MACHINES_sord = m5 m5p m5p_brno
+
 # All machines, every platform — the roster `make kernels` bakes and CI verifies.
 MACHINES = $(foreach p,$(PLATFORMS),$(PLATFORM_MACHINES_$(p)))
 
@@ -150,6 +158,7 @@ PLATFORM_SUBTARGET_camputers = camputers
 PLATFORM_SUBTARGET_tatung    = tatung
 PLATFORM_SUBTARGET_memotech  = memotech
 PLATFORM_SUBTARGET_enterprise = enterprise
+PLATFORM_SUBTARGET_sord      = sord
 
 PLATFORM_SOURCES_sinclair = \
 	src/mame/sinclair/spectrum.cpp src/mame/sinclair/spec128.cpp \
@@ -216,6 +225,12 @@ PLATFORM_SOURCES_memotech = \
 # src/devices/bus/ep64/ ride the device closure.
 PLATFORM_SOURCES_enterprise = \
 	src/mame/enterprise/ep64.cpp
+
+# m5.cpp only — future32.cpp is excluded because its sole machine
+# (future32a) is MACHINE_NOT_WORKING (the reutapm precedent). The m.5
+# cartridge-bus devices under src/devices/bus/m5/ ride the device closure.
+PLATFORM_SOURCES_sord = \
+	src/mame/sord/m5.cpp
 
 # Every shipped platform's SOURCES, joined. The shared-engine build
 # (scripts/build-mame.sh) compiles ONE mamedrivers SUBTARGET from this — the
@@ -802,6 +817,38 @@ MACHINE_STRING_ep128        = ep128
 MACHINE_ASSETS_ep64         = ep64
 MACHINE_ASSETS_phc64        = phc64
 MACHINE_ASSETS_ep128        = ep128
+
+# --- Sord m.5 defaults strings ---
+# Bare machine names: no slot anywhere is must_be_loaded — every machine
+# boots from its monitor ROM to its own face. MAME's slot defaults stand
+# untouched: both cartridge slots (M5_CART_SLOT, m5_cart) default to
+# nullptr, the cassette deck defaults to CASSETTE_PLAY with no image
+# mounted, and centronics defaults to the ROM-less "printer". The FD-5
+# floppy subsystem (z80fd5 CPU + upd765 + one "3ssdd" connector) is
+# HARDWIRED by the driver, not a removable slot (m5.cpp's own TODO:
+# "rewrite fd5 floppy as unpluggable device"), and its controller ROM
+# (sordfd5.rom) is a member of the machine's own romset, not a device
+# romset; the BRNO mod replaces it with a WD2797 + two ROM-less "35hd"
+# connectors and a 512K RAM disk. Whether a BASIC cartridge gets baked
+# into the defaults string (the real m.5 shipped with the BASIC-I cart;
+# bare it boots to the monitor) is D.'s policy call, staged as an open
+# question, not decided here. m5 is NTSC (TMS9928A) — it joins the NTSC
+# canvas case in scripts/mksd.sh; m5p and m5p_brno are PAL (TMS9929A).
+MACHINE_STRING_m5           = m5
+MACHINE_STRING_m5p          = m5p
+MACHINE_STRING_m5p_brno     = m5p_brno
+
+# --- Sord m.5 asset dependencies (manifest asset names) ---
+# m5.zip (parent) carries sordjap.ic21 + sordfd5.rom. m5p is a clone whose
+# ROM_START loads its own sordint.ic21 plus the parent's sordfd5.rom (same
+# name and hashes), which falls through to m5.zip in split-set mirrors —
+# so m5p lists both (the pentagon/spec128 precedent). m5p_brno's two
+# members (sordint.ic21 + brno_rom12.rom) are both absent from the PARENT
+# zip, so its split zip is self-contained — one asset. The manifest
+# stanzas await the ROM-sourcing parcel.
+MACHINE_ASSETS_m5           = m5
+MACHINE_ASSETS_m5p          = m5p m5
+MACHINE_ASSETS_m5p_brno     = m5p_brno
 
 # Query helper: `make -f machines.mk -s print-MACHINE_STRING_spectrum`.
 # Lets scripts read these facts without pulling in the Circle build.

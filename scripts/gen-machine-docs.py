@@ -60,6 +60,7 @@ PLATFORM_DISPLAY = {
     "tatung": "Tatung",
     "memotech": "Memotech",
     "enterprise": "Enterprise",
+    "sord": "Sord",
 }
 
 # Per-platform README intro paragraph. The machines table, assets tree and
@@ -143,6 +144,16 @@ PLATFORM_INTRO = {
         "MACHINE=<name>` below bakes one machine into its own "
         "`kernel8-<name>.img` \u2014 see the [top-level README](../../README.md) "
         "for the build and the regional canvas."
+    ),
+    "sord": (
+        "The Sord m.5 line (`m5.cpp` in MAME): Sord's 1983 Z80A home "
+        "computer (TMS9928A/9929A video, SN76489A sound, twin cartridge "
+        "slots) — the Japanese m.5, the European m.5p and the Czech BRNO "
+        "mod with its WD2797 floppy and RAM disk. Each "
+        "`make kernel MACHINE=<name>` below bakes one machine into its own "
+        "`kernel8-<name>.img` — see the "
+        "[top-level README](../../README.md) for the build and the regional "
+        "canvas."
     ),
 }
 
@@ -246,10 +257,11 @@ def parse_defines(text):
 
 
 def strip_disabled_blocks(text):
-    """Drop preprocessor-disabled `#if 0` ... `#endif` regions (tracking
-    nested conditionals) before any scan: a disabled ROM_LOAD is not part of
-    the romset MAME compiles (einstein.cpp fences its diagnostic ROM this
-    way), so it must never reach a docs ROM table."""
+    """Drop disabled source before any scan: preprocessor `#if 0` ... `#endif`
+    regions (tracking nested conditionals; einstein.cpp fences its diagnostic
+    ROM this way) and `//` line comments (m5.cpp keeps alternate BRNO ROMs as
+    commented-out ROM_LOAD lines). A disabled ROM_LOAD is not part of the
+    romset MAME compiles, so it must never reach a docs ROM table."""
     out, depth = [], 0
     for line in text.split("\n"):
         stripped = line.lstrip()
@@ -257,7 +269,7 @@ def strip_disabled_blocks(text):
             if re.match(r"#\s*if\s+0\b", stripped):
                 depth = 1
                 continue
-            out.append(line)
+            out.append(re.sub(r"//.*", "", line))
         else:
             if re.match(r"#\s*(if|ifdef|ifndef)\b", stripped):
                 depth += 1
@@ -557,7 +569,12 @@ def readme_page(platform, roster, facts, manifest):
     lines.append("```")
     lines.append("my-assets/")
     lines.append("└── roms/")
-    shared = sorted({a for m in roster for a in facts["machine_assets"][m] if a != m})
+    # Shared assets are the ones no roster machine already lists as its own
+    # romset zip: a parent romset doubling as a clone's extra asset (sord's
+    # m5.zip under m5p) is already in the tree as its machine's own line and
+    # already has its own details page, so it is not repeated here.
+    shared = sorted({a for m in roster for a in facts["machine_assets"][m]
+                     if a != m} - set(roster))
     for i, m in enumerate(roster):
         last = not shared and i == len(roster) - 1
         lines.append(f"    {'└──' if last else '├──'} {m}.zip")

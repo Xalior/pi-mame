@@ -21,7 +21,6 @@ Built into the platform kernel, awaiting hardware verification — no boot captu
   | `caspl_mos343_cd.bin` | `953b7530` |
   | `caspl_mos343_ef.bin` | `ebc09359` |
   | `mos350.ic24` | `141027b9` |
-  | `anfs425-2201351.rom` | `c2a6655e` |
   | `mos320.cmos` | `c7f9e85a` |
   | `mos350.cmos` | `e84c1854` |
 - `roms/saa5050.zip`
