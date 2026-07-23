@@ -42,7 +42,7 @@
 # Next boards share tbblue.zip + next.img, sprinter needs kb_ms_natural.zip,
 # pc1512 needs pc1512kb.zip, and the CPC+ range needs only sysukpd.bin.
 
-PLATFORMS = sinclair amstrad commodore amiga atari acorn eaca samcoupe camputers tatung memotech enterprise sord
+PLATFORMS = sinclair amstrad commodore amiga atari acorn eaca samcoupe camputers tatung memotech enterprise sord vtech
 
 PLATFORM_MACHINES_sinclair = spectrum spec128 specpls2 specpl2a specpls3 \
 	tbblue specnext_ks1 specnext_ks2 specnext_ks3 zx80 zx81 tc2048 ts2068 \
@@ -126,6 +126,41 @@ PLATFORM_MACHINES_enterprise = ep64 phc64 ep128
 # not in PLATFORM_SOURCES_sord at all (the reutapm precedent).
 PLATFORM_MACHINES_sord = m5 m5p m5p_brno
 
+# VTech (src/mame/vtech/): the Laser/VZ home-computer family and the wider
+# VTech catalog — 32 driver files, of which only SIX carry any machine not
+# flagged MACHINE_NOT_WORKING. The roster is what survives that rule (ruled)
+# minus the netlist park below, 24 machines off five drivers:
+#  - vtech1.cpp (Laser 110/200/210/310, VZ-200/300 and OEM clones) — 9
+#    rostered; excluded: vz200de (NOT_WORKING, also the roster line's only
+#    NO_DUMP set — its German/Dutch BASIC V1.1 is undumped).
+#  - vtech2.cpp (Laser 350/500/700) — all 3 rostered.
+#  - crvision.cpp (CreatiVision console family + the Laser 2001/Salora
+#    Manager computers) — all 9 rostered.
+#  - vsmile.cpp (V.Smile, V.Smile Motion) — both rostered.
+#  - geniusiq.cpp — itunlim only (MACHINE_NO_SOUND, not NOT_WORKING);
+#    excluded: pcunlim iq128 iq128_fr iqtv512 (all NOT_WORKING).
+#  - gamemachine.cpp (The Game Machine, 4 in 1 Electronic Games — screenless
+#    PWM-LED tabletops) survives the flag rule but is PARKED at compile
+#    stage: its NETLIST_SOUND pulls src/lib/netlist, whose
+#    plib/pconfig.h:123 whitelists exact __cplusplus values ending at
+#    202002L while this port's cross wrappers force -std=gnu++23 (202302L,
+#    required by the circle libc++), and plib/ptypes.h also relies on
+#    libstdc++'s transitive <algorithm> include (std::copy) that circle
+#    libc++ doesn't provide. Netlist can never compile here without a mame
+#    rapi-circle patch (or upstream fix) — a ruling, not a port decision —
+#    so the driver is NOT in PLATFORM_SOURCES_vtech and gamemach/v4in1eg
+#    are not rostered until that ruling lands.
+# The other 26 drivers are excluded WHOLE — every machine NOT_WORKING (the
+# reutapm precedent, so none is in PLATFORM_SOURCES_vtech): clickstart
+# geniuscolor geniusjr gkidabc glcx innotv_innotabmax inteladv iqunlim
+# kidsupstar laser3k lcmate2 learnwin magibook pc1000 pc2000 pc4 phusion
+# prestige primusex socrates storio vsmileb vsmilepro vtech5303 vtech_eu3a12
+# vtech_innotab.
+PLATFORM_MACHINES_vtech = laser110 laser200 fellow tx8000 laser210 vz200 \
+	laser310 vz300 laser310h laser350 laser500 laser700 \
+	crvision fnvision crvisioj wizzard rameses vz2000 crvisio2 lasr2001 \
+	manager vsmile vsmilem itunlim
+
 # All machines, every platform — the roster `make kernels` bakes and CI verifies.
 MACHINES = $(foreach p,$(PLATFORMS),$(PLATFORM_MACHINES_$(p)))
 
@@ -159,6 +194,7 @@ PLATFORM_SUBTARGET_tatung    = tatung
 PLATFORM_SUBTARGET_memotech  = memotech
 PLATFORM_SUBTARGET_enterprise = enterprise
 PLATFORM_SUBTARGET_sord      = sord
+PLATFORM_SUBTARGET_vtech     = vtech
 
 PLATFORM_SOURCES_sinclair = \
 	src/mame/sinclair/spectrum.cpp src/mame/sinclair/spec128.cpp \
@@ -231,6 +267,18 @@ PLATFORM_SOURCES_enterprise = \
 # cartridge-bus devices under src/devices/bus/m5/ ride the device closure.
 PLATFORM_SOURCES_sord = \
 	src/mame/sord/m5.cpp
+
+# The five compilable vtech drivers with any non-NOT_WORKING machine (the
+# excluded 26 drivers, and gamemachine.cpp's netlist park, are covered in
+# the roster comment above). makedep's sibling scan pulls the companions:
+# vtech2.h -> vtech2_m.cpp/vtech2_v.cpp via the _m/_v aspect scan, and
+# crvision.h/vsmile.h ride with their own drivers. The vtech ioexp/memexp
+# bus devices under src/devices/bus/vtech/ and the crvision/vsmile
+# cartridge slots ride the device closure.
+PLATFORM_SOURCES_vtech = \
+	src/mame/vtech/vtech1.cpp src/mame/vtech/vtech2.cpp \
+	src/mame/vtech/crvision.cpp src/mame/vtech/vsmile.cpp \
+	src/mame/vtech/geniusiq.cpp
 
 # Every shipped platform's SOURCES, joined. The shared-engine build
 # (scripts/build-mame.sh) compiles ONE mamedrivers SUBTARGET from this — the
@@ -849,6 +897,86 @@ MACHINE_STRING_m5p_brno     = m5p_brno
 MACHINE_ASSETS_m5           = m5
 MACHINE_ASSETS_m5p          = m5p m5
 MACHINE_ASSETS_m5p_brno     = m5p_brno
+
+# --- VTech defaults strings ---
+# Bare machine names: no slot anywhere on the roster is must_be_loaded and no
+# surviving driver carries a fatalerror, so every machine boots to its own
+# firmware face (or, for the cartridge consoles, to the BIOS's own cart-less
+# face). MAME's slot defaults stand untouched: the vtech1/vtech2 ioexp and
+# memexp buses default nullptr (src/devices/bus/vtech/), every cassette deck
+# defaults CASSETTE_STOPPED (crvision: CASSETTE_PLAY, motor disabled) with no
+# image, the crvision/vtech2/geniusiq/vsmile cartridge slots default nullptr,
+# centronics (crvision/lasr2001) defaults the ROM-less "printer", and the
+# vsmile controller port defaults the ROM-less "joy" pad. The vtech2 5.25"
+# drives are HARDWIRED legacy floppy devices (one on laser350/laser500, two
+# on laser700), not slots — built-in per the driver, ROM-less. Whether a
+# cartridge gets baked for the crvision consoles or the V.Smiles (bare, the
+# CreatiVision boots only its 2K BIOS; the V.Smile shows its "please insert
+# a Learning Game" face) is D.'s policy call, staged as an open question,
+# not decided here.
+# Regions: crvisioj (TMS9918), vsmile and vsmilem (60Hz/262-line) are NTSC
+# and join the NTSC canvas case in scripts/mksd.sh; all vtech1 machines
+# (MC6847 in 312-line PAL mode), vtech2 (50Hz), the other crvision machines
+# (TMS9929/9929A) and itunlim (50Hz) are PAL.
+MACHINE_STRING_laser110     = laser110
+MACHINE_STRING_laser200     = laser200
+MACHINE_STRING_fellow       = fellow
+MACHINE_STRING_tx8000       = tx8000
+MACHINE_STRING_laser210     = laser210
+MACHINE_STRING_vz200        = vz200
+MACHINE_STRING_laser310     = laser310
+MACHINE_STRING_vz300        = vz300
+MACHINE_STRING_laser310h    = laser310h
+MACHINE_STRING_laser350     = laser350
+MACHINE_STRING_laser500     = laser500
+MACHINE_STRING_laser700     = laser700
+MACHINE_STRING_crvision     = crvision
+MACHINE_STRING_fnvision     = fnvision
+MACHINE_STRING_crvisioj     = crvisioj
+MACHINE_STRING_wizzard      = wizzard
+MACHINE_STRING_rameses      = rameses
+MACHINE_STRING_vz2000       = vz2000
+MACHINE_STRING_crvisio2     = crvisio2
+MACHINE_STRING_lasr2001     = lasr2001
+MACHINE_STRING_manager      = manager
+MACHINE_STRING_vsmile       = vsmile
+MACHINE_STRING_vsmilem      = vsmilem
+MACHINE_STRING_itunlim      = itunlim
+
+# --- VTech asset dependencies (manifest asset names) ---
+# One self-contained romset zip name per machine. The aliased ROM_STARTs
+# keep their own zip names carrying the same content (the a800xlp/mtx500
+# precedent): laser200/fellow/tx8000 alias rom_laser110, vz300/laser310h
+# alias rom_laser310, wizzard/crvisioj/crvisio2 alias rom_crvision,
+# rameses/vz2000 alias rom_fnvision. The three vtech2 sets load identical
+# members by content under their own names. itunlim's single 2MB member is
+# unique to it (no fall-through to the excluded pcunlim parent). No device
+# romset rides any slot default (all ROM-less). The manifest stanzas await
+# the ROM-sourcing parcel.
+MACHINE_ASSETS_laser110     = laser110
+MACHINE_ASSETS_laser200     = laser200
+MACHINE_ASSETS_fellow       = fellow
+MACHINE_ASSETS_tx8000       = tx8000
+MACHINE_ASSETS_laser210     = laser210
+MACHINE_ASSETS_vz200        = vz200
+MACHINE_ASSETS_laser310     = laser310
+MACHINE_ASSETS_vz300        = vz300
+MACHINE_ASSETS_laser310h    = laser310h
+MACHINE_ASSETS_laser350     = laser350
+MACHINE_ASSETS_laser500     = laser500
+MACHINE_ASSETS_laser700     = laser700
+MACHINE_ASSETS_crvision     = crvision
+MACHINE_ASSETS_fnvision     = fnvision
+MACHINE_ASSETS_crvisioj     = crvisioj
+MACHINE_ASSETS_wizzard      = wizzard
+MACHINE_ASSETS_rameses      = rameses
+MACHINE_ASSETS_vz2000       = vz2000
+MACHINE_ASSETS_crvisio2     = crvisio2
+MACHINE_ASSETS_lasr2001     = lasr2001
+MACHINE_ASSETS_manager      = manager
+MACHINE_ASSETS_vsmile       = vsmile
+MACHINE_ASSETS_vsmilem      = vsmilem
+MACHINE_ASSETS_itunlim      = itunlim
 
 # Query helper: `make -f machines.mk -s print-MACHINE_STRING_spectrum`.
 # Lets scripts read these facts without pulling in the Circle build.
