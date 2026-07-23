@@ -12,13 +12,26 @@
 # runs locally as well as in CI. Size read with `wc -c` (portable across GNU
 # and BSD/macOS — no `stat -c` vs `-f` split).
 #
-# Usage: scripts/verify-kernels.sh [board]   (default $RAPI_BOARD, else rpi4)
+# Usage: scripts/verify-kernels.sh [board] [scope]
+#   board  rpi3|rpi4|rpi5 (default $RAPI_BOARD, else rpi4)
+#   scope  all      every per-machine image + platform binaries + picker
+#          platform platform binaries + picker only — what a release ships.
+#                   Per-machine images are a local byte-patch of the platform
+#                   binary (make kernel MACHINE=<m>); at roster scale the full
+#                   set neither fits a CI runner's disk nor belongs in release
+#                   assets, so CI gates on this scope (the patch path is still
+#                   proven by CI's `make sd` smoke test).
 set -e
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 BOARD="${1:-${RAPI_BOARD:-rpi4}}"
+SCOPE="${2:-all}"
 case "$BOARD" in
     rpi3|rpi4|rpi5) ;;
     *) echo "verify-kernels.sh: unknown board '$BOARD' (rpi3|rpi4|rpi5)" >&2; exit 2 ;;
+esac
+case "$SCOPE" in
+    all|platform) ;;
+    *) echo "verify-kernels.sh: unknown scope '$SCOPE' (all|platform)" >&2; exit 2 ;;
 esac
 MK="$ROOT/host/machines.mk"
 HOSTDIR="$ROOT/host/build/$BOARD"
@@ -32,9 +45,11 @@ check() {   # <path>
     echo "OK: $1 ($sz bytes)"
 }
 
-for m in $(make -s -f "$MK" print-MACHINES); do
-    check "$HOSTDIR/kernel8-$m.img"
-done
+if [ "$SCOPE" = all ]; then
+    for m in $(make -s -f "$MK" print-MACHINES); do
+        check "$HOSTDIR/kernel8-$m.img"
+    done
+fi
 for p in $(make -s -f "$MK" print-PLATFORMS); do
     check "$HOSTDIR/kernel8-$p.img"
 done

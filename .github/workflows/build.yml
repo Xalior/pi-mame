@@ -16,9 +16,11 @@
 # That guard does not apply to `ci` branch pushes, which build regardless
 # of ancestry.
 #
-# Scope: ONE Ubuntu x86_64 job. macOS host builds are out of scope for v1.
+# Scope: one Ubuntu x86_64 job per board (rpi3/rpi4/rpi5) plus a release
+# job that gathers the matrix on tags. macOS host builds are out of scope.
 # Supply-chain restraint: first-party actions only (checkout / cache /
-# upload-artifact), the one exception being the release action on tags.
+# upload-artifact / download-artifact), the one exception being the release
+# action on tags.
 
 name: build
 
@@ -51,9 +53,10 @@ jobs:
     # is baked per architecture, so MAME is a full per-board build (Pi 3/4/5 =
     # cortex-a53/-a72/-a76, RASPPI 3/4/5) against its own source tree
     # (mame-<board>) and circle world — three independent builds, one per runner.
-    # fail-fast off so a break on one board still reports the others. The card
-    # zips + GitHub Release are assembled on rpi4 only (pi-mame's card format is
-    # board-agnostic and integrates the boards as a later, separate step).
+    # fail-fast off so a break on one board still reports the others. pi-mame
+    # ships PER-BOARD cards, so each job assembles and uploads its own board's
+    # card zips (make dist BOARDS=<board>); the release job below gathers all
+    # three boards' artifacts once every job is green.
     strategy:
       fail-fast: false
       matrix:
@@ -190,121 +193,124 @@ jobs:
       - name: Verify the mamedrivers engine (the final host-link fails by design)
         run: make verify-mame RAPI_BOARD=${{ matrix.board }}
 
-      # This board's payload: every platform binary (kernel8-<platform>.img) and
-      # every single-purpose machine image (a byte-patch of its platform binary),
-      # all linking the board's shared mamedrivers engine. The boot picker is a
-      # single-core boot-world kernel — board-agnostic and part of the (deferred)
-      # card format — so it is built on rpi4 only, alongside the cards below.
+      # This board's payload: every platform binary (kernel8-<platform>.img),
+      # each linking the board's shared mamedrivers engine. Per-machine images
+      # are NOT built here: at roster scale (195 machines x ~84MB x 3 boards)
+      # the full set neither fits the runner's disk nor belongs in release
+      # assets — a machine image is a local byte-patch of its platform binary
+      # (`make kernel MACHINE=<m>`), and the patch path is proven by the
+      # `make sd` smoke test below.
       - name: Build kernels (this board)
-        run: make platform machines RAPI_BOARD=${{ matrix.board }}
+        run: make platform RAPI_BOARD=${{ matrix.board }}
 
-      - name: Build boot picker (rpi4 card front door)
-        if: matrix.board == 'rpi4'
-        run: make picker
+      # The platform card's front door, built for THIS board (the bootloader
+      # owns the per-board build under menu-loader/build/<board>/).
+      - name: Build boot picker (this board)
+        run: make picker RAPI_BOARD=${{ matrix.board }}
 
-      # TRUTH GATE #2 (belt and braces): make platform/machines is the real gate
-      # — if it fails the job is already red. Additionally assert every expected
-      # image exists and each is under the 256MB ceiling: every per-machine image
-      # (roster derived from machines.mk), every platform binary
-      # (kernel8-<platform>.img, the no-options kernels), and — on rpi4 — the boot
-      # picker at its real path (rapi-bootloader/menu-loader/, not host/).
-      - name: Verify kernel images
-        run: make verify-kernels RAPI_BOARD=${{ matrix.board }}
+      # TRUTH GATE #2 (belt and braces): make platform is the real gate — if it
+      # fails the job is already red. Additionally assert everything a release
+      # ships exists and fits the 256MB ceiling: every platform binary
+      # (kernel8-<platform>.img, the no-options kernels) and the board's picker
+      # at its real path (rapi-bootloader/menu-loader/, not host/).
+      - name: Verify kernel images (release scope)
+        run: make verify-kernels RAPI_BOARD=${{ matrix.board }} VERIFY_SCOPE=platform
 
-      # A platform card zip per (platform, tier): the picker as the boot kernel,
-      # the platform binary as pi-mame-core-rpi4.img, a generated bootmenu.cfg,
-      # and the FREE-tier assets (public ROMs never ship — the public card's
-      # extra menu entries boot but want their ROMs added). The free and public
-      # card share the one platform binary; only the menu and the asset set
-      # differ. A tier whose menu is empty (e.g. commodore-free — every
-      # commodore romset is public) ships no card: an empty menu is nothing
-      # to boot. Individual machines ship as bare kernel8-<machine>.img (below);
-      # drop one onto a card as pi-mame-core-rpi4.img to run it — no per-machine
-      # bundle, so no near-duplicate zip per machine.
-      - name: Assemble per-platform card zips
-        if: matrix.board == 'rpi4'
-        run: make dist TAG="${GITHUB_REF_NAME}"
+      # This board's card zips, one per (platform, tier): the picker as the
+      # card's front door, the platform binary as the generic kernel-<board>.img
+      # core, a generated bootmenu.cfg, and exactly the assets that menu needs
+      # (mkcard derives the set from the menu — never the whole bundle). A tier
+      # whose menu is empty (e.g. commodore-free — every commodore romset is
+      # public) ships no card. The grey public-tier ROMs are not in the repo;
+      # fetch-assets.sh pulls them from their mirrors here, at build time.
+      - name: Assemble this board's card zips
+        run: make dist TAG="${GITHUB_REF_NAME}" BOARDS=${{ matrix.board }}
 
-      # Smoke-test the single-machine card path (make sd -> scripts/mksd.sh),
-      # which the platform-card path never exercises — exactly where the stale
-      # boot-firmware path bug hid. Assembling one machine's card IS the test:
-      # if mksd.sh's firmware path is wrong, `make sd` fails the step.
-      - name: Smoke-test make sd (single-machine card)
-        if: matrix.board == 'rpi4'
-        run: make sd MACHINE=spectrum ASSETS=./all-assets
-
-      # Every run: this board's images as individual artifacts (~85MB each). Not
-      # zipped into one blob — a user wants the one image for their machine. The
-      # artifact is board-named so all three boards' uploads coexist in the run.
-      - name: Upload kernel images
+      # Every run: this board's platform binaries as individual artifacts
+      # (~85MB each) from the board-scoped build tree. Not zipped into one
+      # blob — a user wants the one image for their platform. The artifact is
+      # board-named so all three boards' uploads coexist in the run. Uploaded
+      # BEFORE the smoke test below patches a per-machine image into the same
+      # directory, so the glob stays platform-binaries-only.
+      - name: Upload platform kernel images
         uses: actions/upload-artifact@v4
         with:
           name: kernel-images-${{ matrix.board }}
-          path: host/kernel8-*.img
+          path: host/build/${{ matrix.board }}/kernel8-*.img
           if-no-files-found: error
+
+      # Smoke-test the single-machine card path (make kernel -> byte-patch,
+      # make sd -> scripts/mksd.sh), which the platform-card path never
+      # exercises — exactly where the stale boot-firmware path bug hid. This
+      # also keeps the per-machine patch path CI-proven now that the full
+      # machine set is no longer built.
+      - name: Smoke-test make kernel + make sd (single-machine card)
+        run: |
+          make kernel MACHINE=spectrum RAPI_BOARD=${{ matrix.board }}
+          make sd MACHINE=spectrum RAPI_BOARD=${{ matrix.board }} ASSETS=./all-assets
 
       # The cards are the actual deliverable — a bare kernel is not something
       # you can put in a Pi. A `ci` branch build exists to hand you the thing
       # you are about to release so it can be bench-tested BEFORE a tag is cut,
-      # so the zips must come out of a branch build too; previously they were
-      # assembled and then thrown away, published only by the tag-gated release
-      # step, which meant the pre-tag validation could not give you a card.
+      # so the zips must come out of a branch build too.
       - name: Upload card zips
-        if: matrix.board == 'rpi4'
         uses: actions/upload-artifact@v4
         with:
-          name: card-zips
+          name: card-zips-${{ matrix.board }}
           path: dist/pi-mame-*.zip
           if-no-files-found: error
 
-      # Cut a GitHub Release carrying every kernel image as a separate
-      # downloadable asset, plus the copy-to-card zips, so users can skip
-      # the toolchain entirely. The body is deliberately honest about what
-      # CI does and does not prove. (Every run is a tag run by design; the
-      # `if` is belt and braces should the triggers ever widen.)
-      # rpi4 assembles the cards and cuts the release (pi-mame's card format is
-      # board-agnostic; multi-board card integration is a later, separate step).
-      # The rpi3/rpi5 jobs still build, verify and upload their board's raw
-      # kernel images as artifacts — the three-board compile proof.
+  # Cut ONE GitHub Release carrying every board's platform binaries and card
+  # zips, gathered from the three build jobs, so users can skip the toolchain
+  # entirely. A separate job because the deliverable is the board MATRIX —
+  # release assets must wait for all three boards to go green. The body is
+  # deliberately honest about what CI does and does not prove.
+  # download-artifact/upload-artifact are first-party; the release action is
+  # the workflow's one standing third-party exception.
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Gather all board artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
       - name: Create release
-        if: matrix.board == 'rpi4' && startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            host/kernel8-*.img
-            dist/pi-mame-*.zip
+            artifacts/kernel-images-*/kernel8-*.img
+            artifacts/card-zips-*/pi-mame-*.zip
           fail_on_unmatched_files: true
           generate_release_notes: false
           body: |
-            Built by CI on a clean Ubuntu runner from tag `${{ github.ref_name }}`.
+            Built by CI on clean Ubuntu runners from tag `${{ github.ref_name }}`,
+            one full build per board (Pi 3, Pi 4, Pi 5).
 
-            These kernel images are **compile-proven**: they built from the
-            published sources with no local toolchain. They have **not** been
-            boot-proofed here — hardware boot-proofs happen on the project
-            bench, on a real Raspberry Pi 4, not in CI.
+            These images are **compile-proven**: they built from the published
+            sources with no local toolchain. They have **not** been boot-proofed
+            here — hardware boot-proofs happen on the project bench, not in CI.
+            What has actually run on hardware lives in the per-platform tables
+            under [docs/](https://github.com/Xalior/pi-mame/tree/${{ github.ref_name }}/docs).
 
-            What has actually run on hardware lives in the platform tables:
-            [Sinclair](https://github.com/Xalior/pi-mame/blob/${{ github.ref_name }}/docs/sinclair/README.md)
-            and [Amstrad](https://github.com/Xalior/pi-mame/blob/${{ github.ref_name }}/docs/amstrad/README.md).
+            The `pi-mame-<tag>-<platform>-<free|public>-<board>.zip` assets are
+            single-board platform cards: that board's firmware, the boot picker
+            as the front door, the platform binary as the `kernel-<board>.img`
+            core, a menu of that platform's machines, and the ROMs that menu
+            needs. Extract one onto a blank FAT32 card and boot. The **free**
+            card lists only machines whose every asset is freely-blessed and
+            bundles just those ROMs. The **public** card lists the full roster —
+            its grey "public-tier" ROMs (`scripts/assets.manifest`) are not in
+            the repo; they are fetched from their mirrors at build time into the
+            public zip alone. A menu entry whose ROMs could not be fetched still
+            boots the picker; add the missing files to its card to run it.
 
-            **Two shapes ship.** Each `kernel8-<machine>.img` is a
-            single-purpose image for one machine — flash a FAT32 card as the
-            README describes, drop the image on it, and boot. Each
-            `kernel8-<platform>.img` (one per vendor-class) is the platform's
-            no-options kernel: booted directly it brings up MAME's own
-            system-selection list.
-
-            To run a specific machine, take its `kernel8-<machine>.img` and
-            drop it onto a prepared card as `pi-mame-core-rpi4.img` (see the
-            README) — that is how you switch the card between machines.
-
-            The `pi-mame-<tag>-<platform>-<free|public>.zip` assets are
-            platform cards: the boot picker as the front door, the platform
-            binary, a menu of that platform's machines, and their ROMs. Both
-            tiers share the one binary; they differ in menu and ROM set. The
-            **free** card lists only all-free-tier machines and bundles just
-            those free-blessed ROMs. The **public** card lists the full roster
-            and bundles the full ROM set — the grey "public-tier" ROMs
-            (`scripts/assets.manifest`) are not in the repo; they are fetched
-            from their mirrors at build time into the public zip alone. Extract
-            a card onto a blank FAT32 card and boot.
+            Each `kernel8-<platform>.img` is that platform's no-options kernel:
+            dropped onto a prepared card as `kernel-<board>.img` it brings up
+            MAME's own system-selection list. A single-machine image is a local
+            one-liner from the published sources — `make kernel MACHINE=<m>` —
+            a byte-patch of the platform binary (see docs/defaults-abi.md).

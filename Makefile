@@ -23,8 +23,12 @@
 #   make kernels                 platform + machines + picker (all CI verifies)
 #   make verify-mame [RAPI_BOARD=<b>]     truth-gate: the board's mamedrivers
 #                                archives exist (genie's host link fails by design)
-#   make verify-kernels [RAPI_BOARD=<b>]  truth-gate: every kernel image exists,
-#                                each under the 256MB ceiling
+#   make verify-kernels [RAPI_BOARD=<b>] [VERIFY_SCOPE=all|platform]
+#                                truth-gate: every kernel image exists, each
+#                                under the 256MB ceiling. Scope `platform`
+#                                gates only what a release ships (platform
+#                                binaries + picker); per-machine images are a
+#                                local `make kernel MACHINE=<m>` byte-patch
 #   make bootmenu PLATFORM=<p> TIER=<free|public>   a card's bootmenu.cfg -> stdout
 #   make card PLATFORM=<p> TIER=<free|public> [RAPI_BOARD=<b>] [ASSETS=<dir>]
 #                                a per-board platform card tree
@@ -137,19 +141,21 @@ kernels: platform machines picker
 verify-mame:
 	scripts/verify-mame.sh $(RAPI_BOARD)
 
+VERIFY_SCOPE ?= all
 verify-kernels:
-	scripts/verify-kernels.sh $(RAPI_BOARD)
+	scripts/verify-kernels.sh $(RAPI_BOARD) $(VERIFY_SCOPE)
 
 # A platform card's menu, derived per tier from the manifest (free = only
 # all-free machines; public = the full roster). Writes to stdout.
 bootmenu:
 	scripts/gen-bootmenu.sh $(PLATFORM) $(TIER)
 
-# A platform card tree (build/card-<platform>-<tier>/): the picker on-card as
-# pi-mame-boot-rpi4.img (firmware boots it), the platform binary as
-# pi-mame-core-rpi4.img, a generated bootmenu.cfg for the tier, and the tier's
-# assets. The free and public cards share the one platform binary — only the
-# menu and the asset bundle differ.
+# A platform card tree (build/card-<platform>-<tier>-<board>/): the picker
+# on-card as pi-mame-boot-<board>.img (firmware boots it), the platform binary
+# as the generic kernel-<board>.img (the picker chain-boots it), a generated
+# bootmenu.cfg for the tier, and the assets that menu needs. The free and
+# public cards share the one platform binary — only the menu and the asset
+# set differ.
 card:
 	scripts/mkcard.sh $(PLATFORM) $(TIER) $(ASSETS)
 
