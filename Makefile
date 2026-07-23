@@ -53,6 +53,19 @@
 #
 # Requires the Arm GNU aarch64-none-elf toolchain on PATH (see README.md).
 
+# The Arm GNU aarch64-none-elf toolchain: a stranger installs it on PATH
+# (README) and CI does the same, but the meta checkout carries a project-local
+# copy one level up. If the compiler is NOT already on PATH and that local
+# install exists, prepend it — conditionally, same pattern as the sub-Makefiles'
+# keg-only gnu-getopt handling, so CI and stranger builds are untouched and a
+# meta-checkout build needs no manual PATH exports.
+ifeq ($(shell command -v aarch64-none-elf-gcc 2>/dev/null),)
+TOOLCHAIN_BIN := $(firstword $(wildcard ../toolchains/arm-gnu-toolchain-*-aarch64-none-elf/bin))
+ifneq ($(TOOLCHAIN_BIN),)
+export PATH := $(abspath $(TOOLCHAIN_BIN)):$(PATH)
+endif
+endif
+
 # The per-platform facts (PLATFORMS, MACHINE_PLATFORM_<m>) live in one place.
 include host/machines.mk
 
