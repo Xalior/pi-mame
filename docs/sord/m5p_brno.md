@@ -6,7 +6,7 @@
 
 ## At power-on
 
-Built into the platform kernel, awaiting hardware verification — no boot capture yet, so no boot behaviour is claimed here.
+**PARKED** — same driver family; additionally its brno_rom12.rom is unsourceable (MAME PR #14491 outpaced public mirrors). The capture above shows the observed stop; the machine is not offered until the park is lifted by a policy ruling.
 
 ## Required assets
 
