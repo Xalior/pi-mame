@@ -42,7 +42,7 @@
 # Next boards share tbblue.zip + next.img, sprinter needs kb_ms_natural.zip,
 # pc1512 needs pc1512kb.zip, and the CPC+ range needs only sysukpd.bin.
 
-PLATFORMS = sinclair amstrad commodore amiga atari acorn eaca samcoupe camputers tatung memotech
+PLATFORMS = sinclair amstrad commodore amiga atari acorn eaca samcoupe camputers tatung memotech enterprise
 
 PLATFORM_MACHINES_sinclair = spectrum spec128 specpls2 specpl2a specpls3 \
 	tbblue specnext_ks1 specnext_ks2 specnext_ks3 zx80 zx81 tc2048 ts2068 \
@@ -110,6 +110,14 @@ PLATFORM_MACHINES_tatung = einstein einst256
 # nothing is excluded: the driver directory's whole catalog is the roster.
 PLATFORM_MACHINES_memotech = mtx512 mtx500 rs128
 
+# Enterprise (src/mame/enterprise/): one driver (ep64.cpp), three machines —
+# the Enterprise Sixty Four (ep64, 1985), its German Mephisto PHC 64 OEM
+# sibling (phc64, 1985) and the Enterprise One Two Eight (ep128, 1986). All
+# three carry MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND — no
+# MACHINE_NOT_WORKING — so nothing is excluded: the driver directory's whole
+# catalog is the roster.
+PLATFORM_MACHINES_enterprise = ep64 phc64 ep128
+
 # All machines, every platform — the roster `make kernels` bakes and CI verifies.
 MACHINES = $(foreach p,$(PLATFORMS),$(PLATFORM_MACHINES_$(p)))
 
@@ -141,6 +149,7 @@ PLATFORM_SUBTARGET_samcoupe  = samcoupe
 PLATFORM_SUBTARGET_camputers = camputers
 PLATFORM_SUBTARGET_tatung    = tatung
 PLATFORM_SUBTARGET_memotech  = memotech
+PLATFORM_SUBTARGET_enterprise = enterprise
 
 PLATFORM_SOURCES_sinclair = \
 	src/mame/sinclair/spectrum.cpp src/mame/sinclair/spec128.cpp \
@@ -199,6 +208,14 @@ PLATFORM_SOURCES_tatung = \
 # expansion-bus devices under src/devices/bus/mtx/ ride the device closure.
 PLATFORM_SOURCES_memotech = \
 	src/mame/memotech/mtx.cpp
+
+# The whole enterprise directory is this one driver file: makedep's sibling
+# scan pulls the NICK video and DAVE sound custom-chip companions
+# (nick.cpp/dave.cpp, devices living in the driver directory) via their
+# same-stem headers, and the EP64 expansion-bus devices under
+# src/devices/bus/ep64/ ride the device closure.
+PLATFORM_SOURCES_enterprise = \
+	src/mame/enterprise/ep64.cpp
 
 # Every shipped platform's SOURCES, joined. The shared-engine build
 # (scripts/build-mame.sh) compiles ONE mamedrivers SUBTARGET from this — the
@@ -760,6 +777,31 @@ MACHINE_STRING_rs128        = rs128
 MACHINE_ASSETS_mtx512       = mtx512
 MACHINE_ASSETS_mtx500       = mtx500
 MACHINE_ASSETS_rs128        = rs128
+
+# --- Enterprise defaults strings ---
+# Bare machine names: every machine boots to the EXOS firmware face from ROM
+# with no must_be_loaded slot anywhere (no media is mandatory). MAME's slot
+# defaults stand untouched: both cassette decks default to CASSETTE_STOPPED
+# with no image mounted, the cartridge slot (generic_linear_slot) and the
+# EP64 expansion bus (EP64_EXPANSION_BUS_SLOT) default to nullptr, rs232
+# defaults to nullptr, and centronics defaults to the ROM-less "printer".
+# No default slot device carries a ROM_START (the EXDOS disk-controller
+# card ROM under src/devices/bus/ep64/exdos.cpp rides only if the expansion
+# slot is filled), so no device romset ships. All three are PAL machines
+# (50Hz raster) — no mksd.sh NTSC case entry.
+MACHINE_STRING_ep64         = ep64
+MACHINE_STRING_phc64        = phc64
+MACHINE_STRING_ep128        = ep128
+
+# --- Enterprise asset dependencies (manifest asset names) ---
+# One romset zip name per machine: phc64 aliases the parent's ROM_START in
+# the driver (#define rom_phc64 rom_ep64) but keeps its own zip name (the
+# a800xlp/mtx500 precedent). Each set is a single 32K EXOS mask ROM —
+# ep64/phc64 carry EXOS ENTER 05-23-A, ep128 carries EXOS ENTER 08-45-A.
+# The manifest stanzas await the ROM-sourcing parcel.
+MACHINE_ASSETS_ep64         = ep64
+MACHINE_ASSETS_phc64        = phc64
+MACHINE_ASSETS_ep128        = ep128
 
 # Query helper: `make -f machines.mk -s print-MACHINE_STRING_spectrum`.
 # Lets scripts read these facts without pulling in the Circle build.

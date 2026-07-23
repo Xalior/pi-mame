@@ -1,12 +1,14 @@
 # Einstein 256
 
+![Einstein 256 at power-on](images/einst256.jpg)
+
 - **`make kernel MACHINE=einst256`** — Tatung
 - **Year**: 1986
 - **Manufacturer**: Tatung
 
 ## At power-on
 
-Built into the platform kernel, awaiting hardware verification — no boot capture yet, so no boot behaviour is claimed here.
+`Einstein 256` at power-on on the real board — see the capture above.
 
 ## Required assets
 

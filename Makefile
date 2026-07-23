@@ -57,8 +57,8 @@ PLATFORM   ?= sinclair
 TIER       ?= free
 ASSETS     ?= ./my-assets
 # Separate from PLATFORM above: gen-machine-docs.py covers amiga, atari, acorn,
-# eaca, samcoupe, camputers and tatung so far (sinclair/amstrad/commodore stay
-# hand-maintained until PoC4 ports them on).
+# eaca, samcoupe, camputers, tatung, memotech and enterprise so far
+# (sinclair/amstrad/commodore stay hand-maintained until PoC4 ports them on).
 DOCS_PLATFORM ?= amiga
 # Which board this build targets: rpi3 | rpi4 | rpi5. Selects the MAME source
 # tree (mame-<board>), the circle world, RASPPI and -mcpu, and the board-scoped
