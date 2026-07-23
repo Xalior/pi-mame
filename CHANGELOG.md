@@ -35,15 +35,13 @@
   its reason recorded: a blocking MAME warning box, media the driver refuses
   to boot without, or a toolchain fault.
 - **The Pi 5 payload comes alive.** Chain-boot works on the BCM2712; serial
-  runs on the GPIO14/15 header UART on every board, Pi 5 included; and the
-  display path takes the Pi 5 firmware on its own terms — the firmware grants
-  one native-EDID surface, so the shim probes the display, sizes its window
-  from the grant, and presents through a shadow buffer, and the Pi 5 build
-  alone bakes `-keepaspect` (MAME soft-scales into the native mode, affordable
-  on that CPU only — Pi 3/4 keep their 1:1 blit onto the signal the firmware
-  outputs). The new-platform bench proofs above all ran on Pi 5 glass. On the
-  smallest board, the loader's staging allocator no longer crashes the
-  1&nbsp;GB Pi 3.
+  runs on the GPIO14/15 header UART on every board, Pi 5 included. On the
+  Pi 5 the shim probes the display, sizes its window from whatever the
+  firmware grants, and presents through a shadow buffer; the Pi 5 build
+  alone bakes `-keepaspect` (MAME soft-scales, affordable on that CPU only —
+  Pi 3/4 keep their 1:1 blit). The new-platform bench proofs above all ran
+  on Pi 5 glass. On the smallest board, the loader's staging allocator no
+  longer crashes the 1&nbsp;GB Pi 3.
 - **Per-platform, per-board SD cards.** Every build produces the actual
   deliverable, not just bare kernels. The release matrix is board × platform ×
   tier, one single-board card zip per cell —
