@@ -42,7 +42,7 @@
 # Next boards share tbblue.zip + next.img, sprinter needs kb_ms_natural.zip,
 # pc1512 needs pc1512kb.zip, and the CPC+ range needs only sysukpd.bin.
 
-PLATFORMS = sinclair amstrad commodore amiga atari acorn eaca samcoupe camputers tatung
+PLATFORMS = sinclair amstrad commodore amiga atari acorn eaca samcoupe camputers tatung memotech
 
 PLATFORM_MACHINES_sinclair = spectrum spec128 specpls2 specpl2a specpls3 \
 	tbblue specnext_ks1 specnext_ks2 specnext_ks3 zx80 zx81 tc2048 ts2068 \
@@ -104,6 +104,12 @@ PLATFORM_MACHINES_camputers = lynx48k lynx96k lynx128k
 # is excluded: the driver directory's whole catalog is the roster.
 PLATFORM_MACHINES_tatung = einstein einst256
 
+# Memotech MTX (src/mame/memotech/): one driver (mtx.cpp), three machines —
+# the MTX 512 (1983, parent), the MTX 500 (1983) and the RS 128 (1984). All
+# three carry flags 0 — no MACHINE_NOT_WORKING, no IMPERFECT flags — so
+# nothing is excluded: the driver directory's whole catalog is the roster.
+PLATFORM_MACHINES_memotech = mtx512 mtx500 rs128
+
 # All machines, every platform — the roster `make kernels` bakes and CI verifies.
 MACHINES = $(foreach p,$(PLATFORMS),$(PLATFORM_MACHINES_$(p)))
 
@@ -134,6 +140,7 @@ PLATFORM_SUBTARGET_eaca      = eaca
 PLATFORM_SUBTARGET_samcoupe  = samcoupe
 PLATFORM_SUBTARGET_camputers = camputers
 PLATFORM_SUBTARGET_tatung    = tatung
+PLATFORM_SUBTARGET_memotech  = memotech
 
 PLATFORM_SOURCES_sinclair = \
 	src/mame/sinclair/spectrum.cpp src/mame/sinclair/spec128.cpp \
@@ -186,6 +193,12 @@ PLATFORM_SOURCES_camputers = \
 # devices under src/devices/bus/einstein/ ride the device closure).
 PLATFORM_SOURCES_tatung = \
 	src/mame/tatung/einstein.cpp
+
+# The whole memotech directory is this one driver file: makedep's sibling
+# scan pulls the mtx_m.cpp machine-aspect companion via mtx.h, and the MTX
+# expansion-bus devices under src/devices/bus/mtx/ ride the device closure.
+PLATFORM_SOURCES_memotech = \
+	src/mame/memotech/mtx.cpp
 
 # Every shipped platform's SOURCES, joined. The shared-engine build
 # (scripts/build-mame.sh) compiles ONE mamedrivers SUBTARGET from this — the
@@ -721,6 +734,32 @@ MACHINE_STRING_einst256     = einst256
 # stanzas await the ROM-sourcing parcel.
 MACHINE_ASSETS_einstein     = einstein
 MACHINE_ASSETS_einst256     = einst256
+
+# --- Memotech MTX defaults strings ---
+# Bare machine names: every machine boots to MTX BASIC from ROM with no
+# must_be_loaded slot anywhere (no media is mandatory). MAME's slot defaults
+# stand untouched: the cassette deck defaults to CASSETTE_PLAY with no image
+# mounted, the ROM-extension socket and both MTX expansion slots (J10
+# external, J0 internal — mtx.cpp's MTX_EXP_SLOT pair) default to nullptr,
+# and centronics defaults to the ROM-less "printer". No default slot device
+# carries a ROM_START (the sdx/cfx expansion ROMs under src/devices/bus/mtx/
+# ride only if a slot is filled), so no device romset ships. All three are
+# PAL machines (TMS9929A video) — no mksd.sh NTSC case entry.
+MACHINE_STRING_mtx512       = mtx512
+MACHINE_STRING_mtx500       = mtx500
+MACHINE_STRING_rs128        = rs128
+
+# --- Memotech MTX asset dependencies (manifest asset names) ---
+# One romset zip name per machine, all three byte-identical in content:
+# mtx500 and rs128 alias the parent's ROM_START in the driver
+# (#define rom_mtx500 rom_mtx512, #define rom_rs128 rom_mtx512) but keep
+# their own zip names (the a800xlp/edu64 precedent). The set carries both
+# BIOS alternates (UK default, German), the ASSEM ROM, the Danish/Finnish
+# keyboard PROMs and the PLD image. The manifest stanzas await the
+# ROM-sourcing parcel.
+MACHINE_ASSETS_mtx512       = mtx512
+MACHINE_ASSETS_mtx500       = mtx500
+MACHINE_ASSETS_rs128        = rs128
 
 # Query helper: `make -f machines.mk -s print-MACHINE_STRING_spectrum`.
 # Lets scripts read these facts without pulling in the Circle build.
