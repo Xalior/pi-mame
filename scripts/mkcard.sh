@@ -23,7 +23,9 @@
 #   config.txt         our host/config-card.txt (firmware boots the picker)
 #   cmdline.txt        the card's regional canvas (see the note below)
 #   firmware           this board's Foundation firmware set + DTBs (Circle's boot/)
-#   roms/ next/ carts/ the tier's assets, if an assets dir is given
+#   roms/ next/ carts/ the assets the card's OWN menu needs, if an assets dir
+#                      is given — each menu machine's manifest assets
+#                      (MACHINE_ASSETS_*), never the whole bundle
 #
 # Regional canvas: cmdline.txt is per-CARD, not per-machine, and a platform can
 # span PAL and NTSC machines. The card defaults to the PAL canvas (the majority
@@ -103,9 +105,28 @@ cp "$BINARY" "$SD/kernel-$BOARD.img"
 # The tier's menu, generated fresh from the manifest.
 "$ROOT/scripts/gen-bootmenu.sh" "$PLATFORM" "$TIER" > "$SD/bootmenu.cfg"
 
+# The card carries the media its own menu asks for, and nothing else. Every
+# machine on the generated bootmenu.cfg declares its manifest assets
+# (MACHINE_ASSETS_* in host/machines.mk — romset zips AND mounted media like
+# next/next.img or carts/sysukpd.bin), and each asset's manifest stanza names
+# the card path (dest). Copy exactly those files. A file absent from the
+# bundle is the public tier's "boots but wants its ROMs added" case — warn,
+# never fail the card.
 if [ -n "$ASSETS" ]; then
-    for d in roms next carts; do
-        [ -d "$ASSETS/$d" ] && cp -R "$ASSETS/$d" "$SD/$d" || true
+    for m in $(awk -F'|' '!/^#/ && NF {print $1}' "$SD/bootmenu.cfg"); do
+        make -s -f "$ROOT/host/machines.mk" "print-MACHINE_ASSETS_$m"
+    done | tr ' ' '\n' | sort -u | while IFS= read -r a; do
+        [ -n "$a" ] || continue
+        dest="$(awk -F'|' -v n="$a" '$1=="asset" && $2==n {print $5; exit}' \
+            "$ROOT/scripts/assets.manifest")"
+        if [ -z "$dest" ]; then
+            echo "mkcard.sh: warning: no manifest stanza for asset '$a'" >&2
+        elif [ -f "$ASSETS/$dest" ]; then
+            mkdir -p "$SD/$(dirname "$dest")"
+            cp "$ASSETS/$dest" "$SD/$dest"
+        else
+            echo "mkcard.sh: warning: $dest not in $ASSETS — add it to boot its machines" >&2
+        fi
     done
 else
     echo "mkcard.sh: no assets dir given — add roms/ (and next/, carts/) to the card yourself" >&2
