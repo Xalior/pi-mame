@@ -40,8 +40,7 @@
   firmware grants, and presents through a shadow buffer; the Pi 5 build
   alone bakes `-keepaspect` (MAME soft-scales, affordable on that CPU only —
   Pi 3/4 keep their 1:1 blit). The new-platform bench proofs above all ran
-  on Pi 5 glass. On the smallest board, the loader's staging allocator no
-  longer crashes the 1&nbsp;GB Pi 3.
+  on Pi 5 glass.
 - **Per-platform, per-board SD cards.** Every build produces the actual
   deliverable, not just bare kernels. The release matrix is board × platform ×
   tier, one single-board card zip per cell —
