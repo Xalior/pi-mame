@@ -48,8 +48,17 @@ PLATFORM_MACHINES_sinclair = spectrum spec128 specpls2 specpl2a specpls3 \
 	tbblue specnext_ks1 specnext_ks2 specnext_ks3 zx80 zx81 tc2048 ts2068 \
 	ts1000 ts1500 pentagon scorpio atmtb2 pentevo tsconf elwro800 byte sprinter
 
+# nc100/nc200 are NOT rostered — PARKED on the real-time clock. Bench
+# evidence (Pi 5, 2026-07-27): the clock is set to a real date and time, the
+# machine's state is saved, the board is power-cycled, and the notepad comes
+# back to its main menu — proving NVRAM itself persists — with its clock
+# reset to 1 Jan 1990 00:00. A notepad whose whole purpose is a diary and a
+# clock cannot ship in that state, so both machines leave the roster until
+# the RTC survives a power cycle. The driver stays in PLATFORM_SOURCES_amstrad
+# below: it compiles and links correctly, and removing it would change the
+# shared engine's device closure for no user-visible gain.
 PLATFORM_MACHINES_amstrad = cpc464 cpc664 cpc6128 cpc464p cpc6128p gx4000 \
-	kccomp nc100 nc200 pc1512
+	kccomp pc1512
 
 PLATFORM_MACHINES_commodore = c64 c64p c64_jp c64_se c64c c64cp c64g c64c_es \
 	c64c_se c64gs sx64 sx64p dx64 vip64 tesa6240 pet64 edu64 vic20 vic20p \

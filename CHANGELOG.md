@@ -63,10 +63,10 @@ machine is not published in that edition at all.
 Every ROM is verified by CRC32 and SHA1 against `scripts/assets.manifest`
 before it is packaged, using the checksums MAME itself declares.
 
-### Fifteen families, 195 machines
+### Fifteen families, 193 machines
 
 - **Sinclair** — ZX Spectrum family, ZX80/ZX81, ZX Spectrum Next (23)
-- **Amstrad** — CPC range, NC100/NC200 notepads, PC1512 (10)
+- **Amstrad** — CPC range, KC Compact, PC1512 (8)
 - **Commodore** — C64 range, VIC-20, TED machines (29)
 - **Amiga** — Arcadia Multi Select coin-op systems (19)
 - **Atari** — 8-bit line, 400 through XEGS (10)
@@ -94,6 +94,26 @@ Three machines require media that cannot be supplied, one is blocked by a
 cartridge that cannot be proven, one hits a cooperative-scheduling hang,
 and two fail to build in this toolchain.
 
+### Withdrawn: the Amstrad NC100 and NC200
+
+Both notepads are parked and do not ship in this release.
+
+Their emulated real-time clock does not survive a power cycle. Set the
+clock to the correct date and time, save, power the board off and on, and
+the machine returns to its own main menu — its saved state is intact — but
+the clock reads 1 January 1990, 00:00. On machines whose advertised purpose
+is a diary, a clock and an address book, that is not a defect worth
+shipping around. Proven on a Raspberry Pi 5 on 27 July 2026.
+
+This also corrects a claim made in PoC2, recorded below, that the NC100
+"warm-boots to its own menu with the clock intact". The first half is
+right and still is: the menu and the battery-backed memory come back. The
+clock does not, and PoC2 should not have said otherwise.
+
+Nothing else about these machines is at fault — the display work done for
+them this cycle was sound, and both rendered their true panel proportions
+on a Pi 5. They return to the roster when their clock does.
+
 ### Raspberry Pi 5 support
 
 The Pi 5 payload now boots. Chain-loading works, and the serial console
@@ -109,17 +129,16 @@ aspect-preserving scaler, which is affordable on that CPU and not on the
 others; the Pi 3 and Pi 4 blit 1:1 into a framebuffer whose geometry is
 set by `cmdline.txt`, and rely on the display to stretch it.
 
-The practical consequence is visible on machines whose panels are not
-approximately 4:3. The Amstrad NC100 (480x64) and NC200 (480x128) render
-in their true proportions on a Pi 5, and are stretched to fill the canvas
-on a Pi 3 or Pi 4.
+The practical consequence is visible on any machine whose panel is not
+approximately 4:3: it renders in its true proportions on a Pi 5, and is
+stretched to fill the canvas on a Pi 3 or Pi 4.
 
 ### Removed: the per-machine download
 
 Previous releases published one `kernel8-<machine>.img` per machine. This
 release does not.
 
-At fifteen families the full set is 195 machines across three boards, at
+At fifteen families the full set is 193 machines across three boards, at
 roughly 84 MB each — approximately 49 GB per release, which exceeds both
 the CI runner's disk and any reasonable release page. The redundancy is
 almost total: a per-machine image is its family's binary with a 28-byte

@@ -51,7 +51,7 @@ tells you which is which.
   the picker chain-boots.
 
 A release does **not** carry a separate download per machine. One image per
-machine would be 195 near-identical files per board, each about 84 MB,
+machine would be 193 near-identical files per board, each about 84 MB,
 differing only by a few bytes of baked-in defaults. If you want a card that
 powers straight on into one machine with no picker, build it from the
 published sources with `make kernel MACHINE=<name>` — see
@@ -62,8 +62,8 @@ machines with a details page each — start at
 [docs/sinclair/](docs/sinclair/README.md),
 [docs/amstrad/](docs/amstrad/README.md),
 [docs/commodore/](docs/commodore/README.md) or
-[docs/amiga/](docs/amiga/README.md), and see
-[the platform table](#-the-default-images) below for all fifteen.
+[docs/amiga/](docs/amiga/README.md), or see
+[the platform table](#-the-default-images) below.
 
 CI **compiles** every release on a clean Ubuntu runner, all three boards —
 that's what's proven for every asset there. It does not boot-test them:
@@ -78,7 +78,7 @@ Prefer building it yourself? See
 
 Delightfully small. Let's be precise about what this actually is:
 
-- **Fifteen platforms, 195 machines.** Each platform is a family of machines
+- **Fifteen platforms, 193 machines.** Each platform is a family of machines
   built on related hardware, sharing a MAME driver lineage and, often, ROMs.
   Every machine on the roster carries a verdict from real hardware: it is
   either proven on the glass with an HDMI capture on its details page, or
@@ -136,7 +136,7 @@ Every machine belongs to one of fifteen platforms:
 | Platform | Machines | Details |
 |---|---|---|
 | Sinclair — the ZX Spectrum family and its clones | 23 | [docs/sinclair/](docs/sinclair/README.md) |
-| Amstrad — the CPC family, the NC notepads, and the PC1512 | 10 | [docs/amstrad/](docs/amstrad/README.md) |
+| Amstrad — the CPC family, the KC Compact, and the PC1512 | 8 | [docs/amstrad/](docs/amstrad/README.md) |
 | Commodore — the C64 line, the VIC-20s, and the TED machines | 29 | [docs/commodore/](docs/commodore/README.md) |
 | Amiga — the Arcadia Multi Select arcade system | 19 | [docs/amiga/](docs/amiga/README.md) |
 | Atari — the 8-bit computer line, 400 through XEGS | 10 | [docs/atari/](docs/atari/README.md) |
@@ -179,23 +179,16 @@ name. The GPU outputs that geometry as the video signal; your display's own
 controller stretches it to the glass. `socmaxtemp=70` in the same file is
 load-bearing thermal configuration: don't remove it. 🌡️
 
-## 💾 It remembers — if you shut it down properly
+## 💾 It remembers
 
-![The Amstrad NC100 warm-booting to its main menu, clock intact](docs/amstrad/images/nc100-saved.jpg)
+Change a machine's settings, or write to its battery-backed memory, and
+that state is written to the card when you close MAME's menu. Power the Pi
+off and it is still there next time.
 
-Power a machine off and its saved state waits on the card for next time.
-The Amstrad NC100 above has come back up straight to its main menu — WORD
-PROCESSOR, CALCULATOR, and DIARY / CLOCK / ADDRESS BOOK under a status bar
-showing the real date and time — with the clock it was keeping still
-running. Nothing was re-entered; it simply remembered. 🕰️
-
-There's a catch, and it's the real machine's catch, not ours: the NC100 and
-NC200 keep their clock and memory **only if you shut them down properly with
-their own On/Off key before you cut the power** — exactly like the
-battery-backed hardware they emulate. Pull the power in the middle of a
-session and the machine forgets, and comes back up to its Set-time screen
-with the clock reset, just as the real notepad did. That's MAME modelling
-the machine faithfully, right down to how it loses its memory — not a bug.
+Emulated real-time clocks are the exception, and it is why the Amstrad
+NC100 and NC200 do not ship in this release: their saved state returns
+correctly, but the clock itself comes back reset. Both machines are parked
+until that is fixed.
 
 ## 🧰 Prerequisites
 
