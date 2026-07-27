@@ -279,7 +279,14 @@ jobs:
         with:
           path: artifacts
 
-      - name: Create release
+      # CI's job here ends at the assets. The release's title and notes are
+      # NOT set from this workflow: they are the project's public prose, they
+      # live in CHANGELOG.md, and they are put on the release through the
+      # GitHub API as a deliberate act. Supplying no body leaves whatever is
+      # already on the release untouched, so the working order is: create the
+      # release as a draft with its notes, push the tag, let this job attach
+      # the built assets to it, then publish.
+      - name: Attach built assets to the release
         uses: softprops/action-gh-release@v2
         with:
           files: |
@@ -287,50 +294,3 @@ jobs:
             artifacts/card-zips-*/pi-mame-*.zip
           fail_on_unmatched_files: true
           generate_release_notes: false
-          body: |
-            Built by CI on clean Ubuntu runners from tag `${{ github.ref_name }}`,
-            one complete build per board: Raspberry Pi 3, Pi 4 and Pi 5.
-
-            ## Which file to download
-
-            The board is the last field in every filename. An image built for
-            one board will not boot on another, so match `rpi3`, `rpi4` or
-            `rpi5` to the Raspberry Pi you own.
-
-            `pi-mame-<tag>-<platform>-<free|public>-<board>.zip` is a complete
-            SD card for one platform on one board: that board's firmware, the
-            boot menu, the emulator built for that platform, and the ROMs that
-            menu refers to. Extract it onto a blank FAT32 card, with the files
-            at the top level of the card rather than inside a directory, then
-            power on. The menu lists that platform's machines; choosing one
-            starts it.
-
-            The two editions differ only in the ROMs they carry. **free**
-            contains only ROMs whose rights holder has permitted
-            redistribution. **public** contains ROM sets mirrored on public
-            archives, which are in wide circulation but carry no explicit
-            permission; those are not held in this repository and are fetched
-            from the mirrors during the build. If a ROM could not be fetched,
-            its menu entry still appears and the card still boots — add the
-            missing file to the card to run that machine.
-
-            `kernel8-<platform>.img` is one platform's emulator on its own.
-            Copy it onto a card you have already prepared, as
-            `kernel-<board>.img`. With no machine name written into it, it
-            starts MAME's own system-selection list. To build a card that
-            starts one machine directly, run `make kernel MACHINE=<name>`
-            against these sources; the format it writes into the image is
-            documented in
-            [docs/defaults-abi.md](https://github.com/Xalior/pi-mame/blob/${{ github.ref_name }}/docs/defaults-abi.md).
-
-            ## What has been tested
-
-            These images are compile-proven: they built from the published
-            sources on a clean machine, with no local toolchain involved. CI
-            does not switch on a Raspberry Pi, so it has not confirmed that any
-            of them boots.
-
-            Results from real hardware are recorded machine by machine in the
-            platform pages under
-            [docs/](https://github.com/Xalior/pi-mame/tree/${{ github.ref_name }}/docs).
-            A machine that works carries a photograph of the actual display.
