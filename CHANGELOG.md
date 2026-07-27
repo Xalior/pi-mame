@@ -2,155 +2,173 @@
 
 ## PoC3 — I can't believe it's not Silicon Spread · 2026-07-27
 
-pi-mame turns a Raspberry Pi into one old home computer. There is no
-operating system and no desktop. You switch the Pi on, and a few seconds
-later the old machine is on your screen, ready to use.
+pi-mame runs MAME's emulation core directly on Raspberry Pi hardware, with
+no operating system underneath it. There is no Linux, no shell, no desktop
+and no configuration to edit: the machine an image emulates is fixed when
+that image is built. Power on, and the emulated computer is on screen in a
+few seconds.
 
-This release adds two more Raspberry Pi models and eleven more computer
-families. It also changes what you download. Please read "Choose the right
-file" below, even if you have used pi-mame before.
+This release extends pi-mame from one Raspberry Pi model to three, from
+four computer families to fifteen, and changes the form the release takes.
 
-### Choose the right file
+### Which file to download
 
-pi-mame now works on the **Raspberry Pi 3, 4 and 5**. Earlier versions
-worked only on the Pi 4.
+pi-mame now supports the **Raspberry Pi 3, 4 and 5**. Earlier releases
+supported the Pi 4 only.
 
-Every Raspberry Pi model has a different processor, so every model needs
-its own version of the program. **The file name ends with the model it is
-made for**: `rpi3`, `rpi4` or `rpi5`. A file made for one model will not
-start on a different model. Please check this before you download.
+Each board has its own build, and **the board is the last field in every
+filename**:
 
-File names look like this:
+    pi-mame-<version>-<family>-<free|public>-<rpi3|rpi4|rpi5>.zip
 
-    pi-mame-<version>-<family>-<free or public>-<model>.zip
+An image built for one board will not boot on another. If you own more
+than one Pi, this is the field to check.
 
-So a file with `sinclair` and `rpi4` in its name holds the Sinclair
-computers and runs on a Raspberry Pi 4.
+### What a download contains
 
-### How to use the file
+Each zip is a complete SD card: the Raspberry Pi firmware for that board,
+the boot configuration, a boot menu, the emulator built for that family,
+and the ROMs that family's menu refers to.
 
-Each file contains a complete SD card. You do not need anything else.
+1. Format an SD card with a single **FAT32** partition.
+2. Unzip the archive onto it, with the files at the top level of the card
+   rather than inside a directory.
+3. Insert the card, connect the display to **HDMI0** — on the Pi 4 and Pi 5
+   the micro-HDMI socket nearest the USB-C power connector, and on the Pi 3
+   the single full-size HDMI socket.
+4. Power on.
 
-1. Format an SD card as **FAT32**.
-2. Unzip the file onto the card. The files must sit at the top level of
-   the card, not inside a folder.
-3. Put the card in the Raspberry Pi. Connect your screen to the **HDMI0**
-   socket. On the Pi 4 and Pi 5 this is the socket nearest the power
-   connector. The Pi 3 has only one HDMI socket.
-4. Switch the Pi on.
+The boot menu lists that family's machines. Selecting one writes the
+machine's name into the emulator image and starts it. The selection is not
+persistent: the next power-on presents the menu again.
 
-A menu appears. Choose a machine with the keyboard and it starts. The menu
-does not remember your choice. The next time you switch the Pi on, it asks
-again.
+### The free and public editions
 
-### Two kinds of file: free and public
+Each family is published in up to two editions, which differ only in the
+provenance of the ROMs they carry.
 
-Most computer families offer two files, **free** and **public**. They
-differ only in which original programs (ROMs) are included.
+- **free** — ROMs whose redistribution the rights holder has explicitly
+  permitted, obtained from an upstream that distributes them under that
+  permission. Amstrad's standing permission covers the Sinclair and
+  Amstrad machines, which is why those families have a free edition.
+- **public** — ROM sets mirrored on public archives. They are in wide
+  circulation but carry no explicit grant, and using them is a decision
+  the reader makes rather than one this project makes for them.
 
-- **free** — contains only ROMs that the copyright owner has given
-  permission to share. Amstrad gave this permission for the Sinclair and
-  Amstrad computers, so those families have free files.
-- **public** — contains ROMs collected from public archive websites. Many
-  people use them, but no owner has formally given permission. Whether you
-  use them is your own decision.
+Nine assets in the manifest are free-tier against 177 public, so most
+families are published as a public edition only — no comparable permission
+exists for them. A family whose free menu would contain no bootable
+machine is not published in that edition at all.
 
-Most families have a public file only, because no permission of that kind
-exists for them. A family with nothing to put in a free file does not get
-one.
+Every ROM is verified by CRC32 and SHA1 against `scripts/assets.manifest`
+before it is packaged, using the checksums MAME itself declares.
 
-### Fifteen computer families, 195 machines
+### Fifteen families, 195 machines
 
-Earlier versions covered four families. This version covers fifteen:
+- **Sinclair** — ZX Spectrum family, ZX80/ZX81, ZX Spectrum Next (23)
+- **Amstrad** — CPC range, NC100/NC200 notepads, PC1512 (10)
+- **Commodore** — C64 range, VIC-20, TED machines (29)
+- **Amiga** — Arcadia Multi Select coin-op systems (19)
+- **Atari** — 8-bit line, 400 through XEGS (10)
+- **Acorn** — BBC Micro family, Electron, Atom (26)
+- **EACA** — Colour Genie (2)
+- **MGT** — SAM Coupé (1)
+- **Camputers** — Lynx (3)
+- **Tatung** — Einstein (2)
+- **Memotech** — MTX line (3)
+- **Enterprise** — Enterprise 64 and 128 (3)
+- **Sord** — m5 (3)
+- **VTech** — Laser/VZ family and relatives (24)
+- **TRS** — TRS-80, CoCo, Dragon, MC-10 (37)
 
-- **Sinclair** — the ZX Spectrum family, the ZX81, and the ZX Spectrum Next
-- **Amstrad** — the CPC computers, the NC notepads, and the PC1512
-- **Commodore** — the C64, the VIC-20, and the Plus/4 family
-- **Amiga** — the Arcadia arcade machines
-- **Atari** — the 8-bit computers, from the 400 to the XEGS
-- **Acorn** — the BBC Micro, the Electron, and the Atom
-- **EACA** — the Colour Genie
-- **SAM Coupé** — MGT's successor to the Spectrum
-- **Camputers** — the Lynx
-- **Tatung** — the Einstein
-- **Memotech** — the MTX computers
-- **Enterprise** — the Enterprise 64 and 128
-- **Sord** — the m5
-- **VTech** — the Laser and VZ computers
-- **TRS** — the TRS-80, the CoCo, the Dragon, and the MC-10
+Every machine on the roster carries a verdict obtained on real hardware,
+recorded on its family's page under `docs/`. Machines that run are
+documented with an HDMI capture of the actual display. Machines that do
+not are recorded as parked, with the cause.
 
-Every one of these 195 machines has a recorded result from a real
-Raspberry Pi. Machines that work have a photograph of the real screen on
-their page. Machines that do not work are listed as not usable, together
-with the reason. The pages are in the `docs` folder, one for each family.
+The dominant cause is not emulation failure. MAME raises a modal warning
+box for machines flagged with imperfect or missing subsystems, and an
+appliance with no user-facing input path at that moment cannot dismiss it,
+so the machine is held behind a dialog rather than failing to emulate.
+Three machines require media that cannot be supplied, one is blocked by a
+cartridge that cannot be proven, one hits a cooperative-scheduling hang,
+and two fail to build in this toolchain.
 
-Most machines that are not usable are not broken. They are stopped by a
-warning message that MAME shows when it starts, and pi-mame has no way to
-answer that message yet. A smaller number need a disk or cartridge that
-cannot be supplied, or do not build correctly.
+### Raspberry Pi 5 support
 
-### The Raspberry Pi 5 now works
+The Pi 5 payload now boots. Chain-loading works, and the serial console
+runs on the GPIO14/15 header pins on all three boards.
 
-The Pi 5 could not run pi-mame before. It can now.
+The Pi 5 differs from its predecessors in an important respect: its
+firmware will not output a requested video mode. Mode requests over the
+mailbox interface are acknowledged and then ignored, and every kernel
+inherits a single surface at the display's native EDID mode. pi-mame
+therefore queries the surface it was given, sizes its window to that, and
+presents through a shadow buffer. The Pi 5 build alone enables MAME's
+aspect-preserving scaler, which is affordable on that CPU and not on the
+others; the Pi 3 and Pi 4 blit 1:1 into a framebuffer whose geometry is
+set by `cmdline.txt`, and rely on the display to stretch it.
 
-The Pi 5 handles the screen differently from the Pi 3 and Pi 4. It cannot
-be told which picture size to send to your screen. Instead, pi-mame lets
-the Pi 5 choose its own size, then resizes the picture to fit it. The
-shape of the picture stays correct.
+The practical consequence is visible on machines whose panels are not
+approximately 4:3. The Amstrad NC100 (480x64) and NC200 (480x128) render
+in their true proportions on a Pi 5, and are stretched to fill the canvas
+on a Pi 3 or Pi 4.
 
-This matters most for wide, short machines such as the Amstrad NC100 and
-NC200. They look correct on a Pi 5. On the Pi 3 and Pi 4 they are
-stretched to fill the screen instead, because those models do not have
-enough spare processing power to resize the picture.
+### Removed: the per-machine download
 
-### Important change: no more one file per machine
+Previous releases published one `kernel8-<machine>.img` per machine. This
+release does not.
 
-Earlier versions offered a separate download for every single machine.
-This version does not.
+At fifteen families the full set is 195 machines across three boards, at
+roughly 84 MB each — approximately 49 GB per release, which exceeds both
+the CI runner's disk and any reasonable release page. The redundancy is
+almost total: a per-machine image is its family's binary with a 28-byte
+string patched in at offset `0x800`.
 
-There are now 195 machines and three Raspberry Pi models, which would mean
-about 585 downloads of roughly 84 MB each. Nearly all of them would be
-identical. The only difference between two of these files is a few bytes
-that name the machine.
-
-Instead, download the file for the family you want and choose the machine
-from the menu.
-
-If you prefer a card that starts one machine immediately, with no menu,
-you can still build one yourself from the source code with a single
-command:
+Releases now carry the card archives and the per-family binaries. A
+single-machine image remains one command from the published sources:
 
     make kernel MACHINE=<name>
 
-The method that writes a machine name into a program file is unchanged and
-still documented in `docs/defaults-abi.md`, so any tool you have written
-yourself will keep working.
+The defaults block that command patches is unchanged and remains
+documented in `docs/defaults-abi.md` — a magic value, capacity and length
+fields, and a 512-byte text buffer that any holder of an image may rewrite
+before boot. Third-party tooling built against it is unaffected.
 
-### There is no sound yet
+### Sound
 
-Every machine is silent. The sound hardware is already working, but the
-emulator is not yet connected to it. This is the next piece of work.
+No image produces sound. The audio path itself is implemented and working:
+the SDL layer drives HDMI audio through Circle's sound device with a
+hardware queue of roughly 100 ms, exposes the standard
+`SDL_OpenAudioDevice` callback interface, and carries samples across the
+core split on a lock-free ring. What is absent is the connection between
+MAME's own sound output and that path. It is the next milestone's work.
 
-### For developers
+### Build changes
 
-- **One build per Raspberry Pi model.** The C library and C++ library that
-  pi-mame is built on are compiled for a specific processor, so MAME is now
-  built separately for the Pi 3, Pi 4 and Pi 5. Each build has its own
-  source tree and its own output folder.
-- **The emulator is compiled once per model, not once per family.** Before,
-  every computer family caused a complete rebuild of MAME. Now each model
-  builds a single shared emulator that contains every family's hardware
-  support, and each family is then linked from that one build with only its
-  own machines included. The finished files are the same size as before,
-  but there is far less building.
-- **Automatic builds cover all three models.** Every release is compiled
-  from scratch on a clean machine, one job per model, running at the same
-  time. If one model fails, the others still report their result. The build
-  uses exactly the same commands that you would use yourself, so the
-  instructions in the README are the ones being tested.
-- **Every SD card contains only what its own menu needs.** Previously a
-  card carried every file for every family, which made some cards over 2 GB
-  when they only needed about 90 MB.
+- **Per-board toolchains.** The newlib and libc++ sysroot pi-mame links
+  against is compiled per architecture, so MAME is built once per board,
+  each in its own source tree against its own Circle world, differentiated
+  by the cross-compiler wrapper's `-mcpu` and `-DRASPPI` flags.
+- **One engine per board, one driver set per family.** PoC2 compiled a
+  complete MAME for every family. A board now compiles a single shared
+  engine once: the framework that does not vary with the driver list, all
+  third-party dependencies, and the combined device closure of every
+  shipped family's drivers. Each family's kernel then links that engine
+  against a driver list generated from its own sources, using MAME's own
+  `sourcesfilter` and `driverlist` tools, so the linker retains only that
+  family's machines. Output images are the size they always were; the
+  compile is performed once rather than once per family.
+- **CI covers all three boards.** One job per board, running concurrently,
+  with fail-fast disabled so a failure on one board still reports the
+  others. CI invokes the same `make` targets documented in the README —
+  `make dist` is the release — so the published build instructions are the
+  ones under test.
+- **Cards carry only their own media.** Card assembly previously copied
+  every family's ROMs, disk and cartridge images onto every card,
+  producing a 2.2 GB Amstrad card that could not fit 1 GB media. A card
+  now derives its contents from its own generated menu: approximately
+  86 MB for that same card.
 
 ## PoC2 — Me and my Shadow core · 2026-07-14
 
