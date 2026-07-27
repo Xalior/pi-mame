@@ -44,11 +44,13 @@ tells you which is which.
   subfolder — put the card in the Pi, plug the display into **HDMI0** (on the
   Pi 4 and Pi 5, the micro-HDMI port nearest the USB-C power connector), and
   power on.
-- **`kernel8-<platform>.img`** — one platform's binary on its own, uploaded
-  per board. This is the same core that is already inside that board's card
+- **`pi-mame-<tag>-<platform>-<board>.img`** — one platform's binary on its
+  own, for one board. This is the same core already inside that board's card
   zips; it is here for anyone assembling a card by hand or replacing the core
   on one they built. Copy it onto the card as `kernel-<board>.img`, the name
-  the picker chain-boots.
+  the picker chain-boots. The board is in this filename for the same reason it
+  is in the zips': all three boards build a file called
+  `kernel8-<platform>.img`, so the release names them apart.
 
 A release does **not** carry a separate download per machine. One image per
 machine would be 193 near-identical files per board, each about 84 MB,

@@ -55,6 +55,19 @@ for b in $BOARDS; do
             make card RAPI_BOARD="$b" PLATFORM="$p" TIER="$tier" ASSETS="$ca"
             ( cd "build/card-$p-$tier-$b" && zip -qr "../../dist/pi-mame-$TAG-$p-$tier-$b.zip" . )
         done
+
+        # The platform binary ships as a release asset in its own right, and it
+        # is NAMED HERE, by the release machinery, for the same reason the zips
+        # are: every board builds a file called kernel8-<platform>.img, and a
+        # GitHub release's assets are a flat namespace keyed on filename. Three
+        # boards' identically-named images collide there and two are silently
+        # discarded — so the board token goes into the name at the point the
+        # release is assembled, not left to whatever collects the files.
+        # Built already if either tier produced a card; built here if a platform
+        # shipped no card at all (both menus empty) so the binary still ships.
+        [ -f "host/build/$b/kernel8-$p.img" ] || \
+            make -C host RAPI_BOARD="$b" PLATFORM="$p"
+        cp "host/build/$b/kernel8-$p.img" "dist/pi-mame-$TAG-$p-$b.img"
     done
 done
 ls -lh dist/

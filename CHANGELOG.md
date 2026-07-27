@@ -144,7 +144,11 @@ the CI runner's disk and any reasonable release page. The redundancy is
 almost total: a per-machine image is its family's binary with a 28-byte
 string patched in at offset `0x800`.
 
-Releases now carry the card archives and the per-family binaries. A
+Releases now carry the card archives and the per-family binaries, the
+latter as `pi-mame-<tag>-<family>-<board>.img`. Every board builds a file
+called `kernel8-<family>.img`, and a release's assets are one flat
+namespace, so the board goes into the name when the release is assembled
+— otherwise three boards' images collide and two are silently dropped. A
 single-machine image remains one command from the published sources:
 
     make kernel MACHINE=<name>

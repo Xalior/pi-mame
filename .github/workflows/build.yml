@@ -226,19 +226,6 @@ jobs:
       - name: Assemble this board's card zips
         run: make dist TAG="${GITHUB_REF_NAME}" BOARDS=${{ matrix.board }}
 
-      # Every run: this board's platform binaries as individual artifacts
-      # (~85MB each) from the board-scoped build tree. Not zipped into one
-      # blob — a user wants the one image for their platform. The artifact is
-      # board-named so all three boards' uploads coexist in the run. Uploaded
-      # BEFORE the smoke test below patches a per-machine image into the same
-      # directory, so the glob stays platform-binaries-only.
-      - name: Upload platform kernel images
-        uses: actions/upload-artifact@v4
-        with:
-          name: kernel-images-${{ matrix.board }}
-          path: host/build/${{ matrix.board }}/kernel8-*.img
-          if-no-files-found: error
-
       # Smoke-test the single-machine card path (make kernel -> byte-patch,
       # make sd -> scripts/mksd.sh), which the platform-card path never
       # exercises — exactly where the stale boot-firmware path bug hid. This
@@ -249,15 +236,17 @@ jobs:
           make kernel MACHINE=spectrum RAPI_BOARD=${{ matrix.board }}
           make sd MACHINE=spectrum RAPI_BOARD=${{ matrix.board }} ASSETS=./all-assets
 
-      # The cards are the actual deliverable — a bare kernel is not something
-      # you can put in a Pi. A `ci` branch build exists to hand you the thing
-      # you are about to release so it can be bench-tested BEFORE a tag is cut,
-      # so the zips must come out of a branch build too.
-      - name: Upload card zips
+      # This board's whole release output, exactly as `make dist` produced it:
+      # the card zips and the platform binaries, already carrying their board
+      # in the filename because the release machinery named them. CI uploads
+      # what the scripts made and decides nothing about naming. A `ci` branch
+      # build exists to hand you the thing you are about to release so it can
+      # be bench-tested BEFORE a tag is cut, so this runs on every build.
+      - name: Upload this board's release output
         uses: actions/upload-artifact@v4
         with:
-          name: card-zips-${{ matrix.board }}
-          path: dist/pi-mame-*.zip
+          name: dist-${{ matrix.board }}
+          path: dist/pi-mame-*
           if-no-files-found: error
 
   # Cut ONE GitHub Release carrying every board's platform binaries and card
@@ -289,8 +278,11 @@ jobs:
       - name: Attach built assets to the release
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            artifacts/kernel-images-*/kernel8-*.img
-            artifacts/card-zips-*/pi-mame-*.zip
+          files: artifacts/dist-*/pi-mame-*
           fail_on_unmatched_files: true
           generate_release_notes: false
+          # Leave it staged. Publishing is a person's decision, taken after
+          # reading the page — not a side effect of a build finishing. Without
+          # this the action defaults to draft:false and puts the release live
+          # the moment the last board goes green.
+          draft: true
