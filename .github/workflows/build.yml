@@ -289,28 +289,48 @@ jobs:
           generate_release_notes: false
           body: |
             Built by CI on clean Ubuntu runners from tag `${{ github.ref_name }}`,
-            one full build per board (Pi 3, Pi 4, Pi 5).
+            one complete build per board: Raspberry Pi 3, Pi 4 and Pi 5.
 
-            These images are **compile-proven**: they built from the published
-            sources with no local toolchain. They have **not** been boot-proofed
-            here — hardware boot-proofs happen on the project bench, not in CI.
-            What has actually run on hardware lives in the per-platform tables
-            under [docs/](https://github.com/Xalior/pi-mame/tree/${{ github.ref_name }}/docs).
+            ## Which file to download
 
-            The `pi-mame-<tag>-<platform>-<free|public>-<board>.zip` assets are
-            single-board platform cards: that board's firmware, the boot picker
-            as the front door, the platform binary as the `kernel-<board>.img`
-            core, a menu of that platform's machines, and the ROMs that menu
-            needs. Extract one onto a blank FAT32 card and boot. The **free**
-            card lists only machines whose every asset is freely-blessed and
-            bundles just those ROMs. The **public** card lists the full roster —
-            its grey "public-tier" ROMs (`scripts/assets.manifest`) are not in
-            the repo; they are fetched from their mirrors at build time into the
-            public zip alone. A menu entry whose ROMs could not be fetched still
-            boots the picker; add the missing files to its card to run it.
+            The board is the last field in every filename. An image built for
+            one board will not boot on another, so match `rpi3`, `rpi4` or
+            `rpi5` to the Raspberry Pi you own.
 
-            Each `kernel8-<platform>.img` is that platform's no-options kernel:
-            dropped onto a prepared card as `kernel-<board>.img` it brings up
-            MAME's own system-selection list. A single-machine image is a local
-            one-liner from the published sources — `make kernel MACHINE=<m>` —
-            a byte-patch of the platform binary (see docs/defaults-abi.md).
+            `pi-mame-<tag>-<platform>-<free|public>-<board>.zip` is a complete
+            SD card for one platform on one board: that board's firmware, the
+            boot menu, the emulator built for that platform, and the ROMs that
+            menu refers to. Extract it onto a blank FAT32 card, with the files
+            at the top level of the card rather than inside a directory, then
+            power on. The menu lists that platform's machines; choosing one
+            starts it.
+
+            The two editions differ only in the ROMs they carry. **free**
+            contains only ROMs whose rights holder has permitted
+            redistribution. **public** contains ROM sets mirrored on public
+            archives, which are in wide circulation but carry no explicit
+            permission; those are not held in this repository and are fetched
+            from the mirrors during the build. If a ROM could not be fetched,
+            its menu entry still appears and the card still boots — add the
+            missing file to the card to run that machine.
+
+            `kernel8-<platform>.img` is one platform's emulator on its own.
+            Copy it onto a card you have already prepared, as
+            `kernel-<board>.img`. With no machine name written into it, it
+            starts MAME's own system-selection list. To build a card that
+            starts one machine directly, run `make kernel MACHINE=<name>`
+            against these sources; the format it writes into the image is
+            documented in
+            [docs/defaults-abi.md](https://github.com/Xalior/pi-mame/blob/${{ github.ref_name }}/docs/defaults-abi.md).
+
+            ## What has been tested
+
+            These images are compile-proven: they built from the published
+            sources on a clean machine, with no local toolchain involved. CI
+            does not switch on a Raspberry Pi, so it has not confirmed that any
+            of them boots.
+
+            Results from real hardware are recorded machine by machine in the
+            platform pages under
+            [docs/](https://github.com/Xalior/pi-mame/tree/${{ github.ref_name }}/docs).
+            A machine that works carries a photograph of the actual display.
