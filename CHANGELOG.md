@@ -1,6 +1,6 @@
 # Changelog
 
-## PoC3 · unreleased
+## PoC3 — I can't believe it's not Silicon Spread · 2026-07-27
 
 - **Multi-board: Raspberry Pi 3, 4 and 5.** Circle's newlib + libc++ sysroot
   is baked per architecture, so MAME is now a full per-board build — Pi 3/4/5
@@ -9,8 +9,9 @@
   cross-wrapper's `-mcpu`/`-DRASPPI` flags. CI dispatches one job per board,
   three concurrent, fail-fast off so a break on one board still reports the
   others. The development network-loader is hardware-verified on all three
-  boards; each board's payload images are CI-built from clean sources, and
-  bench hardware-proofing precedes the PoC tag.
+  boards, each board's payload images are CI-built from clean sources, and
+  before this tag a card was written and booted on real hardware for each
+  board in turn — a Pi 3, a Pi 4 and a Pi 5 all came up from their own card.
 - **Build the drivers once, link them per platform.** Where PoC2 built a full
   MAME per platform, a board now compiles ONE shared engine — the
   `mamedrivers` subtarget: the SOURCES-invariant engine framework, all of
@@ -53,6 +54,16 @@
   card. CI runs the identical `make` machinery a local user runs (`make dist`
   is the release), so the release path is under test both ways; per-platform
   kernels for all three boards upload as individual images alongside.
+- **Removed: the per-machine release download.** PoC2 published a
+  `kernel8-<machine>.img` for every machine on the roster. PoC3 does not: at
+  15 platforms the full set is 195 machines × ~84 MB × 3 boards, which fits
+  neither a CI runner's disk nor a release page anyone could navigate — and
+  each of those files is the same platform binary differing by a few bytes of
+  baked-in defaults. A release now carries the card zips and the per-platform
+  binaries. Building a single-machine image locally is unchanged and still
+  one command (`make kernel MACHINE=<name>`), and the `0x800` defaults-block
+  ABI it patches remains public and documented, so third-party tooling that
+  stamps its own images keeps working.
 
 ## PoC2 — Me and my Shadow core · 2026-07-14
 

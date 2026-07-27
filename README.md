@@ -2,9 +2,9 @@
 
 [![build](https://github.com/Xalior/pi-mame/actions/workflows/build.yml/badge.svg)](https://github.com/Xalior/pi-mame/actions/workflows/build.yml)
 
-Bare-metal MAME for the Raspberry Pi 4. No Linux, no OS, no desktop — the
-Pi boots in seconds straight into an emulated machine, like an appliance,
-because that's what it is. 📺⚡
+Bare-metal MAME for the Raspberry Pi 3, 4 and 5. No Linux, no OS, no
+desktop — the Pi boots in seconds straight into an emulated machine, like an
+appliance, because that's what it is. 📺⚡
 
 pi-mame embeds MAME's emulation core on the [Circle](https://github.com/rsta2/circle)
 bare-metal framework through a purpose-built
@@ -23,37 +23,53 @@ Every tagged release carries several asset forms — grab yours from
 [**the latest release**](https://github.com/Xalior/pi-mame/releases/latest)
 and skip the toolchain:
 
-- **`pi-mame-<tag>-<platform>-<free|public>.zip`** — a platform card, the
-  ready-to-boot download: Pi firmware, `config.txt`, the platform's regional
-  `cmdline.txt`, the boot picker, that platform's binary (as
-  `pi-mame-core-rpi4.img`), a menu of the platform's machines, and their
-  ROMs. The **free** card lists only machines whose ROMs are all free-tier
-  and bundles just those free-blessed ROMs. The **public** card lists the
-  full roster and bundles the full ROM set — the grey "public-tier" ROMs are
-  not in this repo; CI fetches them from their mirrors at build time into this
-  zip alone (see [Assets you must supply](#-assets-you-must-supply) for the
-  tiers). Extract it onto a blank **FAT32** SD
-  card — files at the card's top level, not in a subfolder — put the card in
-  the Pi, plug the display into **HDMI0** (the micro-HDMI port next to the
-  USB-C power connector), and power on.
-- **`kernel8-<machine>.img`** — one machine's kernel, for every machine in
-  the roster. Drop it onto a card you prepared from a platform card, as
-  `pi-mame-core-rpi4.img` (the name the picker chain-boots), replacing the one
-  already there — that is how you point a card at a specific machine.
+**Pick the zip for your board.** Every card is built for one specific
+Raspberry Pi — `rpi3`, `rpi4` or `rpi5` — because the emulator inside it is
+compiled for that board's CPU. A card is not portable between boards; the
+board is the last word in the filename so a folder full of downloads still
+tells you which is which.
 
-Which machine? [docs/sinclair/](docs/sinclair/README.md),
-[docs/amstrad/](docs/amstrad/README.md), [docs/commodore/](docs/commodore/README.md)
-and [docs/amiga/](docs/amiga/README.md) list every one, with a details
-page each.
+- **`pi-mame-<tag>-<platform>-<free|public>-<board>.zip`** — a platform card,
+  the ready-to-boot download: that board's Pi firmware, `config.txt`, the
+  regional `cmdline.txt`, the boot picker (as `pi-mame-boot-<board>.img`,
+  which the firmware boots), that platform's binary as the MAME core (as
+  `kernel-<board>.img`, which the picker chain-boots), a menu of the
+  platform's machines, and their ROMs. The **free** card lists only machines
+  whose ROMs are all free-tier and bundles just those free-blessed ROMs. The
+  **public** card lists the full roster and bundles the full ROM set — the
+  grey "public-tier" ROMs are not in this repo; CI fetches them from their
+  mirrors at build time into this zip alone (see
+  [Assets you must supply](#-assets-you-must-supply) for the tiers). Extract
+  it onto a blank **FAT32** SD card — files at the card's top level, not in a
+  subfolder — put the card in the Pi, plug the display into **HDMI0** (on the
+  Pi 4 and Pi 5, the micro-HDMI port nearest the USB-C power connector), and
+  power on.
+- **`kernel8-<platform>.img`** — one platform's binary on its own, uploaded
+  per board. This is the same core that is already inside that board's card
+  zips; it is here for anyone assembling a card by hand or replacing the core
+  on one they built. Copy it onto the card as `kernel-<board>.img`, the name
+  the picker chain-boots.
 
-CI **compiles** every release on a clean Ubuntu runner — that's what's
-proven for every asset there. It does not boot-test them: hardware proof
-lives in the platform tables, where every screenshot is an HDMI capture
-from a real Pi 4 (more in
-[Continuous integration](#-continuous-integration) below). A bare
-`kernel8-<machine>.img` carries no ROMs — add the machine's ROMs to the
-card's `roms/` (and `carts/` for the CPC+ range) yourself; see
-[Assets you must supply](#-assets-you-must-supply).
+A release does **not** carry a separate download per machine. One image per
+machine would be 195 near-identical files per board, each about 84 MB,
+differing only by a few bytes of baked-in defaults. If you want a card that
+powers straight on into one machine with no picker, build it from the
+published sources with `make kernel MACHINE=<name>` — see
+[Building from source](#-building-from-source-the-long-way).
+
+Which machine? Every platform's folder under [docs/](docs/) lists its
+machines with a details page each — start at
+[docs/sinclair/](docs/sinclair/README.md),
+[docs/amstrad/](docs/amstrad/README.md),
+[docs/commodore/](docs/commodore/README.md) or
+[docs/amiga/](docs/amiga/README.md), and see
+[the platform table](#-the-default-images) below for all fifteen.
+
+CI **compiles** every release on a clean Ubuntu runner, all three boards —
+that's what's proven for every asset there. It does not boot-test them:
+hardware proof lives in the platform tables, where every screenshot is an
+HDMI capture from a real Pi (more in
+[Continuous integration](#-continuous-integration) below).
 
 Prefer building it yourself? See
 [Building from source](#-building-from-source-the-long-way) below.
@@ -62,21 +78,22 @@ Prefer building it yourself? See
 
 Delightfully small. Let's be precise about what this actually is:
 
-- **Four platforms are proven** — Sinclair, Amstrad, Commodore, and Amiga
-  (the Arcadia Multi Select arcade system). Each is a family of machines
-  built on related hardware, sharing a MAME driver lineage and, often,
-  ROMs: see [docs/sinclair/](docs/sinclair/README.md),
-  [docs/amstrad/](docs/amstrad/README.md),
-  [docs/commodore/](docs/commodore/README.md) and
-  [docs/amiga/](docs/amiga/README.md) for exactly which machines and what
-  each needs — every one with an HDMI capture from a real Pi 4 on its
-  details page.
-- **One board.** 🥧 Proven on a Raspberry Pi 4 Model B (4GB). Nothing else
-  has ever booted it. (The firmware files for the Pi 400 and CM4 ride
-  along because Circle ships them — consider those a rumor, not a
-  feature.)
-- **Single-threaded, and silent.** One of the Pi's four cores does all the
-  work, and audio isn't wired up yet. 🔇
+- **Fifteen platforms, 195 machines.** Each platform is a family of machines
+  built on related hardware, sharing a MAME driver lineage and, often, ROMs.
+  Every machine on the roster carries a verdict from real hardware: it is
+  either proven on the glass with an HDMI capture on its details page, or
+  parked with the reason recorded. Parked is a real category and an honest
+  one — most parked machines are held by a MAME warnings box the appliance
+  has no way to dismiss, not by a broken emulator.
+- **Three boards.** 🥧 Raspberry Pi 3, 4 and 5. MAME is compiled separately
+  for each — they are Cortex-A53, -A72 and -A76 — so a card is built for one
+  board and boots that board only.
+- **Two cores, and silent.** 🔇 The emulation gets a CPU core to itself while
+  another core does nothing but push finished frames to the display, so the
+  two never wait on each other. MAME itself still runs single-threaded
+  (`-numprocessors 1`) on its core. There is no sound yet: the shim has a
+  working HDMI audio path, but no shipped image connects MAME's output to it,
+  and wiring that up is deliberately the next milestone's job.
 
 Building more of MAME in is a `SOURCES` change in `host/machines.mk`
 (each platform's driver list); running more is a matter of what you put in
@@ -87,45 +104,60 @@ go wild. A custom image is the same build with your choices in it. 🧪
 
 ## 📦 The default images
 
-There is **one binary per platform** — one per vendor-class (Sinclair,
-Amstrad, Commodore, Amiga), each linked from the board's shared mamedrivers
-engine with only its own platform's drivers (no crossover). No machine is compiled in: the machine name and its
-media ride a fixed-size **defaults string** at offset `0x800` in the image,
-written before boot. "Which machine" is not configuration you edit at
-runtime — there is no CLI and no config files of ours — it's what got
-stamped into that block. 💾
+Each board compiles **one shared MAME engine**, and each platform links that
+engine against only its own drivers (no crossover) to make **one binary per
+platform**. No machine is compiled in: the machine name and its media ride a
+fixed-size **defaults string** at offset `0x800` in the image, written before
+boot. "Which machine" is not configuration you edit at runtime — there is no
+CLI and no config files of ours — it's what got stamped into that block. 💾
 
 Three shapes come out of that one binary per platform:
 
 | Image | Powers on into |
 |---|---|
-| `kernel8-<machine>.img` | one machine — the platform binary with that machine's defaults stamped in (`make kernel MACHINE=<name>`) |
 | `kernel8-<platform>.img` | the platform's **no-options** kernel — unpatched, so MAME boots its own system list; machines with ROMs on the card run |
-| `kernel8-rpi4.img` (the **boot picker**, `make picker`) | a menu of the platform's machines read from `bootmenu.cfg`; a pick patches the platform binary and chain-boots it |
+| `kernel8-<machine>.img` | one machine — the same platform binary with that machine's defaults stamped in (`make kernel MACHINE=<name>`, built locally; not a release download) |
+| the **boot picker** (`make picker`) | a menu of the platform's machines read from `bootmenu.cfg`; a pick patches the platform binary and chain-boots it |
 
-Those `kernel8-*.img` names are the build products (and the bare release
-downloads). On a card the firmware and picker boot two fixed names instead:
-the core — a machine image or a platform binary — is copied on as
-`pi-mame-core-rpi4.img`, and the picker as `pi-mame-boot-rpi4.img`. The
-copy-to-card bundles and `make sd` / `make card` put them there for you; do
-the same rename by hand only if you're dropping a bare kernel onto a card
-you already built.
+Those `kernel8-*.img` names are the build products. **On a card, two fixed
+names matter instead**, both carrying the board token so a card is
+self-describing:
 
-Every machine belongs to one of four platforms:
+| On the card | What it is |
+|---|---|
+| `pi-mame-boot-<board>.img` | the boot picker — this is what the Pi firmware boots |
+| `kernel-<board>.img` | the MAME core the picker chain-boots: a platform binary, or a single machine's image on a `make sd` card |
 
-| Platform | Details | Machines |
+`make sd` and `make card` put them there for you; do the rename by hand only
+if you're dropping a bare kernel onto a card you already built.
+
+Every machine belongs to one of fifteen platforms:
+
+| Platform | Machines | Details |
 |---|---|---|
-| Sinclair — the ZX Spectrum family and its clones | [docs/sinclair/README.md](docs/sinclair/README.md) | [`docs/sinclair/`](docs/sinclair/) |
-| Amstrad — the CPC family, the NC notepads, and the PC1512 | [docs/amstrad/README.md](docs/amstrad/README.md) | [`docs/amstrad/`](docs/amstrad/) |
-| Commodore — the C64 line, the VIC-20s, and the TED machines | [docs/commodore/README.md](docs/commodore/README.md) | [`docs/commodore/`](docs/commodore/) |
-| Amiga — the Arcadia Multi Select arcade system | [docs/amiga/README.md](docs/amiga/README.md) | [`docs/amiga/`](docs/amiga/) |
+| Sinclair — the ZX Spectrum family and its clones | 23 | [docs/sinclair/](docs/sinclair/README.md) |
+| Amstrad — the CPC family, the NC notepads, and the PC1512 | 10 | [docs/amstrad/](docs/amstrad/README.md) |
+| Commodore — the C64 line, the VIC-20s, and the TED machines | 29 | [docs/commodore/](docs/commodore/README.md) |
+| Amiga — the Arcadia Multi Select arcade system | 19 | [docs/amiga/](docs/amiga/README.md) |
+| Atari — the 8-bit computer line, 400 through XEGS | 10 | [docs/atari/](docs/atari/README.md) |
+| Acorn — the BBC Micro family, the Electron, and the Atom | 26 | [docs/acorn/](docs/acorn/README.md) |
+| EACA — the Colour Genie | 2 | [docs/eaca/](docs/eaca/README.md) |
+| SAM Coupé — MGT's Spectrum successor | 1 | [docs/samcoupe/](docs/samcoupe/README.md) |
+| Camputers — the Lynx | 3 | [docs/camputers/](docs/camputers/README.md) |
+| Tatung — the Einstein | 2 | [docs/tatung/](docs/tatung/README.md) |
+| Memotech — the MTX line | 3 | [docs/memotech/](docs/memotech/README.md) |
+| Enterprise — the 64 and 128 | 3 | [docs/enterprise/](docs/enterprise/README.md) |
+| Sord — the m5 | 3 | [docs/sord/](docs/sord/README.md) |
+| VTech — the Laser / VZ family and friends | 24 | [docs/vtech/](docs/vtech/README.md) |
+| TRS — the TRS-80, CoCo, Dragon and MC-10 | 37 | [docs/trs/](docs/trs/README.md) |
 
 Each platform page carries its own machine table (`make kernel MACHINE=` target,
 system, year, romset, TV region) and a details page per machine covering
 exactly what appears on the glass at power-on and exactly which assets it
 needs. Every screenshot in those pages is an HDMI capture from a real
-Raspberry Pi 4 running that machine's image — not an emulator window, not
-a mockup. 📸
+Raspberry Pi running that machine's image — not an emulator window, not a
+mockup. 📸 The four original platforms were captured on a Pi 4; the eleven
+that followed were captured on a Pi 5.
 
 A platform card's menu and the mechanism behind it are documented
 separately: [docs/bootmenu.md](docs/bootmenu.md) covers the boot picker
@@ -203,54 +235,65 @@ make mame      # the board's ONE shared mamedrivers engine — the long one; log
                #   design; the archives are the product and the kernel links itself)
 make kernels   # every platform binary + every machine's kernel8-<machine>.img
                #   + the boot picker — each platform kernel links the shared
-               #   mamedrivers engine with its own drivlist. See docs/sinclair/,
-               #   docs/amstrad/ and docs/commodore/ for the full list, or
-               #   `make kernel MACHINE=<name>` for one
+               #   mamedrivers engine with its own drivlist. Each platform's
+               #   folder under docs/ lists its machines, or use
+               #   `make kernel MACHINE=<name>` for just one
 
 make sd MACHINE=spectrum ASSETS=~/my-assets   # a single-machine card, or:
 make card PLATFORM=sinclair TIER=free ASSETS=~/my-assets   # a platform card
 ```
 
 `make sd` assembles a complete single-machine copy-to-card tree in
-`build/sd/`: Raspberry Pi firmware (fetched at the revision Circle pins),
-our `config.txt` boot configuration, the machine's regional canvas
-`cmdline.txt`, and the MAME core as `pi-mame-core-rpi4.img` (the firmware
-boots it directly — no picker). `make card PLATFORM=<p> TIER=<free|public>`
-instead lays out a platform card in `build/card-<p>-<tier>/`: the boot
-picker (`pi-mame-boot-rpi4.img`) as the front door, the MAME core
-(`pi-mame-core-rpi4.img`), and a generated
-`bootmenu.cfg` (the **free** menu lists only machines whose ROMs are all
-free-tier; **public** lists the full roster). `ASSETS` points at a directory
-you provide (layout on the platform pages); leave it off and the tree still
-builds — you'll just add `roms/` (and any platform extras) to the card
-yourself.
+`build/sd/`: that board's Raspberry Pi firmware (fetched at the revision
+Circle pins), our `config.txt` boot configuration, the machine's regional
+canvas `cmdline.txt`, and the MAME core as `kernel-<board>.img` — which the
+firmware boots directly, no picker. `make card PLATFORM=<p> TIER=<free|public>`
+instead lays out a platform card in `build/card-<p>-<tier>-<board>/`: the boot
+picker as `pi-mame-boot-<board>.img` (the front door the firmware boots), the
+MAME core as `kernel-<board>.img`, and a generated `bootmenu.cfg` (the
+**free** menu lists only machines whose ROMs are all free-tier; **public**
+lists the full roster). A card carries the media its own menu asks for and
+nothing else. `ASSETS` points at a directory you provide (layout on the
+platform pages); leave it off and the tree still builds — you'll just add
+`roms/` (and any platform extras) to the card yourself.
+
+Both targets take `RAPI_BOARD=rpi3|rpi4|rpi5` and build for that board;
+`make dist` fans the whole matrix — every platform, both tiers, all three
+boards — into one zip per combination in `dist/`.
 
 Then, concretely: 💾
 
 1. Format an SD card with a single **FAT32** partition (any size card; the
-   Pi 4 boots from FAT).
+   Pi boots from FAT).
 2. Copy everything *inside* `build/sd/` onto it — files at the card's top
    level, not in a subfolder.
-3. Put the card in the Pi, plug the display into **HDMI0 — the micro-HDMI
-   port next to the USB-C power connector** — and power on. 🔌
+3. Put the card in the Pi — the same board you built for — plug the display
+   into **HDMI0** (on the Pi 4 and Pi 5, the micro-HDMI port nearest the
+   USB-C power connector; the Pi 3 has a single full-size HDMI socket), and
+   power on. 🔌
 
 ## 🤖 Continuous integration
 
 Every version tag (`v*`) on `main` is built from scratch on a clean Ubuntu
 runner — a stranger test at every release cut: if these published sources
 can't build pi-mame with nothing but the toolchain, the tag goes red. 🚦
-Each tag's build cuts a GitHub Release whose assets are the ready-made
-`kernel8-<machine>.img` files, so you can grab an image and skip the
-toolchain entirely. ⬇️ CI proves the build **compiles**; what has actually
-run on real hardware lives in the platform tables — every screenshot there
-is an HDMI capture from a Pi 4, not a CI artifact. 📸
+One job per board, three at once, and a break on one board still reports the
+others. CI runs the same `make` targets you would run locally, so the release
+path is the tested path. Each tag's build cuts a GitHub Release whose assets
+are the card zips and the per-platform binaries, so you can grab one and skip
+the toolchain entirely. ⬇️
+
+CI proves the build **compiles**; what has actually run on real hardware
+lives in the platform tables — every screenshot there is an HDMI capture from
+a real Pi, not a CI artifact. 📸
 
 ## 🕹️ Assets you must supply
 
 This repository contains no ROMs and no disk images. `make sd`'s `ASSETS`
 directory always has a `roms/` folder; some platforms add their own
 subfolder alongside it (the Sinclair platform's Next SD-card image lives
-in `next/`, for instance). Each platform page has the exact tree:
+in `next/`, for instance). Each platform's page under [docs/](docs/) has the
+exact tree it expects — for example
 [docs/sinclair/README.md](docs/sinclair/README.md#assets),
 [docs/amstrad/README.md](docs/amstrad/README.md#assets) and
 [docs/commodore/README.md](docs/commodore/README.md#assets). Only supplying
@@ -272,6 +315,12 @@ tiers, because provenance differs:
 - **public** — publicly-available-but-grey MAME romset mirrors on
   archive.org. Widely used, not formally blessed; your call whether to
   drink.
+
+Be aware how lopsided that split is: nine assets are free-tier and the rest
+are public. Amstrad's standing permission is the reason the Sinclair and
+Amstrad machines have a free card at all — no comparable blessing exists for
+most other platforms, so their machines are public-tier only. A platform
+whose free menu would be empty simply ships no free card.
 
 ```sh
 make assets-free   ASSETS=~/my-assets   # just the blessed sources
@@ -301,10 +350,12 @@ Spectrum, Left Shift is CAPS SHIFT and Right Shift is SYMBOL SHIFT. 🌈
 
 ## 🚧 Status
 
-Video, input, and media loading are proven on hardware; audio is not wired
-up yet. The emulation is currently single-threaded (`-numprocessors 1`) on
-one of the Pi 4's four cores; a multicore architecture is designed and
-measured, not yet integrated. This is a proof of concept wearing its P
+Video, input, and media loading are proven on hardware, on all three boards.
+The core split is integrated and shipping: MAME emulates on a core of its
+own while another core presents frames. MAME itself remains single-threaded
+(`-numprocessors 1`) on that core. Sound is the notable gap — the audio path
+exists in the shim and is not yet connected to MAME in any shipped image,
+which is the next milestone's work. This is a proof of concept wearing its P
 proudly. 🚀
 
 ## ⚖️ License
