@@ -45,12 +45,15 @@ check() {   # <path>
     echo "OK: $1 ($sz bytes)"
 }
 
+# --no-print-directory: these rosters are captured into shell variables, and a
+# narrating make would turn its own "Entering directory" banner into a machine
+# name to check (see gen-bootmenu.sh).
 if [ "$SCOPE" = all ]; then
-    for m in $(make -s -f "$MK" print-MACHINES); do
+    for m in $(make --no-print-directory -s -f "$MK" print-MACHINES); do
         check "$HOSTDIR/kernel8-$m.img"
     done
 fi
-for p in $(make -s -f "$MK" print-PLATFORMS); do
+for p in $(make --no-print-directory -s -f "$MK" print-PLATFORMS); do
     check "$HOSTDIR/kernel8-$p.img"
 done
 

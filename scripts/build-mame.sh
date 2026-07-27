@@ -58,8 +58,10 @@ command -v aarch64-none-elf-ar >/dev/null || {
     exit 1
 }
 
-# Read a machines.mk fact without pulling in the Circle build.
-q() { make -s -f "$MACHINES_MK" "print-$1"; }
+# Read a machines.mk fact without pulling in the Circle build. The answer is
+# captured into a shell variable, so make must not narrate its directory
+# changes into stdout (see gen-bootmenu.sh).
+q() { make --no-print-directory -s -f "$MACHINES_MK" "print-$1"; }
 
 SUBTARGET="$(q MAMEDRIVERS_SUBTARGET)"
 SOURCES="$(q PLATFORM_SOURCES_MAMEDRIVERS | tr -s ' ' ',')"

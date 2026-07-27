@@ -14,7 +14,10 @@ set -e
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 BOARD="${1:-${RAPI_BOARD:-rpi4}}"
 
-st=$(make -s -f "$ROOT/host/machines.mk" print-MAMEDRIVERS_SUBTARGET)
+# --no-print-directory: the answer becomes a path component below, so make must
+# not narrate its directory changes into stdout (see gen-bootmenu.sh).
+st=$(make --no-print-directory -s -f "$ROOT/host/machines.mk" \
+    print-MAMEDRIVERS_SUBTARGET)
 MB="$ROOT/mame-$BOARD/build/mamedrivers/rapi-circle"
 ok=1
 [ -f "$MB/obj/Release/src/mame/mame.o" ]     || { echo "MISSING: $MB/obj/Release/src/mame/mame.o"; ok=0; }

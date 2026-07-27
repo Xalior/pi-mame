@@ -35,7 +35,10 @@ make assets      ASSETS="$ALL"
 
 mkdir -p dist
 for b in $BOARDS; do
-    for p in $(make -s -f host/machines.mk print-PLATFORMS); do
+    # --no-print-directory: the roster is captured into a shell variable, so a
+    # narrating make would add "Entering directory" as a platform to card up
+    # (see gen-bootmenu.sh).
+    for p in $(make --no-print-directory -s -f host/machines.mk print-PLATFORMS); do
         for tier in free public; do
             # Skip only a truly empty menu (all lines '#' or blank). Counted with
             # awk, not `grep -qv '^#'` — the latter silently drops cards under a

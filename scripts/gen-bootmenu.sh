@@ -33,8 +33,11 @@ case "$TIER" in
     *) echo "gen-bootmenu.sh: tier must be 'free' or 'public', got '$TIER'" >&2; exit 2 ;;
 esac
 
-# Read a machines.mk fact without pulling in the Circle build.
-q() { make -s -f "$MACHINES_MK" "print-$1"; }
+# Read a machines.mk fact without pulling in the Circle build. The answer is
+# captured into a shell variable, so make must not narrate: run under another
+# make it would otherwise prepend "Entering/Leaving directory" banners to
+# stdout and those words become menu entries. --no-print-directory, always.
+q() { make --no-print-directory -s -f "$MACHINES_MK" "print-$1"; }
 
 ROSTER="$(q "PLATFORM_MACHINES_$PLATFORM")"
 if [ -z "$ROSTER" ]; then

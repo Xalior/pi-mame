@@ -114,7 +114,8 @@ cp "$BINARY" "$SD/kernel-$BOARD.img"
 # never fail the card.
 if [ -n "$ASSETS" ]; then
     for m in $(awk -F'|' '!/^#/ && NF {print $1}' "$SD/bootmenu.cfg"); do
-        make -s -f "$ROOT/host/machines.mk" "print-MACHINE_ASSETS_$m"
+        make --no-print-directory -s -f "$ROOT/host/machines.mk" \
+            "print-MACHINE_ASSETS_$m"
     done | tr ' ' '\n' | sort -u | while IFS= read -r a; do
         [ -n "$a" ] || continue
         dest="$(awk -F'|' -v n="$a" '$1=="asset" && $2==n {print $5; exit}' \

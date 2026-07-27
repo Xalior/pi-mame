@@ -133,11 +133,13 @@ picker:
 	$(MAKE) -C rapi-bootloader menu-loader-$(RAPI_BOARD)
 
 # One single-purpose image: the machine's PLATFORM binary patched with <m>'s
-# defaults string.
+# defaults string. Every image lands under host/build/<board>/, so the goal
+# carries that path — host's per-machine rule is anchored there.
 kernel:
 	@if [ -z "$(KERNEL_PLATFORM)" ]; then \
 		echo "unknown machine '$(MACHINE)' — not in host/machines.mk"; exit 1; fi
-	$(MAKE) -C host RAPI_BOARD=$(RAPI_BOARD) PLATFORM=$(KERNEL_PLATFORM) kernel8-$(MACHINE).img
+	$(MAKE) -C host RAPI_BOARD=$(RAPI_BOARD) PLATFORM=$(KERNEL_PLATFORM) \
+		build/$(RAPI_BOARD)/kernel8-$(MACHINE).img
 
 # Every single-purpose image — one link per platform, then a byte-patch per
 # machine of that platform.

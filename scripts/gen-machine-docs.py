@@ -193,8 +193,11 @@ SYSTEM_MACROS = r"GAME|GAMEL|COMP|COMPX|COMPB|CONS|CONSX|SYST"
 # --- host/machines.mk facts, via `make print-<VAR>` (never re-parsed by hand) ---
 
 def make_var(var):
+    # --no-print-directory: the answer IS the captured stdout, and run under
+    # another make the banners would land in it (see gen-bootmenu.sh).
     result = subprocess.run(
-        ["make", "-s", "-f", str(MACHINES_MK), f"print-{var}"],
+        ["make", "--no-print-directory", "-s", "-f", str(MACHINES_MK),
+         f"print-{var}"],
         cwd=SCRIPT_ROOT, capture_output=True, text=True, check=True,
     )
     return result.stdout.strip()

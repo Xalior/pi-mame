@@ -32,7 +32,7 @@ esac
 SD="$ROOT/build/sd-$MACHINE-$BOARD"
 IMG="$ROOT/host/build/$BOARD/kernel8-$MACHINE.img"
 
-[ -f "$IMG" ] || { echo "mksd.sh: $IMG not built (make -C host RAPI_BOARD=$BOARD MACHINE=$MACHINE)" >&2; exit 1; }
+[ -f "$IMG" ] || { echo "mksd.sh: $IMG not built (make kernel RAPI_BOARD=$BOARD MACHINE=$MACHINE)" >&2; exit 1; }
 
 # Firmware + ARM stub via Circle's own boot makefile (pinned revision). Firmware
 # is board-agnostic Foundation firmware; the board's own circle world carries it.
