@@ -27,10 +27,13 @@
 #                      is given — each menu machine's manifest assets
 #                      (MACHINE_ASSETS_*), never the whole bundle
 #
-# Regional canvas: cmdline.txt is per-CARD, not per-machine, and a platform can
-# span PAL and NTSC machines. The card defaults to the PAL canvas (the majority
-# tube); the per-region-per-card design is an open PoC2 question (see
-# docs/pi-mame-poc2.html "Platform cards"), not decided here.
+# Regional canvas: cmdline.txt is per-CARD, not per-machine, because the
+# framebuffer geometry is fixed at boot. This script writes the PAL canvas
+# (720x576) onto every card it builds, so an NTSC machine on a card whose
+# platform spans both regions runs on a PAL canvas. mksd.sh, which builds a
+# single-machine card, selects the canvas per machine and gets this right;
+# this script does not, and a card's name carries no region field either.
+# Tracked as a defect, not a choice made here.
 
 set -e
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
