@@ -41,7 +41,7 @@
 # height= in the SD card's FAT-root cmdline.txt), set PER REGION, not per
 # machine — cmdline-pal.txt is the PAL canvas (720x576) every PAL machine
 # fills, cmdline-ntsc.txt the NTSC canvas (720x480) the American 60Hz machines
-# fill, the way a CRT was filled.
+# fill, the way a CRT was filled. Every card built today uses the PAL canvas.
 #
 # Prerequisite: scripts/build-mame.sh <board> has produced
 # mame-<board>/build/mamedrivers/rapi-circle/, and circle-libsdl2 has built the board's

@@ -101,9 +101,9 @@ can fetch these for you — `make assets ASSETS=~/my-assets`.
   carries only the clone's ROMs, `spec128.zip` supplies the shared 128
   ROMs, and their built-in Beta Disk / TR-DOS interface reads
   `betadisk.zip`.
-- **The Timex NTSC machines fill a different canvas.** `ts2068`, `ts1000`,
-  and `ts1500` are the 60Hz American Sinclair/Timex machines — they use
-  `cmdline-ntsc.txt`'s 720×480 canvas, not the 720×576 PAL canvas every
-  other Sinclair machine fills.
+- **The Timex machines are NTSC, but their card is not.** `ts2068`,
+  `ts1000`, and `ts1500` are the 60Hz American Sinclair/Timex machines.
+  Every card built today uses the 720×576 PAL canvas, these included;
+  giving them `cmdline-ntsc.txt`'s 720×480 canvas is work still to come.
 
 [← back to the top-level README](../../README.md)

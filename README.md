@@ -176,8 +176,9 @@ The framebuffer geometry is Raspberry Pi boot configuration
 with the family television. 📼 Two canvases ship: `cmdline-pal.txt` is the
 720×576 PAL canvas that every PAL machine stretches to fill, and
 `cmdline-ntsc.txt` is the 720×480 NTSC canvas for the American 60Hz
-machines. `make sd` copies the right one for the machine you
-name. The GPU outputs that geometry as the video signal; your display's own
+machines. Every card this release builds uses the PAL canvas, including
+the ones carrying American machines; serving those their own canvas is
+work still to come. The GPU outputs that geometry as the video signal; your display's own
 controller stretches it to the glass. `socmaxtemp=70` in the same file is
 load-bearing thermal configuration: don't remove it. 🌡️
 
