@@ -65,14 +65,9 @@ fi
 cp "$ROOT/host/config-machine.txt" "$SD/config.txt"
 cp "$IMG" "$SD/kernel-$BOARD.img"
 
-# The regional canvas: a machine's region picks its television. The American
-# 60Hz machines fill the NTSC tube (720x480); everything else fills PAL
-# (720x576).
-case "$MACHINE" in
-    ts2068|ts1000|ts1500|c64|c64_jp|c64c|sx64|dx64|pet64|edu64|vic20|vic1001|c264|plus4|c16|v364|bbcb_us|a400|a800|a600xl|a800xl|a65xe|a800xe|xegs|m5|crvisioj|vsmile|vsmilem|trs80|trs80dt1|agvision|trsvidtx|coco|cocoh|deluxecoco|coco2b|coco2bh|cp400|cp400c2|mx1600|t4426|lzcolor64|cd6809|ms1600|coco3|coco3h|msm3|tanodr64|tanodr64h|mc10|alice|alice32|alice90|vis) CANVAS=cmdline-ntsc.txt ;;
-    *)                    CANVAS=cmdline-pal.txt ;;
-esac
-cp "$ROOT/host/$CANVAS" "$SD/cmdline.txt"
+# The regional canvas: PAL (720x576) for every machine, on purpose. NTSC is a
+# later phase's work.
+cp "$ROOT/host/cmdline-pal.txt" "$SD/cmdline.txt"
 
 if [ -n "$ASSETS" ]; then
     [ -d "$ASSETS/roms" ] && cp -R "$ASSETS/roms" "$SD/roms" \
