@@ -287,84 +287,13 @@ int SDL_GL_SetAttribute(SDL_GLattr, int) { return -1; }
 int SDL_GL_SetSwapInterval(int) { return -1; }
 void SDL_GL_SwapWindow(SDL_Window *) {}
 
-// ---- SDL2: joystick / game controller / haptic --------------------------------
+// ---- SDL2: haptic ------------------------------------------------------------
 
-int SDL_NumJoysticks(void) { return 0; }
-SDL_Joystick *SDL_JoystickOpen(int) { return nullptr; }
-void SDL_JoystickClose(SDL_Joystick *) {}
-const char *SDL_JoystickName(SDL_Joystick *) { return nullptr; }
-const char *SDL_JoystickGetSerial(SDL_Joystick *) { return nullptr; }
-Uint16 SDL_JoystickGetVendor(SDL_Joystick *) { return 0; }
-Uint16 SDL_JoystickGetProduct(SDL_Joystick *) { return 0; }
-Uint16 SDL_JoystickGetProductVersion(SDL_Joystick *) { return 0; }
-int SDL_JoystickNumAxes(SDL_Joystick *) { return -1; }
-int SDL_JoystickNumBalls(SDL_Joystick *) { return -1; }
-int SDL_JoystickNumHats(SDL_Joystick *) { return -1; }
-int SDL_JoystickNumButtons(SDL_Joystick *) { return -1; }
-SDL_JoystickID SDL_JoystickInstanceID(SDL_Joystick *) { return -1; }
-SDL_JoystickID SDL_JoystickGetDeviceInstanceID(int) { return -1; }
-
-SDL_JoystickGUID SDL_JoystickGetGUID(SDL_Joystick *)
-{
-    SDL_JoystickGUID guid;
-    memset(&guid, 0, sizeof(guid));
-    return guid;
-}
-
-SDL_JoystickGUID SDL_JoystickGetDeviceGUID(int)
-{
-    SDL_JoystickGUID guid;
-    memset(&guid, 0, sizeof(guid));
-    return guid;
-}
-
-void SDL_JoystickGetGUIDString(SDL_JoystickGUID, char *pszGUID, int cbGUID)
-{
-    if (pszGUID != nullptr && cbGUID > 0)
-        pszGUID[0] = '\0';
-}
-
-SDL_bool SDL_IsGameController(int) { return SDL_FALSE; }
-SDL_GameController *SDL_GameControllerOpen(int) { return nullptr; }
-void SDL_GameControllerClose(SDL_GameController *) {}
-const char *SDL_GameControllerName(SDL_GameController *) { return nullptr; }
-const char *SDL_GameControllerGetSerial(SDL_GameController *) { return nullptr; }
-Uint16 SDL_GameControllerGetVendor(SDL_GameController *) { return 0; }
-Uint16 SDL_GameControllerGetProduct(SDL_GameController *) { return 0; }
-Uint16 SDL_GameControllerGetProductVersion(SDL_GameController *) { return 0; }
-SDL_GameControllerType SDL_GameControllerGetType(SDL_GameController *)
-{
-    return SDL_CONTROLLER_TYPE_UNKNOWN;
-}
-SDL_Joystick *SDL_GameControllerGetJoystick(SDL_GameController *) { return nullptr; }
-char *SDL_GameControllerMapping(SDL_GameController *) { return nullptr; }
-int SDL_GameControllerAddMappingsFromRW(SDL_RWops *, int) { return -1; }
-SDL_bool SDL_GameControllerHasAxis(SDL_GameController *, SDL_GameControllerAxis)
-{
-    return SDL_FALSE;
-}
-SDL_bool SDL_GameControllerHasButton(SDL_GameController *, SDL_GameControllerButton)
-{
-    return SDL_FALSE;
-}
-
-SDL_GameControllerButtonBind SDL_GameControllerGetBindForAxis(
-    SDL_GameController *, SDL_GameControllerAxis)
-{
-    SDL_GameControllerButtonBind bind;
-    memset(&bind, 0, sizeof(bind));
-    bind.bindType = SDL_CONTROLLER_BINDTYPE_NONE;
-    return bind;
-}
-
-SDL_GameControllerButtonBind SDL_GameControllerGetBindForButton(
-    SDL_GameController *, SDL_GameControllerButton)
-{
-    SDL_GameControllerButtonBind bind;
-    memset(&bind, 0, sizeof(bind));
-    bind.bindType = SDL_CONTROLLER_BINDTYPE_NONE;
-    return bind;
-}
+// Joysticks and game controllers are NOT stubbed here: the shim implements
+// both (circle-libsdl2 src/joystick.cpp, src/gamecontroller.cpp), and a stub
+// in this object would win the link over the archive member and quietly
+// disconnect every pad. Haptics the shim leaves unimplemented on purpose —
+// Circle offers rumble, not force feedback — so these fail honestly.
 
 SDL_Haptic *SDL_HapticOpenFromJoystick(SDL_Joystick *) { return nullptr; }
 void SDL_HapticClose(SDL_Haptic *) {}
@@ -380,11 +309,10 @@ const char *SDL_GetAudioDriver(int) { return "circle"; }
 
 // ---- SDL2: misc -----------------------------------------------------------------
 
-void SDL_free(void *mem) { free(mem); }
+// SDL_free and SDL_RWFromFile are NOT stubbed here: the shim implements both
+// (SDL_RWops arrived with the game-controller mapping database).
 
 const char *SDL_GetScancodeName(SDL_Scancode) { return ""; }
-
-SDL_RWops *SDL_RWFromFile(const char *, const char *) { return nullptr; }
 
 SDL_bool SDL_HasClipboardText(void) { return SDL_FALSE; }
 

@@ -19,12 +19,12 @@
 #include <circle/logger.h>
 #include <circle/sched/scheduler.h>
 #include <circle/input/console.h>
-#include <circle/cputhrottle.h>
 #include <circle/multicore.h>
 #include <circle/memory.h>
 #include <circle/types.h>
 #include <SDCard/emmc.h>
 #include <fatfs/ff.h>
+#include <SDL2/SDL_circle.h>
 
 enum TShutdownMode
 {
@@ -67,7 +67,11 @@ private:
     CEMMCDevice         m_EMMC;
     FATFS               m_FileSystem;
     CConsole            m_Console;
-    CCPUThrottle        m_CPUThrottle;   // full clock: Circle boots at idle speed
+    // The shim owns Circle's one CCPUThrottle (creating a second halts the
+    // machine). This member brings its hardware management up during kernel
+    // construction — full clock before MAME's ROM loading, and the boot log
+    // can report real SoC numbers — instead of waiting for SDL_Init.
+    CSDL2CircleHardware m_Hardware;
     CSplitCores         m_Cores;
 };
 

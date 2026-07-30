@@ -50,6 +50,11 @@ static const char From[] = "mame-host";
 // worker. Role-to-core binding is a per-world constant.
 void CSplitCores::Run(unsigned nCore)
 {
+    // A freshly started core holds whatever the firmware left in its thread
+    // pointer, and C++ exception state is reached through it: arm the runtime
+    // before this core executes anything that can throw.
+    SDL2Circle_ArmCoreRuntime();
+
     switch (nCore)
     {
     case 1:
@@ -105,8 +110,7 @@ CKernel::CKernel(void)
       m_Timer(&m_Interrupt),
       m_Logger(m_Options.GetLogLevel(), &m_Timer),
       m_EMMC(&m_Interrupt, &m_Timer, &m_ActLED),
-      m_Console(&m_Serial, &m_Serial),   // stdio over the UART
-      m_CPUThrottle(CPUSpeedMaximum)
+      m_Console(&m_Serial, &m_Serial)    // stdio over the UART
 {
     m_ActLED.Blink(3);
 }
@@ -207,11 +211,12 @@ TShutdownMode CKernel::Run(void)
                    m_Options.GetWidth(), m_Options.GetHeight());
 
     // SoC state around the run: render throughput lives and dies by the
-    // ARM/core clocks, and CCPUThrottle clamps them to idle above the
-    // socmaxtemp limit (cmdline.txt on the SD card; Circle default 60C).
+    // ARM/core clocks, and the shim's hardware management (it owns Circle's
+    // one CCPUThrottle) clamps them to idle above the socmaxtemp limit
+    // (cmdline.txt on the SD card; Circle default 60C).
     m_Logger.Write(From, LogNotice, "SoC: %uC, arm %u MHz, core %u MHz, socmaxtemp %uC",
-                   m_CPUThrottle.GetTemperature(),
-                   m_CPUThrottle.GetClockRate() / 1000000,
+                   SDL2Circle_SoCTemperature(),
+                   SDL2Circle_CPUClockRate() / 1000000,
                    CMachineInfo::Get()->GetClockRate(CLOCK_ID_CORE) / 1000000,
                    CKernelOptions::Get()->GetSoCMaxTemp());
 
@@ -238,8 +243,8 @@ TShutdownMode CKernel::Run(void)
     int res = s_mame_result;
 
     m_Logger.Write(From, LogNotice, "SoC: %uC, arm %u MHz, core %u MHz",
-                   m_CPUThrottle.GetTemperature(),
-                   m_CPUThrottle.GetClockRate() / 1000000,
+                   SDL2Circle_SoCTemperature(),
+                   SDL2Circle_CPUClockRate() / 1000000,
                    CMachineInfo::Get()->GetClockRate(CLOCK_ID_CORE) / 1000000);
     m_Logger.Write(From, LogNotice, "MAME exited with %d, rebooting", res);
 
