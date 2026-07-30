@@ -147,6 +147,12 @@ LIBS = $(MAME_OBJS) \
 	$(CIRCLEHOME)/lib/sound/libsound.a \
 	$(filter-out %/liblibcxx-threading.a,$(CIRCLE_STDLIB_LIBS))
 
+# The shim links WHOLE (mk/ld/circle-app.mk): every libSDL2 member loads, so
+# a circle_stubs.cpp stub of a symbol the shim implements is a duplicate-
+# symbol error at link time instead of silently shadowing the working
+# implementation — the SDL_RWFromFile failure mode, made impossible.
+APP_WHOLE_ARCHIVES = $(ROOT)/circle-libsdl2/libSDL2-$(RAPI_BOARD).a
+
 # The platform image carries the patchable-defaults block: link with the
 # defaults linker script (trampoline + block pinned at 0x800) and gate every
 # produced image on the 0x800 magic (mk/ld/circle-app.mk).

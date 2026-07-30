@@ -290,10 +290,11 @@ void SDL_GL_SwapWindow(SDL_Window *) {}
 // ---- SDL2: haptic ------------------------------------------------------------
 
 // Joysticks and game controllers are NOT stubbed here: the shim implements
-// both (circle-libsdl2 src/joystick.cpp, src/gamecontroller.cpp), and a stub
-// in this object would win the link over the archive member and quietly
-// disconnect every pad. Haptics the shim leaves unimplemented on purpose —
-// Circle offers rumble, not force feedback — so these fail honestly.
+// both (circle-libsdl2 src/joystick.cpp, src/gamecontroller.cpp). Stubbing a
+// symbol the shim implements is a duplicate-symbol link error — the Makefile
+// links libSDL2 whole (APP_WHOLE_ARCHIVES) for exactly that seatbelt.
+// Haptics the shim leaves unimplemented on purpose — Circle offers rumble,
+// not force feedback — so these fail honestly.
 
 SDL_Haptic *SDL_HapticOpenFromJoystick(SDL_Joystick *) { return nullptr; }
 void SDL_HapticClose(SDL_Haptic *) {}
@@ -301,16 +302,19 @@ void SDL_HapticClose(SDL_Haptic *) {}
 // ---- SDL2: audio extras --------------------------------------------------------
 
 // SDL_GetDefaultAudioInfo and SDL_GetAudioDeviceSpec are NOT stubbed here:
-// the shim implements them (circle-libsdl2 src/audio.cpp), and a stub in this
-// object would win the link over the archive member and quietly replace a
-// working implementation with a failure return.
+// the shim implements them (circle-libsdl2 src/audio.cpp). Historically a
+// stub here silently beat the archive member; the whole-archive link
+// (APP_WHOLE_ARCHIVES in the Makefile) now makes that a loud duplicate-
+// symbol error instead.
 int SDL_GetNumAudioDrivers(void) { return 1; }
 const char *SDL_GetAudioDriver(int) { return "circle"; }
 
 // ---- SDL2: misc -----------------------------------------------------------------
 
 // SDL_free and SDL_RWFromFile are NOT stubbed here: the shim implements both
-// (SDL_RWops arrived with the game-controller mapping database).
+// (SDL_RWops arrived with the game-controller mapping database). Their stubs
+// shadowed the shim SILENTLY — the linker never pulled the members, so no
+// error fired; that class is what the whole-archive link now catches.
 
 const char *SDL_GetScancodeName(SDL_Scancode) { return ""; }
 

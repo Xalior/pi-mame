@@ -15,11 +15,23 @@
 APP_LDSCRIPT ?= $(dir $(lastword $(MAKEFILE_LIST)))circle-tls.ld
 APP_DEFAULTS_BLOCK ?=
 
+# APP_WHOLE_ARCHIVES: archives (a subset of LIBS — keep them there, LIBS is
+# the prerequisite list) whose EVERY member must load. This is the seatbelt
+# against silent symbol shadowing: an object linked directly always beats an
+# archive member the linker never pulls, so a leftover stub can quietly
+# replace a library's working implementation and no error says so. Forcing
+# the library's members in turns that class into a loud duplicate-symbol
+# failure at link time.
+APP_WHOLE_ARCHIVES ?=
+
 $(TARGET).img: $(OBJS) $(LIBS) $(APP_LDSCRIPT)
 	@echo "  LD    $(TARGET).elf ($(notdir $(APP_LDSCRIPT)))"
 	@$(LD) -o $(TARGET).elf -Map $(TARGET).map $(LDFLAGS) \
 		-T $(APP_LDSCRIPT) $(CRTBEGIN) $(OBJS) \
-		--start-group $(LIBS) $(EXTRALIBS) --end-group $(CRTEND)
+		--start-group \
+		$(if $(APP_WHOLE_ARCHIVES),--whole-archive $(APP_WHOLE_ARCHIVES) --no-whole-archive) \
+		$(filter-out $(APP_WHOLE_ARCHIVES),$(LIBS)) \
+		$(EXTRALIBS) --end-group $(CRTEND)
 	@echo "  DUMP  $(TARGET).lst"
 	@$(OBJDUMP) -d $(TARGET).elf | $(CPPFILT) > $(TARGET).lst
 	@echo "  COPY  $(TARGET).img"
