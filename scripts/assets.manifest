@@ -1924,3 +1924,41 @@ mem|shangon|epr-10643.66|06f55364|fd685795e12541e3d0059d383fab293b3980d247|-
 mem|shangon|epr-10644.67|b41d541d|28bbfa5edaa4a5901c74074354ba6f14d8f42ff6|-
 mem|shangon|epr-10645.68|a60dabff|bbef0fb0d7837cc7efc866226bfa2bd7fab06459|-
 mem|shangon|epr-10646.69|473cc411|04ca2d047eb59581cd5d76e0ac6eca8b19eef497|-
+
+# Turbo Out Run (Sega, 1989), the Out Run upgrade set. Copyrighted commercial
+# arcade game: public tier, never free. Self-contained set — toutrun declares
+# PARENT 0. Its main 68000 is an FD1094 encrypted CPU, so 317-0118.key (the
+# dumped key memory) is a required member, not an optional extra.
+asset|toutrun|public|zip|roms/toutrun.zip
+src|toutrun|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/toutrun.zip
+mem|toutrun|epr-12513.133|ae8835a5|09573964d4f42ac0f08be3682b73e3420df27c6d|-
+mem|toutrun|epr-12512.118|f90372ad|b42dd8c580421b4d7ffacf8d3baa7b9fc9e392ef|-
+mem|toutrun|epr-12515.132|1f047df4|c1c67847f1390e671c19f0b90c3cbfbc237d960b|-
+mem|toutrun|epr-12514.117|5539e9c3|01046e3b836f66ba6d5c4be1611de48197aca67f|-
+mem|toutrun|epr-12293.131|f4321eea|64334acc82c14bb58b7d51719f34fd81cfb9fc6b|-
+mem|toutrun|epr-12292.116|51d98af0|6e7115706bfafb687faa23d55d4a8c8e498a4df2|-
+mem|toutrun|317-0118.key|083d7d56|3153e44479986859f60a26fe9264ecea07e6e469|-
+mem|toutrun|opr-12295.76|d43a3a84|362c98f62c205b6b40b7e8a4ba107745b547b984|-
+mem|toutrun|opr-12294.58|27cdcfd3|4fe57db95b109ab1bb1326789e06a3d3aac311cc|-
+mem|toutrun|opr-12297.75|1d9b5677|fb6e33acc43fbc7a8d7ac44045439ecdf794fdeb|-
+mem|toutrun|opr-12296.57|0a513671|4c13ca3a6f0aa9d06ed80798b466cca0c966a265|-
+mem|toutrun|opr-12323.102|4de43a6f|68909338e1f192ac2699c8a8d24c3f46502dd019|-
+mem|toutrun|opr-12324.103|24607a55|69033f2281cd42e88233c23d809b73607fe54853|-
+mem|toutrun|opr-12325.104|1405137a|367db88d36852e35c5e839f692be5ea8c8e072d2|-
+mem|toutrun|mpr-12336.9|dda465c7|83acc12a387b004986f084f25964c15a9f88a41a|-
+mem|toutrun|mpr-12337.10|828233d1|d73a200af4245d590e1fd3ac436723f99cc50452|-
+mem|toutrun|mpr-12338.11|46b4b5f4|afeb2e5ac6792edafe7328993fe8dfcd4bce1924|-
+mem|toutrun|mpr-12339.12|0d7e3bab|fdb603df55785ded593daf591ddd90f8f24e0d47|-
+mem|toutrun|mpr-12364.13|a4b83e65|966d8c163cef0842abff54e1dba3f15248e73f68|-
+mem|toutrun|mpr-12365.14|4a80b2a9|14b4fe71e102622a73c8dc0dbd0013cbbe6fcf9d|-
+mem|toutrun|mpr-12366.15|385cb3ab|fec6d80d488bfe26524fa3a48b195a45a073e481|-
+mem|toutrun|mpr-12367.16|4930254a|00f24be3bf02b143fa554f4d32e283bdac79af6a|-
+mem|toutrun|epr-12299.47|fc9bc41b|9af73e096253cf2c4f283f227530110a4b37fcee|-
+mem|toutrun|epr-12298.11|fc9bc41b|9af73e096253cf2c4f283f227530110a4b37fcee|-
+mem|toutrun|epr-12300.88|e8ff7011|6eaf3aea507007ea31d507ed7825d905f4b8e7ab|-
+mem|toutrun|opr-12301.66|6e78ad15|c31ddf434b459cd1a381d2a028beabddd4ed10d2|-
+mem|toutrun|opr-12302.67|e72928af|40e0b178958cfe97c097fe9d82b5de54bc27a29f|-
+mem|toutrun|opr-12303.68|8384205c|c1f9d52bc587eab5a97867198e9aa7c19e973429|-
+mem|toutrun|opr-12304.69|e1762ac3|855f06c082a17d90857e6efa3cf95b0eda0e634d|-
+mem|toutrun|opr-12305.70|ba9ce677|056781f92450c902e1d279a02bda28337815cba9|-
+mem|toutrun|opr-12306.71|e49249fd|ff36e4dba4e9d3d354e3dd528edeb50ad9c18ee4|-
