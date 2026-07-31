@@ -1,5 +1,75 @@
 # Changelog
 
+## PoC4
+
+This release gives pi-mame's machines their sound, brings every supported
+board to the same display behaviour, and puts a card's own added files in a
+new, consistent place.
+
+### Sound
+
+PoC3's release notes said the connection between MAME's own audio output and
+pi-mame's audio path was the next milestone's work. It is done, and confirmed
+working on real hardware on 31 July 2026: pi-mame's machines make sound.
+
+MAME's own sound callback fills a lock-free ring buffer on the core MAME runs
+on. The servo task on core 0, which already owns pi-mame's hardware devices
+under the core split introduced in PoC2, reads samples from that ring and
+feeds them to Circle's HDMI sound device.
+
+Many HDMI displays and capture devices carry no audio output at all. A
+machine connected to one of those is behaving correctly: it produces sound
+that the device has no way to play, not failing to produce sound in the
+first place.
+
+### Display
+
+Every board's display behaviour changed, and the change is visible on any
+machine whose screen shape is not close to 4:3.
+
+PoC3 shipped two different approaches. The Raspberry Pi 5 build asked MAME
+to scale its own picture, preserving proportions; the Pi 3 and Pi 4 builds
+asked the firmware for a specific screen mode sized to the machine's own
+resolution, and let the display stretch that mode to fill the screen, which
+distorted the picture on any machine whose native screen was not close to
+4:3.
+
+No board now asks the firmware for a video mode at all. Every board boots
+into whatever mode the display's own firmware is already using. MAME renders
+into a separate image, sized to the machine it is running (or a fixed size,
+for machines that do not name one), and pi-mame's own presentation code,
+introduced in PoC2's core split, scales that image onto the screen
+afterward, preserving its proportions, on every board.
+
+Firmware overscan, which insets the picture with a border by default on some
+displays, is now switched off on every board's card, so the picture also
+fills the whole screen.
+
+### Media layout on cards
+
+Where a card keeps a machine's disk, tape, and cartridge images has changed.
+Media now lives at `/media/<mediatype>/<driver>/`, where `mediatype` is
+MAME's own name for the kind of device (`cass`, `flop`, `cart`, `quik`,
+`hard`) and `driver` is the machine's own short name. For example, the ZX
+Spectrum Next's hard disk image, previously at `/next/next.img`, is now at
+`/media/hard/tbblue/next.img`.
+
+Anyone who has already added their own media to an existing card needs to
+move it to match this layout. `/roms`, which holds each machine's own game
+data rather than added media, is unchanged.
+
+### Downloading extra game titles
+
+A new `make media` step downloads game titles this repository cannot carry
+directly, verifying each one against its recorded checksum before
+installing it. A title with no recorded source is reported as unavailable,
+and the rest of the download continues.
+
+### Build changes
+
+- **`make ci` runs the whole CI matrix locally.** It runs the same job
+  steps CI runs, for every board, without needing a pushed commit.
+
 ## PoC3 — I can't believe it's not Silicon Spread · 2026-07-27
 
 pi-mame runs MAME's emulation core directly on Raspberry Pi hardware, with
