@@ -21,6 +21,10 @@
 #   make machines                every single-purpose image (one link per
 #                                platform, then a byte-patch per machine)
 #   make kernels                 platform + machines + picker (all CI verifies)
+#   make ci [BOARDS="rpi3 rpi4 rpi5"]    the CI matrix, locally: every board
+#                                through CI's exact job steps (mame, verify-mame,
+#                                platform, picker, verify-kernels scope=platform),
+#                                boards fanned out in parallel like the matrix
 #   make verify-mame [RAPI_BOARD=<b>]     truth-gate: the board's mamedrivers
 #                                archives exist (genie's host link fails by design)
 #   make verify-kernels [RAPI_BOARD=<b>] [VERIFY_SCOPE=all|platform]
@@ -97,7 +101,7 @@ TAG ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
 # `make kernel MACHINE=<m>` builds <m>'s image from its own platform's binary.
 KERNEL_PLATFORM = $(MACHINE_PLATFORM_$(MACHINE))
 
-.PHONY: deps mame platform picker kernel machines kernels verify-mame \
+.PHONY: deps mame platform picker kernel machines kernels ci verify-mame \
 	verify-kernels bootmenu card sd dist assets assets-free assets-public docs
 
 # Each consumer owns its Circle world as a submodule, one per threading model,
@@ -149,6 +153,24 @@ machines:
 # Everything CI verifies: every platform binary, every patched machine image,
 # and the picker.
 kernels: platform machines picker
+
+# The CI matrix, locally. Each ci-board-<b> chain runs the workflow's job
+# steps in the workflow's order, against the same targets CI calls — the same
+# code path, on this machine. The wrapper fans the boards out in parallel,
+# exactly as the workflow's matrix does; each board's chain is serial within
+# itself, like its CI job. Boards are fully disjoint (mame-<board> tree,
+# host/build/<board>/, per-board picker build and mame-build log), so the
+# fan-out is collision-free.
+ci:
+	$(MAKE) -j$(words $(BOARDS)) $(BOARDS:%=ci-board-%)
+
+ci-board-%:
+	$(MAKE) mame RAPI_BOARD=$*
+	$(MAKE) verify-mame RAPI_BOARD=$*
+	$(MAKE) platform RAPI_BOARD=$*
+	$(MAKE) picker RAPI_BOARD=$*
+	$(MAKE) verify-kernels RAPI_BOARD=$* VERIFY_SCOPE=platform
+	@echo "CI-BOARD-GREEN $*"
 
 # Truth-gates, runnable locally and in CI (CI just calls these). verify-mame
 # checks the board's mamedrivers archives survived genie's by-design host-link
