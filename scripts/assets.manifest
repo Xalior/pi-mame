@@ -3,7 +3,11 @@
 # Grammar (pipe-delimited; '#' comments; blank lines ignored):
 #   asset|<name>|<tier>|<kind>|<dest>
 #       tier = free | public       kind = zip | file | image
-#       dest = path under ASSETS_DIR (roms/<n>.zip, carts/<f>, next/<f>)
+#       dest = path under ASSETS_DIR — romset zips at roms/<n>.zip (rompath,
+#              untouched by the card layout ruling); loose media (carts, SD
+#              images, …) at media/<mediatype>/<driver>/<f>, mediatype being
+#              the MAME device instance (hard, cart, cass, flop, …) and
+#              driver the MAME machine short name the card mounts it for
 #   src|<name>|<type>|<url>        sources, tried in listed order
 #       type = raw  -> url is a base dir; member's <raw> field is the filename
 #              zip  -> url is a set-zip; members located by CRC32 (rename/repack)
@@ -848,11 +852,14 @@ mem|tbblue|boot-30204.bin|95118eb6|acf5112e831be8c73952b8513fab33a427e88cf8|-
 mem|tbblue|boot-30204-ab.bin|96c32007|6c9fcbd282f7a18fb5a726386ac6fb9df209c36b|-
 
 # CPC+/GX4000 default cartridge: engpados.bin from the 0.193 software-list
-# mirror, installed as carts/sysukpd.bin (the CPC+ range needs a cartridge).
+# mirror, installed as media/cart/cpc6128p/sysukpd.bin (the CPC+ range needs
+# a cartridge; cpc6128p is the ROM_START base cpc464p and gx4000 alias —
+# #define rom_cpc464p rom_cpc6128p, #define rom_gx4000 rom_cpc6128p in the
+# driver source — so the three machines share this one file at one path).
 # Tier is public BY RULING, not by accident: it stays there until the
 # appliance lets the user put carts on the card AND pick one at startup —
 # only then does baking it into shipped bundles meet the licensing bar.
-asset|sysukpd|public|file|carts/sysukpd.bin
+asset|sysukpd|public|file|media/cart/cpc6128p/sysukpd.bin
 src|sysukpd|zip|https://archive.org/download/MAME_0.193_Software_List_ROMs_split/MAME_0.193_Software_List_ROMs_split.zip/MAME%200.193%20Software%20List%20ROMs%20%28split%29/gx4000/sysukpd.zip
 mem|sysukpd|sysukpd.bin|e9c5e30e|596bf4d4dedafca71fadffb6e5fa8634c3cd843f|engpados.bin
 
@@ -862,7 +869,11 @@ mem|sysukpd|sysukpd.bin|e9c5e30e|596bf4d4dedafca71fadffb6e5fa8634c3cd843f|engpad
 # bytes expected today — future size drift is noted, never fatal).
 # (SpecNext's own distro, https://www.specnext.com/latestdistro/, ships a
 # file tree rather than a raw SD image; the hosted image is the source.)
-asset|next|free|image|next/next.img
+# Installed at media/hard/tbblue/next.img: tbblue is the ROM_START base for
+# specnext_ks1/ks2 (#define rom_specnext_ks1/ks2 rom_tbblue) and the COMP()
+# PARENT of ks1/ks2/ks3 in the driver source, so all four Next machines
+# share this one file at one path rather than four copies of a 2GB image.
+asset|next|free|image|media/hard/tbblue/next.img
 src|next|zip|https://zxnext.uk/hosted/index_files/hdfimages/cspect-next-2gb.zip
 mem|next|next.img|-|-|cspect-next-2gb.img
 
@@ -2243,3 +2254,88 @@ mem|enduror|epr-7681.ic8|bc0c4d12|3de71bde4c23e3c31984f20fc4bc7e221354c56f|-
 mem|enduror|epr-7680.ic7|627b3c8c|806fe7dce619ad19c09178061be4607d2beba14d|-
 mem|enduror|epr-6844.ic123|e3ec7bd6|feec0fe664e16fac0fde61cf64b401b9b0575323|-
 mem|enduror|317-0013a.key|a965b2da|046f800f258163b6935f4f75326d9dc225b27dde|-
+
+# --- FREE tier: trial games ---
+# Curated loose-media titles, not ROM sets — dest paths follow the ruled SD
+# layout (/media/<mediatype>/<driver>/, host/machines.mk's own comment and
+# docs/pi-mame-poc4.html's "Trial games" card). Every title is CC BY-NC-SA
+# (Mojon Twins, https://www.mojontwins.com/licencia-mt/) or D.'s own curation
+# ruling ("blessed" per docs/pi-mame-poc4.html) for the RGCD/Psytronik and
+# Roland in Retroalacant titles — see each destination directory's own
+# PROVENANCE.txt in the golden store (assets/media/...) for the full citation
+# and, where recorded, the verified source URL. The Sinclair titles below
+# carry a real src (mojontwins.com, cross-checked against archive.org in
+# scratchpad/trial-media/sinclair/REPORT.md); the Amstrad and Commodore
+# titles carry no independently logged source URL, so they have no src/mem
+# lines here — fetch-assets.sh reports them FAILED (no source in manifest)
+# until a URL is re-established, same as any other asset this project cannot
+# yet fetch on a user's behalf.
+
+asset|uwol-spectrum|free|file|media/cass/spectrum/uwol.tzx
+src|uwol-spectrum|raw|https://www.mojontwins.com/juegos
+mem|uwol-spectrum|uwol.tzx|78b0849b|a446faead690aa50b5c76723003eaecc31f3af7a|Mojon-Twins--Uwol.tzx
+
+asset|sirababol-spectrum|free|file|media/cass/spectrum/sirababol.tzx
+src|sirababol-spectrum|raw|https://www.mojontwins.com/juegos
+mem|sirababol-spectrum|sirababol.tzx|0830a383|2736b1a82c11f68318ea30c0be67e99206d903fd|Mojon-Twins--Sir-Ababol.tzx
+
+asset|sirababoldx-spectrum|free|file|media/cass/spectrum/sirababoldx.tap
+src|sirababoldx-spectrum|zip|https://www.mojontwins.com/juegos/mojon-twins--sir-ababol-2-bundle--eng.zip
+mem|sirababoldx-spectrum|sirababoldx.tap|06705a38|da41745dd0e830adfc4f5070b088fb7a655e6c4b|-
+
+asset|cherilgoddess|free|file|media/cass/spectrum/cherilgoddess.tap
+src|cherilgoddess|raw|https://www.mojontwins.com/juegos
+mem|cherilgoddess|cherilgoddess.tap|94cc3db8|e8c2f24c644381b7ca4fe129efa4bc5dfba92fba|Mojon-Twins--Cheril-The-Goddess--V2.tap
+
+asset|cherilperils|free|file|media/cass/spectrum/cherilperils.tzx
+src|cherilperils|raw|https://www.mojontwins.com/juegos
+mem|cherilperils|cherilperils.tzx|dc7c8339|6bdaef31c0a86ad329f33c96e94d274575fe64bb|Mojon-Twins--Cheril-Perils.tzx
+
+asset|ninjajar|free|file|media/cass/spec128/ninjajar.tap
+src|ninjajar|raw|https://www.mojontwins.com/juegos
+mem|ninjajar|ninjajar.tap|617db06c|3fc1aaa4df7d1cdace24824a37caff0a40e2d7e9|mojon-twins--ninjajar-eng-v1.1.tap
+
+# Zombi Mall and Ramiro el Vampiro IV are itch.io-only (no mojontwins.com
+# direct link) — itch.io's anonymous download flow is not a stable src URL
+# for an unattended fetch script, so these carry no src/mem line either;
+# the bytes live in the golden store (assets/media/cass/spectrum/) already.
+asset|zombimall|free|file|media/cass/spectrum/zombimall.tap
+asset|ramiro4-spectrum|free|file|media/cass/spectrum/ramiro4.tap
+
+asset|mariano|free|file|media/cass/spectrum/mariano.tzx
+src|mariano|raw|https://www.mojontwins.com/juegos
+mem|mariano|mariano.tzx|dbabeaee|68f7801faa2aea6ff34bbb1ec1766dd7cc90a6e3|Mojon-Twins--Mariano-the-Dragon-Capers-in-Cityland.tzx
+
+asset|tenebramacabre-spectrum|free|file|media/cass/spectrum/tenebramacabre.tap
+src|tenebramacabre-spectrum|raw|https://www.mojontwins.com/juegos
+mem|tenebramacabre-spectrum|tenebramacabre.tap|bfa58b2c|98185a91db7007ba4ad65cf66c0be4a76dc20d31|mojon-twins--tenebra-macabre.tap
+
+asset|phantomasa1a|free|file|media/cass/spectrum/phantomasa1-a.tzx
+src|phantomasa1a|raw|https://www.mojontwins.com/juegos
+mem|phantomasa1a|phantomasa1-a.tzx|4f75249d|8397a8aa1ee92aa09852997c93891b34690ffbf0|Mojon-Twins--Phantomasa-I-v.3.0--CARA-A.tzx
+
+asset|phantomasa1b|free|file|media/cass/spectrum/phantomasa1-b.tzx
+src|phantomasa1b|raw|https://www.mojontwins.com/juegos
+mem|phantomasa1b|phantomasa1-b.tzx|38004424|c70acb74dfc62a0f591c55701bd68d32b813bec4|Mojon-Twins--Phantomasa-I-v.3.0--CARA-B.tzx
+
+# Amstrad CPC trial games — no independently logged source URL (see
+# assets/media/flop/cpc6128/PROVENANCE.txt); asset|-only, no src/mem.
+asset|uwol2-cpc|free|file|media/flop/cpc6128/uwol2.dsk
+asset|sirababol2-cpc|free|file|media/flop/cpc6128/sirababol2.dsk
+asset|jetpaco|free|file|media/flop/cpc6128/jetpaco.dsk
+asset|lalaprologue|free|file|media/flop/cpc6128/lalaprologue.dsk
+asset|impossamal|free|file|media/flop/cpc6128/impossamal.dsk
+asset|ramiro3-cpc|free|file|media/flop/cpc6128/ramiro3.dsk
+asset|roland|free|file|media/flop/cpc6128/roland.dsk
+
+# Commodore 64 trial games — no independently logged source URL (see
+# assets/media/flop/c64/, cart/c64/, quik/c64/ PROVENANCE.txt); asset|-only.
+asset|c64anabalt|free|file|media/flop/c64/c64anabalt.d64
+asset|nixy|free|file|media/flop/c64/nixy.d64
+asset|tristamisland|free|file|media/flop/c64/tristamisland.d64
+asset|uwol-c64|free|file|media/flop/c64/uwol.d64
+asset|slipstream-c64|free|file|media/flop/c64/slipstream.d64
+asset|luftrauserz|free|file|media/cart/c64/luftrauserz.crt
+asset|rocketsmashex|free|file|media/cart/c64/rocketsmashex.crt
+asset|tenebramacabre-c64|free|file|media/cart/c64/tenebramacabre.crt
+asset|tigerclaw|free|file|media/quik/c64/tigerclaw.prg

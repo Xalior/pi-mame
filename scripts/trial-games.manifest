@@ -1,0 +1,65 @@
+# trial-games.manifest — curated trial-game menu entries layered onto a
+# platform card's menu, on top of its machine roster.
+#
+# Grammar (pipe-delimited; '#' comments; blank lines ignored):
+#   trial|<platform>|<label>|<machine>|<asset>|<mount-flag>
+#     platform   the platform card this entry appears on (must have a
+#                PLATFORM_MACHINES_<platform> roster in host/machines.mk)
+#     label      the bootmenu.cfg label — free text, not a machine short
+#                name (the menu-loader only displays it; see
+#                rapi-bootloader/menu-loader/bootmenu.h)
+#     machine    the MAME machine short name this entry boots — an existing
+#                roster machine (its own romset ships as usual)
+#     asset      the scripts/assets.manifest asset name whose dest is
+#                mounted — always under the ruled SD layout
+#                (/media/<mediatype>/<driver>/, docs/pi-mame-poc4.html
+#                "Trial games" card)
+#     mount-flag the MAME media-mount switch prepended to the mounted
+#                asset's path (-cass, -flop1, -cart, -quik, …) — MAME's own
+#                CLI option for that machine's device instance
+#
+# Curated by D. (docs/pi-mame-poc4.html "Trial games" card); every asset
+# named here is free-tier in scripts/assets.manifest, so an entry is valid
+# on both a platform's free and public card (free ⊂ public — see
+# scripts/gen-bootmenu.sh's tier doctrine). gen-bootmenu.sh appends one
+# extra "label|defaults-string" line per entry after a platform's machine
+# roster; scripts/mkcard.sh copies each entry's asset the same way it
+# copies a roster machine's MACHINE_ASSETS_* media. No new card mechanism:
+# same bootmenu.cfg format, same menu-loader, same defaults-block ABI.
+#
+# -flop8 (the c64 entries) is BEST-EFFORT: the C64 attaches its floppy
+# drive over the IEC bus at device address 8, and this project has no MAME
+# binary to execute (bare-metal cross-compiled target) to confirm the
+# switch against `-listmedia`. Verify before treating those five entries
+# as proven.
+
+trial|sinclair|Uwol: Quest for Money|spectrum|uwol-spectrum|-cass
+trial|sinclair|Sir Ababol|spectrum|sirababol-spectrum|-cass
+trial|sinclair|Sir Ababol DX|spectrum|sirababoldx-spectrum|-cass
+trial|sinclair|Cheril the Goddess|spectrum|cherilgoddess|-cass
+trial|sinclair|Cheril Perils|spectrum|cherilperils|-cass
+trial|sinclair|Ninjajar!|spec128|ninjajar|-cass
+trial|sinclair|Zombi Mall|spectrum|zombimall|-cass
+trial|sinclair|Mariano the Dragon|spectrum|mariano|-cass
+trial|sinclair|Ramiro el Vampiro IV|spectrum|ramiro4-spectrum|-cass
+trial|sinclair|Tenebra Macabre|spectrum|tenebramacabre-spectrum|-cass
+trial|sinclair|Phantomasa I (Side A)|spectrum|phantomasa1a|-cass
+trial|sinclair|Phantomasa I (Side B)|spectrum|phantomasa1b|-cass
+
+trial|amstrad|Uwol 2|cpc6128|uwol2-cpc|-flop1
+trial|amstrad|Sir Ababol 2|cpc6128|sirababol2-cpc|-flop1
+trial|amstrad|Jet Paco|cpc6128|jetpaco|-flop1
+trial|amstrad|Lala Prologue|cpc6128|lalaprologue|-flop1
+trial|amstrad|Impossamal|cpc6128|impossamal|-flop1
+trial|amstrad|Ramiro III|cpc6128|ramiro3-cpc|-flop1
+trial|amstrad|Roland in Retroalacant|cpc6128|roland|-flop1
+
+trial|commodore|C64anabalt|c64|c64anabalt|-flop8
+trial|commodore|Nixy|c64|nixy|-flop8
+trial|commodore|Tristam Island|c64|tristamisland|-flop8
+trial|commodore|Uwol (C64)|c64|uwol-c64|-flop8
+trial|commodore|Slipstream|c64|slipstream-c64|-flop8
+trial|commodore|LuftrauserZ|c64|luftrauserz|-cart
+trial|commodore|Rocket Smash EX|c64|rocketsmashex|-cart
+trial|commodore|Tenebra Macabre|c64|tenebramacabre-c64|-cart
+trial|commodore|Tiger Claw|c64|tigerclaw|-quik

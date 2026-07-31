@@ -752,8 +752,9 @@ def readme_page(platform, roster, facts, manifest, manifest_members, pdata):
     # entirely on a baked cartridge, listed below as that shared asset
     # instead). Every entry's real destination comes from the manifest, not
     # an assumed roms/<name>.zip — a cartridge file or an SD-card image
-    # lives elsewhere (carts/, next/), so the tree is grouped by each
-    # asset's actual directory rather than assumed to be one flat roms/.
+    # lives under media/<mediatype>/<driver>/, so the tree is grouped by
+    # each asset's actual directory rather than assumed to be one flat
+    # roms/.
     tree_paths = [asset_path(m) for m in roster
                   if m in manifest or rom_table(m, facts["rom_starts"], facts["defines"])]
     tree_paths += [asset_path(a) for a in shared]

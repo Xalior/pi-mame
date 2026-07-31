@@ -22,7 +22,7 @@ ZX Spectrum Next / NextZXOS on the KS2 board, booting from its attached SD card 
   | `boot-30204.bin` | `95118eb6` |
   | `boot-30204-ab.bin` | `96c32007` |
 - `roms/tbblue.zip` — the shared ZX Spectrum Next: Emulators ID
-- `next/next.img`
+- `media/hard/tbblue/next.img`
 
 ## Notes
 

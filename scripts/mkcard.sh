@@ -23,9 +23,16 @@
 #   config.txt         our host/config-card.txt (firmware boots the picker)
 #   cmdline.txt        host/cmdline-native.txt (no mode request — see below)
 #   firmware           this board's Foundation firmware set + DTBs (Circle's boot/)
-#   roms/ next/ carts/ the assets the card's OWN menu needs, if an assets dir
-#                      is given — each menu machine's manifest assets
-#                      (MACHINE_ASSETS_*), never the whole bundle
+#   roms/               romsets the card's OWN menu needs (rompath; untouched
+#                       by the media layout below)
+#   media/<type>/<driver>/  loose media (hard disk images, cartridges,
+#                       cassettes, …) the card's OWN menu needs — one
+#                       directory per MAME device instance type per driver
+#                       short name, e.g. media/hard/tbblue/next.img
+#                       These, and roms/, are populated only if an assets
+#                       dir is given — each menu entry's manifest assets
+#                       (MACHINE_ASSETS_* for a machine, trial-games.manifest
+#                       for a trial title), never the whole bundle
 #
 # There are NO region cards. Every board boots the panel's native mode
 # (cmdline.txt asks for none — asking is also what makes a Pi 5 firmware
@@ -108,18 +115,35 @@ cp "$BINARY" "$SD/kernel-$BOARD.img"
 # The tier's menu, generated fresh from the manifest.
 "$ROOT/scripts/gen-bootmenu.sh" "$PLATFORM" "$TIER" > "$SD/bootmenu.cfg"
 
-# The card carries the media its own menu asks for, and nothing else. Every
-# machine on the generated bootmenu.cfg declares its manifest assets
-# (MACHINE_ASSETS_* in host/machines.mk — romset zips AND mounted media like
-# next/next.img or carts/sysukpd.bin), and each asset's manifest stanza names
-# the card path (dest). Copy exactly those files. A file absent from the
-# bundle is the public tier's "boots but wants its ROMs added" case — warn,
-# never fail the card.
+# The card carries the media its own menu asks for, and nothing else.
+#
+# A bootmenu.cfg line's label is either a real machine short name (a roster
+# entry — MACHINE_ASSETS_* in host/machines.mk names its manifest assets:
+# romset zips AND mounted media like /media/hard/tbblue/next.img) or a
+# trial-game label (scripts/trial-games.manifest — free text, not a
+# machine; its OWN line there names the one asset it mounts). Trial labels
+# are excluded from the MACHINE_ASSETS_ lookup below (a label containing
+# ':' or spaces is not a valid make target) and resolved separately.
+# Every asset's manifest stanza names the card path (dest); copy exactly
+# those files. A file absent from the bundle is the public tier's "boots
+# but wants its ROMs added" case — warn, never fail the card.
 if [ -n "$ASSETS" ]; then
-    for m in $(awk -F'|' '!/^#/ && NF {print $1}' "$SD/bootmenu.cfg"); do
-        make --no-print-directory -s -f "$ROOT/host/machines.mk" \
-            "print-MACHINE_ASSETS_$m"
-    done | tr ' ' '\n' | sort -u | while IFS= read -r a; do
+    TRIAL_LABELS="$ROOT/scripts/trial-games.manifest"
+    {
+        for m in $(awk -F'|' '!/^#/ && NF {print $1}' "$SD/bootmenu.cfg"); do
+            if [ -f "$TRIAL_LABELS" ] && \
+               awk -F'|' -v p="$PLATFORM" -v l="$m" \
+                   '$1=="trial" && $2==p && $3==l {found=1} END{exit !found}' \
+                   "$TRIAL_LABELS"
+            then
+                continue
+            fi
+            make --no-print-directory -s -f "$ROOT/host/machines.mk" \
+                "print-MACHINE_ASSETS_$m"
+        done
+        [ -f "$TRIAL_LABELS" ] && awk -F'|' -v p="$PLATFORM" \
+            '$1=="trial" && $2==p {print $5}' "$TRIAL_LABELS"
+    } | tr ' ' '\n' | sort -u | while IFS= read -r a; do
         [ -n "$a" ] || continue
         dest="$(awk -F'|' -v n="$a" '$1=="asset" && $2==n {print $5; exit}' \
             "$ROOT/scripts/assets.manifest")"
@@ -133,7 +157,7 @@ if [ -n "$ASSETS" ]; then
         fi
     done
 else
-    echo "mkcard.sh: no assets dir given — add roms/ (and next/, carts/) to the card yourself" >&2
+    echo "mkcard.sh: no assets dir given — add roms/ (and media/ for its machines) to the card yourself" >&2
 fi
 
 echo "platform card ready ($BOARD): $SD"

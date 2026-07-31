@@ -11,12 +11,12 @@ README](../../README.md) for the build and the regional canvas.
 
 ## quirks
 - **The Next needs `next.img`.** `tbblue`, `specnext_ks1`, `specnext_ks2`,
-  and `specnext_ks3` all boot NextZXOS from `next/next.img` (distributed by
-  the [Spectrum Next project](https://www.specnext.com/latestdistro/)),
-  attached as the machine's hard disk. `specnext_ks1`, `specnext_ks2`, and
-  `specnext_ks3` are each a MAME clone of `tbblue` with their own
-  board-specific romset, and each also needs `tbblue.zip` on the card
-  alongside its own.
+  and `specnext_ks3` all boot NextZXOS from `media/hard/tbblue/next.img`
+  (distributed by the [Spectrum Next
+  project](https://www.specnext.com/latestdistro/)), attached as the
+  machine's hard disk. `specnext_ks1`, `specnext_ks2`, and `specnext_ks3`
+  are each a MAME clone of `tbblue` with their own board-specific romset,
+  and each also needs `tbblue.zip` on the card alongside its own.
 - **The Russian clones share `betadisk.zip`.** `pentagon`, `scorpio`,
   `atmtb2`, and `pentevo` are each a MAME clone of `spec128`, but each
   carries its own complete, self-contained romset — nothing is borrowed

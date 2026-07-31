@@ -9,13 +9,13 @@
 
 ## At power-on
 
-The Plus-range CPC, whose hardware boots from a cartridge: the image bakes `-cart /carts/sysukpd.bin` (the game-free Locomotive BASIC + ParaDOS cart), which signs on yellow-on-blue as `Amstrad Microcomputer (v4)` / `©1985 Amstrad plc and Locomotive Software Ltd.` / `PARADOS V1.1. ©1997 QUANTUM Solutions.` over `BASIC 1.1` / `Ready`, on the PAL canvas.
+The Plus-range CPC, whose hardware boots from a cartridge: the image bakes `-cart /media/cart/cpc6128p/sysukpd.bin` (the game-free Locomotive BASIC + ParaDOS cart), which signs on yellow-on-blue as `Amstrad Microcomputer (v4)` / `©1985 Amstrad plc and Locomotive Software Ltd.` / `PARADOS V1.1. ©1997 QUANTUM Solutions.` over `BASIC 1.1` / `Ready`, on the PAL canvas.
 
 ## Required assets
 
 No romset zip: the `cpc464p` romset is empty.
 
-- `carts/sysukpd.bin`
+- `media/cart/cpc6128p/sysukpd.bin`
 
 ## Notes
 

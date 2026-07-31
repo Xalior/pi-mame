@@ -30,7 +30,7 @@ my-assets/
 │   ├── kccomp.zip
 │   ├── pc1512.zip
 │   └── pc1512kb.zip
-└── carts/
+└── media/cart/cpc6128p/
     └── sysukpd.bin
 ```
 
@@ -52,7 +52,7 @@ my-assets/
 
 - **The CPC+ range boots from the baked cart.** `cpc464p`, `cpc6128p`, and
   `gx4000` have empty romsets — no zip, because the Plus firmware lives on
-  the cartridge itself. These images bake `-cart /carts/sysukpd.bin`, the
+  the cartridge itself. These images bake `-cart /media/cart/cpc6128p/sysukpd.bin`, the
   game-free Locomotive BASIC + ParaDOS homebrew cart (MAME softlist entry
   `sysukpd`: `engpados.bin`, renamed `sysukpd.bin`), which you supply like
   every other asset. Other carts load through MAME's UI at runtime

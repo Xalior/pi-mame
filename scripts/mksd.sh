@@ -13,8 +13,10 @@
 # download mechanism), our host/config-machine.txt as config.txt (firmware boots
 # the MAME core directly, no picker), the machine's regional canvas as
 # cmdline.txt, the chosen kernel image as kernel-<board>.img, and — if an assets
-# directory is given — roms/, next/, and carts/ copied from it. ROMs, disk
-# images, and cartridges are yours to provide; not part of this repository.
+# directory is given — roms/ and this one machine's own loose media (from
+# media/<type>/<driver>/ in the assets dir, MACHINE_ASSETS_<machine> in
+# host/machines.mk naming which). ROMs, disk images, and cartridges are yours
+# to provide; not part of this repository.
 
 set -e
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -74,12 +76,26 @@ cp "$ROOT/host/cmdline-native.txt" "$SD/cmdline.txt"
 if [ -n "$ASSETS" ]; then
     [ -d "$ASSETS/roms" ] && cp -R "$ASSETS/roms" "$SD/roms" \
         || echo "mksd.sh: warning: no roms/ in $ASSETS" >&2
-    [ -d "$ASSETS/next" ] && cp -R "$ASSETS/next" "$SD/next" \
-        || true
-    [ -d "$ASSETS/carts" ] && cp -R "$ASSETS/carts" "$SD/carts" \
-        || true
+    # This machine's own loose media (MACHINE_ASSETS_<machine> in
+    # host/machines.mk), each asset's manifest stanza naming the card path
+    # (dest) under the ruled media/<type>/<driver>/ layout — the
+    # media/hard/tbblue/next.img precedent (mkcard.sh copies the same way
+    # for a whole platform's roster).
+    for a in $(make --no-print-directory -s -f "$ROOT/host/machines.mk" \
+                    "print-MACHINE_ASSETS_$MACHINE"); do
+        dest="$(awk -F'|' -v n="$a" '$1=="asset" && $2==n {print $5; exit}' \
+            "$ROOT/scripts/assets.manifest")"
+        [ -n "$dest" ] || continue
+        case "$dest" in roms/*) continue ;; esac  # already copied above
+        if [ -f "$ASSETS/$dest" ]; then
+            mkdir -p "$SD/$(dirname "$dest")"
+            cp "$ASSETS/$dest" "$SD/$dest"
+        else
+            echo "mksd.sh: warning: $dest not in $ASSETS — add it to boot $MACHINE" >&2
+        fi
+    done
 else
-    echo "mksd.sh: no assets dir given — add roms/ (and next/ for tbblue) to the card yourself" >&2
+    echo "mksd.sh: no assets dir given — add roms/ (and its media/ for $MACHINE) to the card yourself" >&2
 fi
 
 echo "SD tree ready ($BOARD): $SD"

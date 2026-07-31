@@ -24,6 +24,7 @@ set -e
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 MACHINES_MK="$ROOT/host/machines.mk"
 MANIFEST="$ROOT/scripts/assets.manifest"
+TRIALS="$ROOT/scripts/trial-games.manifest"
 
 PLATFORM="${1:?usage: gen-bootmenu.sh <platform> <free|public>}"
 TIER="${2:?usage: gen-bootmenu.sh <platform> <free|public>}"
@@ -70,3 +71,19 @@ for m in $ROSTER; do
     fi
     printf '%s|%s\n' "$m" "$(q "string-$m")"
 done
+
+# Trial games (scripts/trial-games.manifest): every curated title is a
+# free-tier asset, so it qualifies on both this platform's free and public
+# card (free is a subset of public). Same bootmenu.cfg line shape as a
+# machine entry — a free-text label, and a defaults-string MAME parses
+# identically (the machine short name plus its media-mount flag). One awk
+# pass: read assets.manifest first to build asset-name -> dest, then walk
+# trial-games.manifest for this platform and join in the dest.
+if [ -f "$TRIALS" ]; then
+    awk -F'|' -v p="$PLATFORM" '
+        NR==FNR { if ($1=="asset") dest[$2]=$5; next }
+        $1=="trial" && $2==p && ($5 in dest) {
+            print $3"|"$4" "$6" /"dest[$5]
+        }
+    ' "$MANIFEST" "$TRIALS"
+fi

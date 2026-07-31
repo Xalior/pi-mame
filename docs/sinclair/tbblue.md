@@ -21,7 +21,7 @@ ZX Spectrum Next / NextZXOS, booting from its attached SD card image.
   | `boot-30200-ab.bin` | `1d16e9d4` |
   | `boot-30204.bin` | `95118eb6` |
   | `boot-30204-ab.bin` | `96c32007` |
-- `next/next.img`
+- `media/hard/tbblue/next.img`
 
 ## Notes
 

@@ -45,8 +45,12 @@
 # generate each platform card's bootmenu.cfg.
 #
 # The machines/*.conf media paths mirror what those machines mount on the
-# card: the Next boards attach /next/next.img as their SD card; the CPC+
-# range boots the game-free /carts/sysukpd.bin cartridge. The MACHINE_ASSETS
+# card, under the ruled /media/<mediatype>/<driver>/ layout (<mediatype> is
+# MAME's own device instance name — hard, cass, flop, cart, quik, …;
+# <driver> the MAME machine short name, not the platform; ROM sets are not
+# media and stay under /roms): the Next boards attach
+# /media/hard/tbblue/next.img as their SD card; the CPC+ range boots the
+# game-free /media/cart/cpc6128p/sysukpd.bin cartridge. The MACHINE_ASSETS
 # lists mirror docs/sinclair/README.md and docs/amstrad/README.md (romset +
 # "Extra assets"): the Russian clones share spec128.zip + betadisk.zip, the
 # Next boards share tbblue.zip + next.img, sprinter needs kb_ms_natural.zip,
