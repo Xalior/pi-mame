@@ -1007,7 +1007,9 @@ MACHINE_ASSETS_toutrun      = toutrun
 # matters to whoever BUILDS a set, not to the card: the zips this project
 # stages and fetch-assets.sh produces are always COMPLETE — the manifest
 # names every ROM_START member, so the parent's zip is a fetch-time source,
-# never a runtime dependency.
+# never a runtime dependency. Bench-proven on a Pi 5: outrun.zip was deleted
+# from the card and outrundx still booted to its attract mode, with no ROM
+# complaint on the serial log.
 MACHINE_ASSETS_outrunra     = outrunra
 MACHINE_ASSETS_outrundx     = outrundx
 
