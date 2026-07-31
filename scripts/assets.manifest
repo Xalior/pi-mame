@@ -1893,3 +1893,34 @@ mem|outrun|opr-10191.68|20a284ab|7c9027416d4122791ba53782fe2230cf02b7d506|-
 mem|outrun|opr-10190.69|7cab70e2|a3c581d2b438630d0d4c39481dcfd85681c9f889|-
 mem|outrun|opr-10189.70|01366b54|f467a6b807694d5832a985f5381c170d24aaee4e|-
 mem|outrun|opr-10188.71|bad30ad9|f70dd3a6362c314adef313b064102f7a250401c8|-
+
+# Super Hang-On (Sega, 1987), the unprotected sitdown/upright set. Copyrighted
+# commercial arcade game: public tier, never free. Self-contained set —
+# shangon declares PARENT 0, so nothing falls through to a sibling.
+asset|shangon|public|zip|roms/shangon.zip
+src|shangon|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/shangon.zip
+mem|shangon|epr-10886.133|8be3cd36|de96481807e782ca441d51e99f1a221bdee7d170|-
+mem|shangon|epr-10884.118|cb06150d|840dada0cdeec444b554e6c1f2bdacc1047be567|-
+mem|shangon|epr-10887.132|8d248bb0|7d8ed61609fd0df203255e7d046d9d30983f1dcd|-
+mem|shangon|epr-10885.117|70795f26|332921b0a6534c4cbfe76ff957c721cc80d341b0|-
+mem|shangon|epr-10792.76|16299d25|b14d5feef3e6889320d51ffca36801f4c9c4d5f8|-
+mem|shangon|epr-10790.58|2246cbc1|c192b1ddf4c848adb564c7c87d5413d62ed650d7|-
+mem|shangon|epr-10793.75|d9525427|cdb24db9f7a293f20fd8becc4afe84fd6abd678a|-
+mem|shangon|epr-10791.57|5faf4cbe|41659a961e6469d9233849c3c587cd5a0a141344|-
+mem|shangon|epr-10652.54|260286f9|dc7c8d2c6ef924a937328685eed19bda1c8b1819|-
+mem|shangon|epr-10651.55|c609ee7b|c6dacf81cbfe7e5df1f9a967cf571be1dcf1c429|-
+mem|shangon|epr-10650.56|b236a403|af02b8122794c083a66f2ab35d2c73b84b2df0be|-
+mem|shangon|mpr-10794.8|7c958e63|ef79614e94280607a6cdf6e13db051accfd2add0|-
+mem|shangon|mpr-10798.16|7d58f807|783c9929d27a0270b3f7d5eb799cee6b2e5b7ae5|-
+mem|shangon|mpr-10795.6|d9d31f8c|3ce07b83e3aa2d8834c1a449fa31e003df5486a3|-
+mem|shangon|mpr-10799.14|96d90d3d|6572cbce8f98a1a7a8e59b0c502ab274f78d2819|-
+mem|shangon|mpr-10796.4|fb48957c|86a66bcf38686be5537a1361d390ecbbccdddc11|-
+mem|shangon|mpr-10800.12|feaff98e|20e38f9039079f64919d750a2e1382503d437463|-
+mem|shangon|mpr-10797.2|27f2870d|40a34e4555885bf3c6a42e472b80d11c3bd4dcba|-
+mem|shangon|mpr-10801.10|12781795|44bf6f657f32b9fab119557eb73c2fbf78700204|-
+mem|shangon|epr-10642.47|7836bcc3|26f308bf96224311ddf685799d7aa29aac42dd2f|-
+mem|shangon|epr-10649c.88|f6c1ce71|12299f7e5378a56be3a31cce3b8b74e48744f33a|-
+mem|shangon|epr-10643.66|06f55364|fd685795e12541e3d0059d383fab293b3980d247|-
+mem|shangon|epr-10644.67|b41d541d|28bbfa5edaa4a5901c74074354ba6f14d8f42ff6|-
+mem|shangon|epr-10645.68|a60dabff|bbef0fb0d7837cc7efc866226bfa2bd7fab06459|-
+mem|shangon|epr-10646.69|473cc411|04ca2d047eb59581cd5d76e0ac6eca8b19eef497|-

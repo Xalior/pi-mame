@@ -224,7 +224,7 @@ PLATFORM_MACHINES_trs = trs80 trs80dt1 agvision trsvidtx \
 # is a curation decision for later, not a bring-up one. outrun carries flags
 # 0 — no MACHINE_NOT_WORKING, no MACHINE_IMPERFECT_* — and its ROM_START
 # holds no NO_DUMP and no BAD_DUMP member.
-PLATFORM_MACHINES_sega = outrun
+PLATFORM_MACHINES_sega = outrun shangon
 
 # All machines, every platform — the roster `make kernels` bakes and CI verifies.
 MACHINES = $(foreach p,$(PLATFORMS),$(PLATFORM_MACHINES_$(p)))
@@ -1000,6 +1000,7 @@ MACHINE_ASSETS_vis          = vis
 # carries no separate device romset. Out Run is a commercial Sega arcade
 # game still in copyright, so the asset is public tier and can never be free.
 MACHINE_ASSETS_outrun       = outrun
+MACHINE_ASSETS_shangon      = shangon
 
 # Query helpers. Lets scripts read these facts without pulling in the
 # Circle build.
