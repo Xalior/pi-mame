@@ -152,7 +152,7 @@ Every machine belongs to one of sixteen platforms:
 | Sord — the m5 | 3 | [docs/sord/](docs/sord/README.md) |
 | VTech — the Laser / VZ family and friends | 24 | [docs/vtech/](docs/vtech/README.md) |
 | TRS — the TRS-80, CoCo, Dragon and MC-10 | 37 | [docs/trs/](docs/trs/README.md) |
-| Sega — the Out Run, Turbo Out Run and Super Hang-On arcade boards | 3 | [docs/sega/](docs/sega/README.md) |
+| Sega — the Out Run arcade board and the games built on it | 3 | [docs/sega/](docs/sega/README.md) |
 
 Each platform page carries its own machine table (`make kernel MACHINE=` target,
 system, year, romset, TV region) and a details page per machine covering
