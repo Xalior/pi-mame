@@ -14,12 +14,13 @@
 // system-selection list — the degenerate "no-options" personality is just
 // the unpatched platform binary. The only other boot-time knobs are Circle's
 // FAT-root cmdline.txt options (width=/height=, socmaxtemp=) — platform boot
-// config, not application configuration. What width=/height= MEANS is
-// per-board: on Pi 3/4 the firmware outputs that geometry as the video
-// signal, so the card sets the machine's raster (the PAL canvas) and the
-// panel does any stretching; on Pi 5 the firmware ignores mode requests
-// (every kernel inherits one native-EDID-mode surface), so the card sets
-// the native mode and MAME scales — see the per-board aspect flag below.
+// config, not application configuration. The card sets the machine's
+// raster (the PAL canvas) as width=/height= on EVERY board and MAME
+// renders it 1:1; what lifts it to the glass is per-board — Pi 3/4
+// firmware outputs the geometry as the video signal (the panel
+// stretches), Pi 5 firmware ignores mode requests (one native-EDID
+// surface), so the shim's presentation core scales the canvas onto the
+// native scanout, aspect preserved.
 //
 // The law/policy line is physical: the evergreen decrees below stay compiled
 // C, unreachable by any patcher. The string carries only what a machine is
@@ -41,7 +42,17 @@ void CGlueStdioInit(CConsole &rConsole);
 // shim types serial-RX bytes into the running machine. Dev bench only — the
 // switch is never baked into a shipped image.
 extern "C" int rapi_debug_uart;
+extern "C" int rapi_perf_interval;
+extern "C" int rapi_vdisplay_w;
+extern "C" int rapi_vdisplay_h;
 void SDL2Circle_SetInjectSerial(CSerialDevice *pSerial);
+
+// The region canvas: the virtual display every machine gets unless its
+// defaults block names its own with --rapi-vdisplay=WxH. PAL, CRT-shaped —
+// the frame every PAL machine historically filled. (PoC3 rules the regional
+// canvas PAL-only; an NTSC canvas arrives with an NTSC card.)
+static const int CanvasWidth  = 720;
+static const int CanvasHeight = 576;
 
 static const char From[] = "mame-host";
 
@@ -72,23 +83,16 @@ void CSplitCores::Run(unsigned nCore)
 static const char *MameArgv[] = {
     "mame",
     "-video", "soft",
-#if RASPPI >= 5
-    // The Pi 5 firmware cannot output the machine's raster as the video
-    // signal (every kernel inherits one native-EDID-mode surface), so the
-    // boot-config geometry is that native mode and MAME's soft scaler
-    // stretches the frame to it, aspect preserved (pillarboxed). The
-    // scale is affordable on the Pi 5's CPU only — which is why this is
-    // baked per-board and never on the PAL boards below.
-    "-keepaspect",
-#else
     // keepaspect is desktop application surface; the appliance bakes it
-    // off. The framebuffer IS the driver's raster (boot-config width=/
-    // height=) and the firmware outputs it as the video signal, so the
-    // soft renderer blits 1:1 — MAME's assumed-4:3 CRT fit (a scale,
-    // glyph-destroying when it shrinks, CPU these boards cannot spare)
-    // never engages. Physical aspect is the panel's business.
+    // off ON EVERY BOARD. The canvas IS the machine's raster (boot-config
+    // width=/height=), so the soft renderer blits 1:1 — MAME's
+    // assumed-4:3 CRT fit (a scale, glyph-destroying when it shrinks)
+    // never engages. What lifts the canvas to the glass is per-board and
+    // none of MAME's business: Pi 3/4 firmware outputs it as the video
+    // signal (the panel stretches); Pi 5 firmware cannot, so the shim's
+    // presentation core scales it onto the native scanout, aspect
+    // preserved, off the emulation core entirely.
     "-nokeepaspect",
-#endif
     "-numprocessors", "1",
     "-rompath", "/roms",
     "-cfg_directory", "/mame/cfg",
@@ -203,12 +207,36 @@ TShutdownMode CKernel::Run(void)
                        "serial key injection armed (--rapi-debug-uart)");
     }
 
+    // Bench instrumentation: the shim's per-core receipts print only if the
+    // host arms them (the library reads no boot config for it, by design).
+    if (rapi_perf_interval)
+        SDL2Circle_SetPerfInterval(rapi_perf_interval);
+
     // Geometry evidence belongs on serial (the HDMI capture dongle is not
     // pixel-faithful): what boot config handed us, read next to the shim's
     // framebuffer-grant line (size/pitch are the scanout truth on boards
-    // whose firmware ignores requests) when the window is created.
+    // whose firmware ignores requests) when the window is created. Under
+    // the declared-display contract this is the firmware MODE REQUEST
+    // only — it plays no part in what MAME is given.
     m_Logger.Write(From, LogNotice, "boot config geometry: %ux%u",
                    m_Options.GetWidth(), m_Options.GetHeight());
+
+    // Declare the virtual display — the resolution MAME is given, whatever
+    // the glass is doing; the shim's presentation core scales it out,
+    // aspect preserved. Mandatory before SDL_Init (the shim refuses to
+    // start undeclared): the machine's own raster where the defaults block
+    // stamped one, the region canvas otherwise.
+    {
+        int w = rapi_vdisplay_w > 0 ? rapi_vdisplay_w : CanvasWidth;
+        int h = rapi_vdisplay_h > 0 ? rapi_vdisplay_h : CanvasHeight;
+        if (SDL2Circle_DeclareVirtualDevice(32, w, h) == 0)
+            m_Logger.Write(From, LogNotice, "virtual display declared: %dx%d%s",
+                           w, h, rapi_vdisplay_w > 0 ? " (machine)" : " (region canvas)");
+        else
+            m_Logger.Write(From, LogError,
+                           "virtual display %dx%d REFUSED — SDL_Init will fail",
+                           w, h);
+    }
 
     // SoC state around the run: render throughput lives and dies by the
     // ARM/core clocks, and the shim's hardware management (it owns Circle's

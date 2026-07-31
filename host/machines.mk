@@ -15,7 +15,13 @@
 #   MACHINE_PLATFORM_<machine>    the vendor-class a machine belongs to
 #                                 (derived from PLATFORM_MACHINES_*, below)
 #   MACHINE_STRING_<machine>      the defaults-string patched into the block
-#                                 (machine name + its media: -hard1 / -cart)
+#                                 (machine name + its media: -hard1 / -cart;
+#                                 a curated machine also carries its own
+#                                 raster as --rapi-vdisplay=WxH — the virtual
+#                                 display MAME renders 1:1, which the shim's
+#                                 presentation core scales to the glass.
+#                                 Absent, the kernel declares the region
+#                                 canvas, 720x576 PAL)
 #   MACHINE_ASSETS_<machine>      the assets.manifest asset names the machine
 #                                 needs — used to DERIVE its free/public tier
 #                                 (a machine is free only if EVERY asset it

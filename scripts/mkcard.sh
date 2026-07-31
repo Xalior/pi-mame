@@ -21,14 +21,19 @@
 #                             menu-loader/kernel.h bakes SD:/kernel-<board>.img).
 #   bootmenu.cfg       generated for this platform + tier (gen-bootmenu.sh)
 #   config.txt         our host/config-card.txt (firmware boots the picker)
-#   cmdline.txt        the card's regional canvas (see the note below)
+#   cmdline.txt        host/cmdline-native.txt (no mode request — see below)
 #   firmware           this board's Foundation firmware set + DTBs (Circle's boot/)
 #   roms/ next/ carts/ the assets the card's OWN menu needs, if an assets dir
 #                      is given — each menu machine's manifest assets
 #                      (MACHINE_ASSETS_*), never the whole bundle
 #
-# Regional canvas: PAL (720x576) on every card, on purpose. NTSC is a later
-# phase's work.
+# There are NO region cards. Every board boots the panel's native mode
+# (cmdline.txt asks for none — asking is also what makes a Pi 5 firmware
+# claim a mode it is not scanning out) and the shim's presentation core
+# scales the picture onto it, aspect preserved. Region is a VIRTUAL
+# resolution now: the kernel declares what MAME renders — the machine's own
+# raster where its defaults string carries --rapi-vdisplay=WxH, the region
+# canvas (720x576 PAL) otherwise.
 
 set -e
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -96,7 +101,7 @@ fi
 # Firmware boots pi-mame-boot-<board>.img (the PICKER); the picker chain-boots
 # kernel-<board>.img (the platform binary — the MAME core).
 cp "$ROOT/host/config-card.txt" "$SD/config.txt"
-cp "$ROOT/host/cmdline-pal.txt" "$SD/cmdline.txt"
+cp "$ROOT/host/cmdline-native.txt" "$SD/cmdline.txt"
 cp "$PICKER" "$SD/pi-mame-boot-$BOARD.img"
 cp "$BINARY" "$SD/kernel-$BOARD.img"
 

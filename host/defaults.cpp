@@ -27,6 +27,7 @@
 #include <circle/memorymap.h>
 #include <circle/logger.h>
 #include <cstring>
+#include <cstdlib>
 
 static const char From[] = "defaults";
 
@@ -62,6 +63,9 @@ TDefaultsBlock _pimame_defaults =
 // Kernel flags settable by injected --rapi-* switches
 int rapi_show_fps = 0;
 int rapi_debug_uart = 0;
+int rapi_perf_interval = 0;   // seconds between the shim's per-core receipts
+int rapi_vdisplay_w = 0;      // the machine's declared virtual display —
+int rapi_vdisplay_h = 0;      // 0x0 means the region canvas (kernel default)
 
 }
 
@@ -82,6 +86,43 @@ static void DispatchKernelSwitch (const char *pSwitch)
 		rapi_debug_uart = 1;
 		CLogger::Get ()->Write (From, LogNotice,
 					"--rapi-debug-uart consumed: serial key injection on");
+	}
+	else if (strncmp (pSwitch, "--rapi-vdisplay=", 16) == 0)
+	{
+		// The machine's virtual display, WxH — the resolution MAME is
+		// given, a fact about the machine that rides the defaults block
+		// exactly as the machine name does. The shim's presentation
+		// core scales it to the glass, aspect preserved. Malformed
+		// values are dropped (logged), leaving the region-canvas
+		// default standing.
+		const char *p = pSwitch + 16;
+		int w = atoi (p);
+		const char *x = strchr (p, 'x');
+		int h = x ? atoi (x + 1) : 0;
+		if (w > 0 && h > 0)
+		{
+			rapi_vdisplay_w = w;
+			rapi_vdisplay_h = h;
+			CLogger::Get ()->Write (From, LogNotice,
+						"--rapi-vdisplay consumed: virtual display %dx%d",
+						w, h);
+		}
+		else
+			CLogger::Get ()->Write (From, LogWarning,
+						"--rapi-vdisplay \"%s\" malformed (want WxH), ignored",
+						p);
+	}
+	else if (strncmp (pSwitch, "--rapi-perf", 11) == 0
+		 && (pSwitch[11] == '\0' || pSwitch[11] == '='))
+	{
+		// The shim reads no boot config for its receipts by design; the
+		// host arms them. Bare switch: a 10-second cadence.
+		rapi_perf_interval = (pSwitch[11] == '=') ? atoi (pSwitch + 12) : 10;
+		if (rapi_perf_interval <= 0)
+			rapi_perf_interval = 10;
+		CLogger::Get ()->Write (From, LogNotice,
+					"--rapi-perf consumed: per-core receipts every %ds",
+					rapi_perf_interval);
 	}
 	else
 	{
