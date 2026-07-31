@@ -17,11 +17,11 @@ The Plus/4 was Commodore's 1984 successor to the VIC-20 in the low-cost home lin
 
   | ROM | CRC32 |
   |---|---|
-  | `318005-04.u24` | `799a633d` |
-  | `318005-05.u24` | `70295038` |
-  | `jiffydos plus4.u24` | `818d3f45` |
-  | `diag264_097_ntsc_kernal.u24` | `6423deaa` |
-  | `318006-01.u23` | `74eaae87` |
+  | `318005-04.u24` (kernal) | `799a633d` |
+  | `318005-05.u24` (kernal) | `70295038` |
+  | `jiffydos plus4.u24` (kernal) | `818d3f45` |
+  | `diag264_097_ntsc_kernal.u24` (kernal) | `6423deaa` |
+  | `318006-01.u23` (kernal) | `74eaae87` |
   | `317053-01.u25` | `4fd1d8cb` |
   | `317054-01.u26` | `109de2fc` |
   | `251641-02.u19` | `83be2076` |

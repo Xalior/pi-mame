@@ -17,11 +17,11 @@ This is the PAL Plus/4 — the European sibling of the NTSC [`plus4`](plus4.md).
 
   | ROM | CRC32 |
   |---|---|
-  | `318006-01.u23` | `74eaae87` |
-  | `318004-03.u24` | `77bab934` |
-  | `318004-04.u24` | `be54ed79` |
-  | `318004-05.u24` | `71c07bd4` |
-  | `diag264_097_pal_kernal.u24` | `bf0b3657` |
+  | `318006-01.u23` (kernal) | `74eaae87` |
+  | `318004-03.u24` (kernal) | `77bab934` |
+  | `318004-04.u24` (kernal) | `be54ed79` |
+  | `318004-05.u24` (kernal) | `71c07bd4` |
+  | `diag264_097_pal_kernal.u24` (kernal) | `bf0b3657` |
   | `317053-01.u25` | `4fd1d8cb` |
   | `317054-01.u26` | `109de2fc` |
   | `251641-02.u19` | `83be2076` |

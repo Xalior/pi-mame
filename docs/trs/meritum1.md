@@ -24,7 +24,7 @@
   | `rom_4.ic11` | `2ba025d7` |
   | `rom_5.ic12` | `ed547445` |
   | `rom_6.ic13` | `650c0f47` |
-  | `char_gen.ic72` | `626fb8b1` |
+  | `char_gen.ic72` (chargen) | `626fb8b1` |
 
 ## Notes
 

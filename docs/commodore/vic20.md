@@ -17,10 +17,10 @@ The VIC-20 (marketed in Japan as the VIC-1001, in Europe as the VC-20) was Commo
 
   | ROM | CRC32 |
   |---|---|
-  | `901486-01.ue11` | `db4c43c1` |
-  | `901486-06.ue12` | `e5e7c174` |
-  | `jiffydos vic-20 ntsc.ue12` | `683a757f` |
-  | `901460-03.ud7` | `83e032a6` |
+  | `901486-01.ue11` (basic) | `db4c43c1` |
+  | `901486-06.ue12` (kernal) | `e5e7c174` |
+  | `jiffydos vic-20 ntsc.ue12` (kernal) | `683a757f` |
+  | `901460-03.ud7` (chargen) | `83e032a6` |
 
 ## Notes
 

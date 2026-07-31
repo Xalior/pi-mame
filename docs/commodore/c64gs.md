@@ -17,8 +17,8 @@ The C64GS is the keyboard-less, cartridge-only console built on Commodore 64C in
 
   | ROM | CRC32 |
   |---|---|
-  | `390852-01.u4` | `b0a9c2da` |
-  | `901225-01.u5` | `ec4272ee` |
+  | `390852-01.u4` (kernal) | `b0a9c2da` |
+  | `901225-01.u5` (chargen) | `ec4272ee` |
   | `252535-01.u8` | `54c89351` |
 
 ## Notes

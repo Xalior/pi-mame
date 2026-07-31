@@ -17,9 +17,9 @@ The VIP-64 is the Swedish/Finnish-market portable SX-64. It carries the SX-64's 
 
   | ROM | CRC32 |
   |---|---|
-  | `901226-01.ud4` | `f833d117` |
-  | `kernelsx.ud3` | `7858d3d7` |
-  | `charswe.ud1` | `bee9b3fd` |
+  | `901226-01.ud4` (basic) | `f833d117` |
+  | `kernelsx.ud3` (kernal) | `7858d3d7` |
+  | `charswe.ud1` (chargen) | `bee9b3fd` |
   | `906114-01.ue4` | `54c89351` |
 - `roms/sx1541.zip`
 

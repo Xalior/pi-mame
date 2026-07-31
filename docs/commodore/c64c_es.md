@@ -17,8 +17,8 @@ Commodore 64 BASIC V2, `READY.` — the IEC disk bus boots empty (`-iec8 ""`), s
 
   | ROM | CRC32 |
   |---|---|
-  | `251913-01.u4` | `0010ec31` |
-  | `325056-03.u5` | `c890c175` |
+  | `251913-01.u4` (kernal) | `0010ec31` |
+  | `325056-03.u5` (chargen) | `c890c175` |
   | `252715-01.u8` | `54c89351` |
 
 ## Notes

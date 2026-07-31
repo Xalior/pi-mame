@@ -17,9 +17,9 @@ This is the Nordic VIC-20 — the machine Commodore sold in **Sweden and Finland
 
   | ROM | CRC32 |
   |---|---|
-  | `901486-01.ue11` | `db4c43c1` |
-  | `nec22081.206` | `b2a60662` |
-  | `nec22101.207` | `d808551d` |
+  | `901486-01.ue11` (basic) | `db4c43c1` |
+  | `nec22081.206` (kernal) | `b2a60662` |
+  | `nec22101.207` (chargen) | `d808551d` |
 
 ## Notes
 

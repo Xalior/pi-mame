@@ -20,7 +20,7 @@
   | `abasic.ic20` | `289b7791` |
   | `afloat.ic21` | `81d86af7` |
   | `mos3.rom` | `20158bd8` |
-  | `bbcbasic.rom` | `79434781` |
+  | `bbcbasic.rom` (basic) | `79434781` |
 - `roms/atom_discpack.zip`
 
 ## Notes

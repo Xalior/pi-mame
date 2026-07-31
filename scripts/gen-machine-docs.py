@@ -24,7 +24,12 @@ Ground truth (read fresh every run, nothing cached or hand-maintained):
                            CONS()/SYST() macro invocations give YEAR,
                            MANUFACTURER and TITLE; ROM_START(<machine>)
                            blocks give the ROM filenames + CRC32 for that
-                           machine's own zip, verbatim. A ROM_START that is
+                           machine's own zip, verbatim, and each entry's
+                           enclosing ROM_REGION name gives its role label
+                           when that name already says what it is (see
+                           ROM_ROLE_LABELS below) — anything else, PLA_TAG
+                           included, carries no label rather than a guess.
+                           A ROM_START that is
                            just a bare reference to a #define'd macro (the
                            BIOS-root pattern) is expanded one level to
                            produce that shared asset's own table.
@@ -425,22 +430,56 @@ def parse_system_macros(text):
 # lists every BIOS alternate's members, and so does this.
 ROM_LOAD_MACROS = r"ROM_LOAD\w*|ROMX_LOAD"
 
+# ROM_REGION and its width variants (ROM_REGION16_BE, ...) — scanned
+# alongside ROM_LOAD_MACROS in source order so each load entry can be
+# attributed to its enclosing region.
+ROM_REGION_MACROS = r"ROM_REGION\w*"
+
+# A ROM_REGION's second argument names the region. When that name already
+# IS the ROM's role — "basic", "kernal", a Commodore/Acorn BASIC ROM; the
+# character generator, spelled "charom" in some drivers and "chargen" in
+# others — the label is read straight off the source, no guessing involved.
+# Any other region name (a CPU/graphics tag like "maincpu"/"gfx1", a
+# device tag, or a macro token such as commodore's PLA_TAG, which expands
+# to a board designator like "u17" — human board knowledge this generator
+# has no source for) carries no label at all. Mechanical only: extending
+# this map to a new name is a decision about what MAME's own source
+# already spells out, never a hand-authored guess.
+ROM_ROLE_LABELS = {
+    "basic": "basic",
+    "kernal": "kernal",
+    "charom": "chargen",
+    "chargen": "chargen",
+}
+
 
 def rom_entries_in_block(block):
-    """Literal ROM_LOAD*(...) calls directly in this block: [(filename, crc32)],
-    in source order. Entries with no CRC (NO_DUMP) are skipped — nothing to
-    fetch, nothing to verify."""
+    """Literal ROM_LOAD*(...) calls directly in this block, each tagged with
+    its enclosing ROM_REGION's role label (see ROM_ROLE_LABELS) when that
+    region's name is one this generator recognises as self-describing —
+    [(filename, crc32, label_or_None)], in source order. Entries with no CRC
+    (NO_DUMP) are skipped — nothing to fetch, nothing to verify."""
     out = []
-    for _, call in iter_calls(block, ROM_LOAD_MACROS):
+    seen = set()
+    label = None
+    for name, call in iter_calls(block, f"{ROM_REGION_MACROS}|{ROM_LOAD_MACROS}"):
+        if name.startswith("ROM_REGION"):
+            args = split_top_level(call)
+            region = args[1].strip() if len(args) > 1 else ""
+            label = (ROM_ROLE_LABELS.get(region[1:-1])
+                      if region.startswith('"') and region.endswith('"') else None)
+            continue
         fname = re.search(r'"([^"]+)"', call)
         crc = re.search(r"CRC\(([0-9a-fA-F]+)\)", call)
         if fname and crc:
-            entry = (fname.group(1), crc.group(1))
+            key = (fname.group(1), crc.group(1))
             # A romset may load the same physical file more than once (a
             # BIOS-alternate set reusing one BASIC image at two addresses):
             # one zip member, one table row.
-            if entry not in out:
-                out.append(entry)
+            if key in seen:
+                continue
+            seen.add(key)
+            out.append((fname.group(1), crc.group(1), label))
     return out
 
 
@@ -509,9 +548,16 @@ def tv_standard_for_machine(machine):
 # --- rendering helpers ---
 
 def rom_table_md(entries):
+    """entries is [(filename, crc32)] or [(filename, crc32, label_or_None)] —
+    manifest_members (assets.manifest's fallback member list, for a romset
+    this generator cannot scan a ROM_START for) carries no label, only
+    rom_table()'s own driver-source scan does."""
     lines = ["  | ROM | CRC32 |", "  |---|---|"]
-    for fname, crc in entries:
-        lines.append(f"  | `{fname}` | `{crc}` |")
+    for entry in entries:
+        fname, crc = entry[0], entry[1]
+        label = entry[2] if len(entry) > 2 else None
+        cell = f"`{fname}` ({label})" if label else f"`{fname}`"
+        lines.append(f"  | {cell} | `{crc}` |")
     return "\n".join(lines)
 
 

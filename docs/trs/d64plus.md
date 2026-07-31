@@ -20,7 +20,7 @@
   | `d64_1.rom` | `60a4634c` |
   | `d64_2.rom` | `17893a42` |
   | `n82s147an.ic12` | `92b6728d` |
-  | `chargen.ic22` | `514f1450` |
+  | `chargen.ic22` (chargen) | `514f1450` |
 - `roms/dragon_fdc.zip`
 
 ## Notes

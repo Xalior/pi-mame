@@ -18,7 +18,7 @@
   | ROM | CRC32 |
   |---|---|
   | `level1.rom` | `70d06dff` |
-  | `mcm6670p.z29` | `0033f2b9` |
+  | `mcm6670p.z29` (chargen) | `0033f2b9` |
 
 ## Notes
 

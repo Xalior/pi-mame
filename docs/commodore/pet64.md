@@ -17,9 +17,9 @@ The PET 64 (sold as the CBM 4064 / Educator 64) is a Commodore 64 rehoused in a 
 
   | ROM | CRC32 |
   |---|---|
-  | `901226-01.u3` | `f833d117` |
-  | `901246-01.u4` | `789c8cc5` |
-  | `901225-01.u5` | `ec4272ee` |
+  | `901226-01.u3` (basic) | `f833d117` |
+  | `901246-01.u4` (kernal) | `789c8cc5` |
+  | `901225-01.u5` (chargen) | `ec4272ee` |
   | `906114-01.u17` | `54c89351` |
 
 ## Notes

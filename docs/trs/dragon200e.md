@@ -19,7 +19,7 @@
   |---|---|
   | `ic18_v1.4e.ic34` | `95af0a0a` |
   | `ic17_v1.4e.ic37` | `48b985df` |
-  | `rom26.ic1` | `565724bc` |
+  | `rom26.ic1` (chargen) | `565724bc` |
 - `roms/dragon_fdc.zip`
 
 ## Notes

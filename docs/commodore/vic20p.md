@@ -17,10 +17,10 @@ This is the PAL VIC-20 — the machine Commodore sold across Europe as the **VC-
 
   | ROM | CRC32 |
   |---|---|
-  | `901486-01.ue11` | `db4c43c1` |
-  | `901486-07.ue12` | `4be07cb4` |
-  | `jiffydos vic-20 pal.ue12` | `705e7810` |
-  | `901460-03.ud7` | `83e032a6` |
+  | `901486-01.ue11` (basic) | `db4c43c1` |
+  | `901486-07.ue12` (kernal) | `4be07cb4` |
+  | `jiffydos vic-20 pal.ue12` (kernal) | `705e7810` |
+  | `901460-03.ud7` (chargen) | `83e032a6` |
 
 ## Notes
 

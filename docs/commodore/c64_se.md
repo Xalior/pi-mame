@@ -17,10 +17,10 @@ Commodore 64 BASIC V2, `READY.` — the IEC disk bus boots empty (`-iec8 ""`), s
 
   | ROM | CRC32 |
   |---|---|
-  | `901226-01.u3` | `f833d117` |
-  | `kernel.u4` | `f10c2c25` |
-  | `charswe.u5` | `bee9b3fd` |
-  | `charswe2.u5` | `377a382b` |
+  | `901226-01.u3` (basic) | `f833d117` |
+  | `kernel.u4` (kernal) | `f10c2c25` |
+  | `charswe.u5` (chargen) | `bee9b3fd` |
+  | `charswe2.u5` (chargen) | `377a382b` |
   | `906114-01.u17` | `54c89351` |
 
 ## Notes

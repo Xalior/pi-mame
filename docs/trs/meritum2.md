@@ -24,7 +24,7 @@
   | `05.ic11` | `461fbf0d` |
   | `06.ic12` | `ed547445` |
   | `07.ic13` | `044b1459` |
-  | `chargen.ic72` | `3dfc6439` |
+  | `chargen.ic72` (chargen) | `3dfc6439` |
 
 ## Notes
 
