@@ -11,7 +11,7 @@ Prefer a download? Every [tagged release](https://github.com/Xalior/pi-mame/rele
 | `make kernel` | System | Year | Romset | Extra assets | TV | |
 |---|---|---|---|---|---|---|
 | `MACHINE=einstein` | Einstein TC-01 | 1984 | `einstein.zip` | — | PAL | [details](einstein.md) |
-| `MACHINE=einst256` | Einstein 256 | 1986 | `einst256.zip` | — | PAL | [details](einst256.md) |
+| `MACHINE=einst256` | Einstein 256 | 1986 | `einst256.zip` | — | NTSC | [details](einst256.md) |
 
 Click through to a machine's details page for its exact romset (CRC32 per ROM).
 
