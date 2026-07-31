@@ -2265,11 +2265,23 @@ mem|enduror|317-0013a.key|a965b2da|046f800f258163b6935f4f75326d9dc225b27dde|-
 # PROVENANCE.txt in the golden store (assets/media/...) for the full citation
 # and, where recorded, the verified source URL. The Sinclair titles below
 # carry a real src (mojontwins.com, cross-checked against archive.org in
-# scratchpad/trial-media/sinclair/REPORT.md); the Amstrad and Commodore
-# titles carry no independently logged source URL, so they have no src/mem
-# lines here — fetch-assets.sh reports them FAILED (no source in manifest)
-# until a URL is re-established, same as any other asset this project cannot
-# yet fetch on a user's behalf.
+# scratchpad/trial-media/sinclair/REPORT.md).
+#
+# The Amstrad and Commodore titles were staged without an independently
+# logged source URL — a defect in that staging pass, not something papered
+# over here. Three were recovered from the fetch spoil itself
+# (scratchpad/trial-media/<platform>/<title>/headers.txt's recorded served
+# filename): uwol2-cpc, sirababol2-cpc and uwol-c64 are all served from
+# mojontwins.com/juegos/ (same host, same URL shape as the Sinclair titles),
+# confirmed by re-fetching and comparing SHA1 against the golden-store bytes
+# — byte-identical — so they carry a real src/mem below. The remaining eight
+# (jetpaco, lalaprologue, impossamal, ramiro3-cpc, roland, c64anabalt, nixy,
+# tristamisland, slipstream-c64, luftrauserz, rocketsmashex,
+# tenebramacabre-c64, tigerclaw) have no source recorded anywhere in the
+# staging spoil — no logged URL, no request header, nothing inside the
+# staged archives beyond a publisher's homepage name in a manual — so no
+# src/mem line is possible from what exists; they have no src/mem lines
+# here, and fetch-assets.sh reports them UNAVAILABLE rather than FAILED.
 
 asset|uwol-spectrum|free|file|media/cass/spectrum/uwol.tzx
 src|uwol-spectrum|raw|https://www.mojontwins.com/juegos
@@ -2318,22 +2330,34 @@ asset|phantomasa1b|free|file|media/cass/spectrum/phantomasa1-b.tzx
 src|phantomasa1b|raw|https://www.mojontwins.com/juegos
 mem|phantomasa1b|phantomasa1-b.tzx|38004424|c70acb74dfc62a0f591c55701bd68d32b813bec4|Mojon-Twins--Phantomasa-I-v.3.0--CARA-B.tzx
 
-# Amstrad CPC trial games — no independently logged source URL (see
-# assets/media/flop/cpc6128/PROVENANCE.txt); asset|-only, no src/mem.
+# Amstrad CPC trial games — uwol2-cpc and sirababol2-cpc recovered from
+# mojontwins.com/juegos/ (see the tier comment above); the other five have no
+# recoverable source (see assets/media/flop/cpc6128/PROVENANCE.txt) and stay
+# asset|-only.
 asset|uwol2-cpc|free|file|media/flop/cpc6128/uwol2.dsk
+src|uwol2-cpc|raw|https://www.mojontwins.com/juegos
+mem|uwol2-cpc|uwol2.dsk|18588dc1|af09a1d2dc8907fd87c2443bde5b5f7553e8bfb6|Mojon-Twins--Uwol-2--CPC.dsk
+
 asset|sirababol2-cpc|free|file|media/flop/cpc6128/sirababol2.dsk
+src|sirababol2-cpc|raw|https://www.mojontwins.com/juegos
+mem|sirababol2-cpc|sirababol2.dsk|f0b7e869|2a1375fd5e75e72fa852ae212dac2d7cd0b928ed|mojon-twins--sir-ababol-2--CPC.dsk
+
 asset|jetpaco|free|file|media/flop/cpc6128/jetpaco.dsk
 asset|lalaprologue|free|file|media/flop/cpc6128/lalaprologue.dsk
 asset|impossamal|free|file|media/flop/cpc6128/impossamal.dsk
 asset|ramiro3-cpc|free|file|media/flop/cpc6128/ramiro3.dsk
 asset|roland|free|file|media/flop/cpc6128/roland.dsk
 
-# Commodore 64 trial games — no independently logged source URL (see
-# assets/media/flop/c64/, cart/c64/, quik/c64/ PROVENANCE.txt); asset|-only.
+# Commodore 64 trial games — uwol-c64 recovered from mojontwins.com/juegos/
+# (see the tier comment above); the other eight have no recoverable source
+# (see assets/media/flop/c64/, cart/c64/, quik/c64/ PROVENANCE.txt) and stay
+# asset|-only.
 asset|c64anabalt|free|file|media/flop/c64/c64anabalt.d64
 asset|nixy|free|file|media/flop/c64/nixy.d64
 asset|tristamisland|free|file|media/flop/c64/tristamisland.d64
 asset|uwol-c64|free|file|media/flop/c64/uwol.d64
+src|uwol-c64|raw|https://www.mojontwins.com/juegos
+mem|uwol-c64|uwol.d64|28359437|f2620a42b7c892ff2784066fb9ccfa77d0309aa4|Mojon-Twins--Uwol-C64.d64
 asset|slipstream-c64|free|file|media/flop/c64/slipstream.d64
 asset|luftrauserz|free|file|media/cart/c64/luftrauserz.crt
 asset|rocketsmashex|free|file|media/cart/c64/rocketsmashex.crt

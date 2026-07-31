@@ -2,7 +2,7 @@
 # fetch-assets.sh — fetch the ROMs, cartridge, and Next image pi-mame's
 # machines need, from public upstreams, into an assets directory you own.
 #
-#   scripts/fetch-assets.sh <free|public|all> [ASSETS_DIR]
+#   scripts/fetch-assets.sh <free|public|all|media> [ASSETS_DIR]
 #
 # Tiers (see scripts/assets.manifest for the doctrine and every source):
 #   free    content whose redistribution is properly blessed, from a proper
@@ -10,10 +10,17 @@
 #           hosted ready-to-boot Next SD image).
 #   public  publicly-available-but-grey MAME-set mirrors (archive.org).
 #   all     both.
+#   media   the curated extra-game titles named in trial-games.manifest —
+#           the non-romset media a platform's own system menu doesn't carry
+#           (see that file's grammar). Every tier a listed title's own
+#           asset stanza carries is included.
 #
 # This repository ships NO ROMs. The script fetches them; it offers, you choose.
 # Every member is verified CRC32 + SHA1 against the manifest before install; a
 # bad artifact is deleted and that asset reported FAILED (the run continues).
+# An asset with no src line in the manifest at all is reported UNAVAILABLE
+# without attempting a fetch — its bytes are known (they came from somewhere)
+# but the download link was never recorded, so there is nothing to try.
 # next.img is the sole checksum-exempt asset (a live image whose version
 # advances). Idempotent: an asset already present and valid is left untouched.
 #
@@ -30,13 +37,20 @@ MODE="${1:-}"
 ASSETS_DIR="${2:-./my-assets}"
 
 case "$MODE" in
-    free|public|all) ;;
-    *) echo "usage: $0 <free|public|all> [ASSETS_DIR]" >&2; exit 2 ;;
+    free|public|all|media) ;;
+    *) echo "usage: $0 <free|public|all|media> [ASSETS_DIR]" >&2; exit 2 ;;
 esac
 
 SELF_DIR=$(cd "$(dirname "$0")" && pwd)
 MANIFEST="$SELF_DIR/assets.manifest"
 [ -f "$MANIFEST" ] || { echo "fetch-assets: manifest not found: $MANIFEST" >&2; exit 2; }
+
+MEDIA_NAMES=""
+if [ "$MODE" = "media" ]; then
+    TRIAL_MANIFEST="$SELF_DIR/trial-games.manifest"
+    [ -f "$TRIAL_MANIFEST" ] || { echo "fetch-assets: trial manifest not found: $TRIAL_MANIFEST" >&2; exit 2; }
+    MEDIA_NAMES=$(grep '^trial|' "$TRIAL_MANIFEST" | awk -F'|' '{print $5}' | sort -u)
+fi
 
 # --- tool detection -----------------------------------------------------------
 if command -v sha1sum >/dev/null 2>&1;  then SHA1="sha1sum"
@@ -163,6 +177,9 @@ do_zip() {
     if [ -f "$_out" ] && verify_zip "$_out" "$_name"; then
         log "ALREADY-PRESENT  $_dest"; return
     fi
+    if [ -z "$(asset_srcs "$_name")" ]; then
+        log "UNAVAILABLE      $_dest  (no source recorded)"; return
+    fi
     _wd="$WORK/build_$_name"; rm -rf "$_wd"; mkdir -p "$_wd"
     _list="$_wd/.list"; : > "$_list"
     _prov="$_wd/.provenance"; : > "$_prov"
@@ -203,8 +220,16 @@ do_zip() {
 do_file() {
     _name="$1"; _dest="$2"
     _out="$ASSETS_DIR/$_dest"
-    # single member; target == the dest file basename
-    set -- $(asset_mems "$_name" | head -1 | awk -F'|' '{print $3, $4, $5, $6}')
+    # single member; target == the dest file basename. An asset this
+    # unrecorded (no mem line at all — e.g. an itch.io-only title whose
+    # download flow was never stable enough to log) can't be checksummed or
+    # fetched either, so it's UNAVAILABLE before anything reads its fields.
+    _mem_line=$(asset_mems "$_name" | head -1)
+    if [ -z "$_mem_line" ] || [ -z "$(asset_srcs "$_name")" ]; then
+        [ -f "$_out" ] && log "ALREADY-PRESENT  $_dest" && return
+        log "UNAVAILABLE      $_dest  (no source recorded)"; return
+    fi
+    set -- $(printf '%s\n' "$_mem_line" | awk -F'|' '{print $3, $4, $5, $6}')
     _tgt="$1"; _crc="$2"; _sha="$3"; _raw="$4"
     if [ -f "$_out" ] && [ "$(sha1_of "$_out")" = "$_sha" ]; then
         log "ALREADY-PRESENT  $_dest"; return
@@ -268,6 +293,7 @@ grep '^asset|' "$MANIFEST" | while IFS='|' read -r _ name tier kind dest; do
     case "$MODE" in
         free)   [ "$tier" = "free" ]   || { log "SKIPPED(public)  $dest"; continue; } ;;
         public) [ "$tier" = "public" ] || { log "SKIPPED(free)    $dest"; continue; } ;;
+        media)  printf '%s\n' "$MEDIA_NAMES" | grep -qx "$name" || continue ;;
     esac
     note "-> $name ($tier, $dest)"
     case "$kind" in
@@ -285,8 +311,9 @@ echo "====================================================="
 _fetched=$(grep -c '^FETCHED'         "$LEDGER"); _fetched=${_fetched:-0}
 _present=$(grep -c '^ALREADY-PRESENT' "$LEDGER"); _present=${_present:-0}
 _failed=$(grep  -c '^FAILED'          "$LEDGER"); _failed=${_failed:-0}
+_unavail=$(grep -c '^UNAVAILABLE'     "$LEDGER"); _unavail=${_unavail:-0}
 _skipped=$(grep -c '^SKIPPED'         "$LEDGER"); _skipped=${_skipped:-0}
-echo "FETCHED=$_fetched  ALREADY-PRESENT=$_present  FAILED=$_failed  SKIPPED=$_skipped"
+echo "FETCHED=$_fetched  ALREADY-PRESENT=$_present  FAILED=$_failed  UNAVAILABLE=$_unavail  SKIPPED=$_skipped"
 
 # Non-zero only if EVERYTHING attempted failed (partial success is normal).
 _attempted=$((_fetched + _present + _failed))

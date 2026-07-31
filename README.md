@@ -337,6 +337,27 @@ ROMs: the fetcher downloads a hosted ready-to-boot image, extracts it,
 sanity-checks the size, and installs it as `media/hard/tbblue/next.img` —
 see [docs/sinclair/tbblue.md](docs/sinclair/tbblue.md).
 
+### 🎮 Extra games
+
+Some platform cards add a few free games to their menu, on top of the
+machine's own system list. These games are not part of any MAME romset, so
+`make assets` does not fetch them. A separate command does:
+
+```sh
+make media ASSETS=~/my-assets
+```
+
+This installs each game into the same `ASSETS` directory, so `make sd` and
+`make card` pick it up with no extra step. It checksums every file it
+downloads and is idempotent, the same way `make assets` is.
+
+Not every game listed in `scripts/trial-games.manifest` has a working
+`make media` entry yet. For some, the exact download link was never
+recorded when the game was first added to the project, and the script will
+not guess one on your behalf. The ledger it prints marks those games
+`UNAVAILABLE` rather than `FAILED`, and the corresponding menu entry will
+not start until a real link is found.
+
 ## ⌨️ At the keyboard
 
 A USB keyboard is the machine's keyboard. Computers with full keyboards

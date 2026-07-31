@@ -49,6 +49,11 @@
 #   make assets-free  [ASSETS=<dir>]     fetch the properly-redistributable ROMs
 #   make assets-public [ASSETS=<dir>]    fetch from public MAME-set mirrors
 #   make assets       [ASSETS=<dir>]     fetch both (free + public)
+#   make media        [ASSETS=<dir>]     fetch the curated extra-game titles
+#                                (scripts/trial-games.manifest) — media a
+#                                platform's own romset doesn't carry. A title
+#                                with no recorded source prints UNAVAILABLE,
+#                                not FAILED.
 #   make docs [DOCS_PLATFORM=<p>]        regenerate docs/<p>/README.md and
 #                                every docs/<p>/<machine>.md from source
 #                                (host/machines.mk, scripts/assets.manifest,
@@ -102,7 +107,8 @@ TAG ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
 KERNEL_PLATFORM = $(MACHINE_PLATFORM_$(MACHINE))
 
 .PHONY: deps mame platform picker kernel machines kernels ci verify-mame \
-	verify-kernels bootmenu card sd dist assets assets-free assets-public docs
+	verify-kernels bootmenu card sd dist assets assets-free assets-public \
+	media docs
 
 # Each consumer owns its Circle world as a submodule, one per threading model,
 # so deps is just two self-contained builds — neither is configured here:
@@ -214,6 +220,15 @@ assets-public:
 
 assets:
 	scripts/fetch-assets.sh all $(ASSETS)
+
+# Fetch the curated extra-game titles (scripts/trial-games.manifest) into
+# $(ASSETS), in the same /media/<mediatype>/<driver>/ layout the card
+# builders (mkcard.sh/mksd.sh) already read. Separate from the ROM fetchers
+# above because this content never comes from a MAME romset — see
+# scripts/assets.manifest's own "trial games" section for per-title sources
+# and, where none was ever recorded, why.
+media:
+	scripts/fetch-assets.sh media $(ASSETS)
 
 # Regenerate one platform's docs/<p>/ pages straight from source (see
 # scripts/gen-machine-docs.py's header for the exact ground truth read).
