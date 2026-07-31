@@ -2068,3 +2068,48 @@ mem|outrundx|opr-10191.68|20a284ab|7c9027416d4122791ba53782fe2230cf02b7d506|-
 mem|outrundx|opr-10190.69|7cab70e2|a3c581d2b438630d0d4c39481dcfd85681c9f889|-
 mem|outrundx|opr-10189.70|01366b54|f467a6b807694d5832a985f5381c170d24aaee4e|-
 mem|outrundx|opr-10188.71|bad30ad9|f70dd3a6362c314adef313b064102f7a250401c8|-
+
+# Hang-On (Sega, 1985), Rev A. Copyrighted commercial arcade game: public
+# tier, never free. Self-contained set — hangon declares PARENT 0.
+#
+# NOTE THE SOURCE. This is the first stanza here NOT served by the 0.250
+# split-set mirror: that mirror's hangon.zip is short two members,
+# 315-5103.6e and 315-5121.2a, which are programmable-logic chip dumps from
+# the sound and ROM boards and were added to MAME's set between 0.281 and
+# 0.282. The URL below is the version-matched 0.288 item's UPDATE subfolder,
+# which carries all 33; that item's base folder still holds the old copy.
+asset|hangon|public|zip|roms/hangon.zip
+src|hangon|zip|https://archive.org/download/mame-roms-split_/MAME%20ROMs%20%28split%29%20%28v0.281%20to%20v0.282%29%20-%20Update/hangon.zip
+mem|hangon|epr-6918a.ic22|20b1c2b0|01b4f5105e2bbeb6ec6dbd18bfb728e3a973e0ca|-
+mem|hangon|epr-6916a.ic8|7d9db1bf|952ee3e7a0d57ec1bb3385e0e6675890b8378d31|-
+mem|hangon|epr-6917a.ic20|fea12367|9a1ce5863c562160b657ad948812b43f42d7d0cc|-
+mem|hangon|epr-6915a.ic6|ac883240|f943341ae13e062f3d12c6221180086ce8bdb8c4|-
+mem|hangon|epr-6920.ic63|1c95013e|8344ac953477279c2c701f984d98292a21dd2f7d|-
+mem|hangon|epr-6919.ic51|6ca30d69|ed933351883ebf6d9ef9428a81d09749b609cd60|-
+mem|hangon|epr-6841.ic38|54d295dc|ad8cdb281032a2f931c2abbeb966998944683dc3|-
+mem|hangon|epr-6842.ic23|f677b568|636ca60bd4be9b5c2be09de8ae49db1063aa6c79|-
+mem|hangon|epr-6843.ic7|a257f0da|9828f8ce4ef245ffb8dbad347f9ca74ed81aa998|-
+mem|hangon|epr-6819.ic27|469dad07|6d01c0b3506e28832928ad74d518577ff5be323b|-
+mem|hangon|epr-6820.ic34|87cbc6de|b64652e062e1b88c6f6ae8dd2ffe4533bb27ba45|-
+mem|hangon|epr-6821.ic28|15792969|b061dbf24e8b511116446794753c8b0cc49e2149|-
+mem|hangon|epr-6822.ic35|e9718de5|30e3a7d5b33504da03c5780b4a946b977e46098a|-
+mem|hangon|epr-6823.ic29|49422691|caee2a4a3f4587ae27dec330214edaa1229012af|-
+mem|hangon|epr-6824.ic36|701deaa4|053032ef886b85a4cb4753d17b3c27d228695157|-
+mem|hangon|epr-6825.ic30|6e23c8b4|b17fd7d590ed4e6616b7b4d91a47a2820248d8c7|-
+mem|hangon|epr-6826.ic37|77d0de2c|83b126ed1d463504b2702391816e6e20dcd04ffc|-
+mem|hangon|epr-6827.ic31|7fa1bfb6|a27b54c93613372f59050f0b2182d2984a8d2efe|-
+mem|hangon|epr-6828.ic38|8e880c93|8c55deec065daf09a5d1c1c1f3f3f7bc1aeaf563|-
+mem|hangon|epr-6829.ic32|7ca0952d|617d73591158ed3fea5174f7dabf0413d28de9b3|-
+mem|hangon|epr-6830.ic39|b1a63aef|5db0a1cc2d13c6cfc77044f5d7f6f99d198531ed|-
+mem|hangon|epr-6845.ic18|ba08c9b8|65ceaefa18999c468b38576c29101674d1f63e5f|-
+mem|hangon|epr-6846.ic25|f21e57a3|92ce0723e722f446c0cef9e23080a008aa9752e7|-
+mem|hangon|epr-6840.ic108|581230e3|954eab35059322a12a197bba04bf85f816132f20|-
+mem|hangon|epr-6833.ic73|3b942f5f|4384b5c090954e69de561dde0ef32104aa11399a|-
+mem|hangon|epr-6831.ic5|cfef5481|c04b302fee58f0e59a097b2be2b61e5d03df7c91|-
+mem|hangon|epr-6832.ic6|4165aea5|be05c6d295807af2f396a1ff72d5a3d2a1e6054d|-
+mem|hangon|epr-6844.ic123|e3ec7bd6|feec0fe664e16fac0fde61cf64b401b9b0575323|-
+mem|hangon|315-5118.bin|51d448a2|0a1018cc1d4c6dc87625d59539d257e01c9dc872|-
+mem|hangon|315-5119.bin|a37f00e1|129b10f6cb48e1a1fefd69009380516cf2c677b5|-
+mem|hangon|315-5120.bin|ba5f92ec|74e1fb137ac2ab6dbdad2e8111c27b836e2ff14b|-
+mem|hangon|315-5103.6e|85284c32|45bcc6745b3540777eed02374064d2f853b4fe1f|-
+mem|hangon|315-5121.2a|5dd89643|b94bbed9fca269d198788e0a5e995ce7cbc453d7|-
