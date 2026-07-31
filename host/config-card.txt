@@ -23,6 +23,11 @@ arm_64bit=1
 kernel_address=0x80000
 initial_turbo=0
 
+# The firmware's default overscan insets the picture on some panels; this
+# appliance always wants the full frame (geometry belongs to the payload
+# and the panel, never to firmware borders).
+disable_overscan=1
+
 # --- RASPPI 3 world (BCM2837): pi-mame-boot-rpi3.img ---
 [pi02]
 kernel=pi-mame-boot-rpi3.img
