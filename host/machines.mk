@@ -52,7 +52,7 @@
 # Next boards share tbblue.zip + next.img, sprinter needs kb_ms_natural.zip,
 # pc1512 needs pc1512kb.zip, and the CPC+ range needs only sysukpd.bin.
 
-PLATFORMS = sinclair amstrad commodore amiga atari acorn eaca samcoupe camputers tatung memotech enterprise sord vtech trs
+PLATFORMS = sinclair amstrad commodore amiga atari acorn eaca samcoupe camputers tatung memotech enterprise sord vtech trs sega
 
 PLATFORM_MACHINES_sinclair = spectrum spec128 specpls2 specpl2a specpls3 \
 	tbblue specnext_ks1 specnext_ks2 specnext_ks3 zx80 zx81 tc2048 ts2068 \
@@ -210,6 +210,22 @@ PLATFORM_MACHINES_trs = trs80 trs80dt1 agvision trsvidtx \
 	tanodr64h dgnalpha mc10 alice alice32 alice90 \
 	meritum1 meritum2 meritum_net vis
 
+# Sega (src/mame/sega/) — an arcade GAME platform, like amiga's Arcadia
+# coin-ops and unlike every home-computer platform above. What scopes this
+# roster and its SOURCES is the size of the directory: src/mame/sega/ is the
+# largest vendor directory in MAME by driver count, spanning the Master
+# System, the Mega Drive, System 16, the Model 1/2/3 3D boards and much else.
+# A vendor directory of that size is brought online one driver at a time, and
+# this is the Out Run bring-up: segaorun.cpp's Out Run / Super Hang-On board.
+#
+# outrun alone is rostered. Its five siblings in the driver
+# (outrunra, outrundx, outrundxj, outrundxa, outrunb) are clones or bootlegs
+# of the same game rather than distinct machines, so which of them ever ship
+# is a curation decision for later, not a bring-up one. outrun carries flags
+# 0 — no MACHINE_NOT_WORKING, no MACHINE_IMPERFECT_* — and its ROM_START
+# holds no NO_DUMP and no BAD_DUMP member.
+PLATFORM_MACHINES_sega = outrun
+
 # All machines, every platform — the roster `make kernels` bakes and CI verifies.
 MACHINES = $(foreach p,$(PLATFORMS),$(PLATFORM_MACHINES_$(p)))
 
@@ -245,6 +261,7 @@ PLATFORM_SUBTARGET_enterprise = enterprise
 PLATFORM_SUBTARGET_sord      = sord
 PLATFORM_SUBTARGET_vtech     = vtech
 PLATFORM_SUBTARGET_trs       = trs
+PLATFORM_SUBTARGET_sega      = sega
 
 PLATFORM_SOURCES_sinclair = \
 	src/mame/sinclair/spectrum.cpp src/mame/sinclair/spec128.cpp \
@@ -349,6 +366,17 @@ PLATFORM_SOURCES_trs = \
 	src/mame/trs/dragon.cpp src/mame/trs/dgnalpha.cpp \
 	src/mame/trs/mc10.cpp src/mame/trs/meritum.cpp \
 	src/mame/trs/vis.cpp
+
+# segaorun.cpp alone — the Out Run / Super Hang-On board. Every other driver
+# file in src/mame/sega/ is other Sega hardware entirely, brought online one
+# driver at a time (see the roster comment above).
+# segaorun.cpp has no header of its own, so there is no _m/_v sibling scan to
+# rely on; the Sega custom chips it includes by same-stem header
+# (315_5195, fd1089, sega16sp, segaic16, segaic16_road) are devices living in
+# the driver directory and ride the dependency scan, and the Out Run cabinet
+# artwork (src/mame/layout/outrun.lay -> outrun.lh) rides its #include.
+PLATFORM_SOURCES_sega = \
+	src/mame/sega/segaorun.cpp
 
 # Every shipped platform's SOURCES, joined. The shared-engine build
 # (scripts/build-mame.sh) compiles ONE mamedrivers SUBTARGET from this — the
@@ -965,6 +993,13 @@ MACHINE_ASSETS_meritum1     = meritum1
 MACHINE_ASSETS_meritum2     = meritum2
 MACHINE_ASSETS_meritum_net  = meritum_net
 MACHINE_ASSETS_vis          = vis
+
+# --- Sega asset dependencies (manifest asset names) ---
+# One romset, self-contained: outrun is its own root system (its GAME line
+# names PARENT 0), so nothing falls through to another set, and the board
+# carries no separate device romset. Out Run is a commercial Sega arcade
+# game still in copyright, so the asset is public tier and can never be free.
+MACHINE_ASSETS_outrun       = outrun
 
 # Query helpers. Lets scripts read these facts without pulling in the
 # Circle build.

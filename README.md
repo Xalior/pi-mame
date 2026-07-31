@@ -80,7 +80,7 @@ Prefer building it yourself? See
 
 Delightfully small. Let's be precise about what this actually is:
 
-- **Fifteen platforms, 193 machines.** Each platform is a family of machines
+- **Sixteen platforms, 194 machines.** Each platform is a family of machines
   built on related hardware, sharing a MAME driver lineage and, often, ROMs.
   Every machine on the roster carries a verdict from real hardware: it is
   either proven on the glass with an HDMI capture on its details page, or
@@ -133,7 +133,7 @@ self-describing:
 `make sd` and `make card` put them there for you; do the rename by hand only
 if you're dropping a bare kernel onto a card you already built.
 
-Every machine belongs to one of fifteen platforms:
+Every machine belongs to one of sixteen platforms:
 
 | Platform | Machines | Details |
 |---|---|---|
@@ -152,13 +152,14 @@ Every machine belongs to one of fifteen platforms:
 | Sord — the m5 | 3 | [docs/sord/](docs/sord/README.md) |
 | VTech — the Laser / VZ family and friends | 24 | [docs/vtech/](docs/vtech/README.md) |
 | TRS — the TRS-80, CoCo, Dragon and MC-10 | 37 | [docs/trs/](docs/trs/README.md) |
+| Sega — the Out Run arcade board | 1 | [docs/sega/](docs/sega/README.md) |
 
 Each platform page carries its own machine table (`make kernel MACHINE=` target,
 system, year, romset, TV region) and a details page per machine covering
 exactly what appears on the glass at power-on and exactly which assets it
 needs. Every screenshot in those pages is an HDMI capture from a real
 Raspberry Pi running that machine's image — not an emulator window, not a
-mockup. 📸 The four original platforms were captured on a Pi 4; the eleven
+mockup. 📸 The four original platforms were captured on a Pi 4; the twelve
 that followed were captured on a Pi 5.
 
 A platform card's menu and the mechanism behind it are documented

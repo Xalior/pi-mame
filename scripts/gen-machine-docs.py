@@ -63,6 +63,7 @@ PLATFORM_DISPLAY = {
     "sord": "Sord",
     "vtech": "VTech",
     "trs": "TRS / Tandy",
+    "sega": "Sega",
 }
 
 # Per-platform README intro paragraph. The machines table, assets tree and
@@ -182,6 +183,18 @@ PLATFORM_INTRO = {
         "clones (`meritum.cpp`); and the Tandy/Memorex VIS CD player "
         "(`vis.cpp`). Each `make kernel MACHINE=<name>` below bakes one "
         "machine into its own `kernel8-<name>.img` — see the "
+        "[top-level README](../../README.md) for the build and the regional "
+        "canvas."
+    ),
+    "sega": (
+        "Out Run, the driving game Sega released in 1986, running on the "
+        "coin-operated board Sega built for it (`segaorun.cpp` in MAME): two "
+        "Motorola 68000 processors, a video board that scales sprites to "
+        "draw the road and the scenery, and a Z80 with a Yamaha FM sound "
+        "chip for the music. Sega's directory in MAME covers a great deal of "
+        "other hardware as well; Out Run is the only machine taken from it "
+        "so far. Each `make kernel MACHINE=<name>` below bakes one machine "
+        "into its own `kernel8-<name>.img` — see the "
         "[top-level README](../../README.md) for the build and the regional "
         "canvas."
     ),
