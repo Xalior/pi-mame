@@ -956,8 +956,14 @@ mem|ar_fast|fast-v28_8-hi.u28|3650aaf0|cc37aa94360159f45076eafaae8140a661bd52f6|
 mem|ar_fast|fast-v28_8-lo.u32|82603f68|8affe73e97b966b8e63bff2c7914fb5ead7b60ff|-
 mem|ar_fast|pal16l8-sec-scpa.u8|3a4df3aa|d0e64af4e1602347af60cd97c6b5b1a9d65cb270|-
 
+# ar_fasta (Fast Break, V 2.7) is a split-set clone of ar_fast (parent per
+# arsystems.cpp's GAME( ar_fasta, ar_fast, ... )): only the two V27_1 ROMs and
+# the diverging V27_6/V27_7/V27_8 pairs are unique; the rest of the ROM set
+# and the shared PAL are byte-identical to ar_fast's and located by CRC32 in
+# the parent ar_fast.zip.
 asset|ar_fasta|public|zip|roms/ar_fasta.zip
 src|ar_fasta|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/ar_fasta.zip
+src|ar_fasta|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/ar_fast.zip
 mem|ar_fasta|fast-v27_1-hi.u11|58ce7e02|73fa33858dceb924e86b95130f8d6a0d3ae5cc6f|-
 mem|ar_fasta|fast-v27_1-lo.u15|6bf75490|3df610dd488e0711a190a9ec47adfd047313a597|-
 mem|ar_fasta|fast-v27_2-hi.u10|3a3dd931|7be3316e2acf6b14b29ef2e36d8f76999d5d4e94|-
@@ -996,8 +1002,14 @@ mem|ar_ldrb|leader_board_08-hi_v2.5.u28|fbdca9af|9612eb777a00ba4153f40eaefd162ca
 mem|ar_ldrb|leader_board_08-lo_v2.5.u32|322f52eb|3033eb753fb8b3bf56b152377bf567b06a0c8144|-
 mem|ar_ldrb|pal16l8-sec-scpa.u8|3a4df3aa|d0e64af4e1602347af60cd97c6b5b1a9d65cb270|-
 
+# ar_ldrba (Leader Board Golf, set 2, V 2.4) is a split-set clone of ar_ldrb
+# (parent per arsystems.cpp's GAME( ar_ldrba, ar_ldrb, ... )): only the V2.4
+# board-01 and board-07 pairs are unique; the rest of the ROM set and the
+# shared PAL are byte-identical to ar_ldrb's and located by CRC32 in the
+# parent ar_ldrb.zip.
 asset|ar_ldrba|public|zip|roms/ar_ldrba.zip
 src|ar_ldrba|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/ar_ldrba.zip
+src|ar_ldrba|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/ar_ldrb.zip
 mem|ar_ldrba|leader_board_01-hi_v2.4.u11|fe1287e9|34088416d970614b31b25e982ef40fd950080b3e|-
 mem|ar_ldrba|leader_board_01-lo_v2.4.u15|7c7bb9ee|5c76445732ab139db82fe21c16f49e2609bb03aa|-
 mem|ar_ldrba|leader_board_02-hi_v2.4.u10|64e5fbae|0dde0d05b05f232aac9ad44398cedd8c7627f146|-
@@ -1016,8 +1028,13 @@ mem|ar_ldrba|leader_board_08-hi_v2.4.u28|b5911807|b2995b308b2618f312005f130048e7
 mem|ar_ldrba|leader_board_08-lo_v2.4.u32|1f1ea828|4af463bc6d58d64d4f082971c71654a6bb0c26bc|-
 mem|ar_ldrba|pal16l8-sec-scpa.u8|3a4df3aa|d0e64af4e1602347af60cd97c6b5b1a9d65cb270|-
 
+# ar_ldrbb (Leader Board Golf, set 3) is a split-set clone of ar_ldrb (parent
+# per arsystems.cpp's GAME( ar_ldrbb, ar_ldrb, ... )): only the board-01 and
+# board-08 pairs are unique; the rest of the ROM set and the shared PAL are
+# byte-identical to ar_ldrb's and located by CRC32 in the parent ar_ldrb.zip.
 asset|ar_ldrbb|public|zip|roms/ar_ldrbb.zip
 src|ar_ldrbb|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/ar_ldrbb.zip
+src|ar_ldrbb|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/ar_ldrb.zip
 mem|ar_ldrbb|ldrb_1h.u11|97dcde78|d324415b853de17646b5266581bea27e571fa08f|-
 mem|ar_ldrbb|ldrb_1l_gcp_22.u15|b51d17f7|56add2f69c35e5082926bd59be7f98a6a223c549|-
 mem|ar_ldrbb|ldrb_2h.u10|64e5fbae|0dde0d05b05f232aac9ad44398cedd8c7627f146|-
@@ -1839,3 +1856,40 @@ asset|vis|public|zip|roms/vis.zip
 src|vis|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/vis.zip
 mem|vis|p513bk0b.bin|364e3f74|04260ef1e65e482c9c49d25ace40e22487d6aab9|-
 mem|vis|p513bk1b.bin|e18239c4|a0262109e10a07a11eca43371be9978fff060bc5|-
+
+# Out Run (Sega, 1986) — the sega platform's first machine. Copyrighted
+# commercial arcade game: public tier, never free. Self-contained set —
+# outrun declares PARENT 0, so nothing falls through to a sibling.
+asset|outrun|public|zip|roms/outrun.zip
+src|outrun|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/outrun.zip
+mem|outrun|epr-10380b.133|1f6cadad|31e870f307f44eb4f293b607123b623beee2bc3c|-
+mem|outrun|epr-10382b.118|c4c3fa1a|69236cf9f27691dee290c79db1fc9b5e73ea77d7|-
+mem|outrun|epr-10381b.132|be8c412b|bf3ff05bbf81bdd44567f3b9bb4919ed4a499624|-
+mem|outrun|epr-10383b.117|10a2014a|1970895145ad8b5735f66ed8c837d9d453ce9b23|-
+mem|outrun|epr-10327a.76|e28a5baf|f715bde96c73ed47035acf5a41630fdeb41bb2f9|-
+mem|outrun|epr-10329a.58|da131c81|57d5219bd0e2fd886217e37e8773fd76be9b40eb|-
+mem|outrun|epr-10328a.75|d5ec5e5d|a4e3cfca4d803e72bc4fcf91ab00e21bf3f8959f|-
+mem|outrun|epr-10330a.57|ba9ec82a|2136c9572e26b7ae6de402c0cd53174407cc6018|-
+mem|outrun|opr-10268.99|95344b04|b3480714b11fc49b449660431f85d4ba92f799ba|-
+mem|outrun|opr-10232.102|776ba1eb|e3477961d19e694c97643066534a1f720e0c4327|-
+mem|outrun|opr-10267.100|a85bb823|a7e0143dee5a47e679fd5155e58e717813912692|-
+mem|outrun|opr-10231.103|8908bcbf|8e1237b640a6f26bdcbfd5e201dadb2687c4febb|-
+mem|outrun|opr-10266.101|9f6f1a74|09164e858ebeedcff4d389524ddf89e7c216dcae|-
+mem|outrun|opr-10230.104|686f5e50|03697b892f911177968aa40de6c5f464eb0258e7|-
+mem|outrun|mpr-10371.9|7cc86208|21320f945f7c8e990c97c9b1232a0f4b6bd00f8f|-
+mem|outrun|mpr-10373.10|b0d26ac9|3a9ce8547cd43b7b04abddf9a9ab5634e0bbfaba|-
+mem|outrun|mpr-10375.11|59b60bd7|e5d8c67e020608edd24ba87b7687b2ac2483ee7f|-
+mem|outrun|mpr-10377.12|17a1b04a|9f7210cb4153ac9029a785dcd4b45f4513a4b008|-
+mem|outrun|mpr-10372.13|b557078c|a3746a2da077a8df4932348f650a061f413e8430|-
+mem|outrun|mpr-10374.14|8051e517|9c8509fbed170b4ac74c169da573393e54774f49|-
+mem|outrun|mpr-10376.15|f3b8f318|a5f2532613f33a64441e0f75443c10ba78dccc6e|-
+mem|outrun|mpr-10378.16|a1062984|4399030a155caf71f2dec7f75c4b65531ab53576|-
+mem|outrun|opr-10186.47|22794426|a554d4b68e71861a0d0da4d031b3b811b246f082|-
+mem|outrun|opr-10185.11|22794426|a554d4b68e71861a0d0da4d031b3b811b246f082|-
+mem|outrun|epr-10187.88|a10abaa9|01c8a819587a66d2ee4d255656e36fa0904377b0|-
+mem|outrun|opr-10193.66|bcd10dde|417ce1d7242884640c5b14f4db8ee57cde7d085d|-
+mem|outrun|opr-10192.67|770f1270|686bdf44d45c1d6002622f6658f037735382f3e0|-
+mem|outrun|opr-10191.68|20a284ab|7c9027416d4122791ba53782fe2230cf02b7d506|-
+mem|outrun|opr-10190.69|7cab70e2|a3c581d2b438630d0d4c39481dcfd85681c9f889|-
+mem|outrun|opr-10189.70|01366b54|f467a6b807694d5832a985f5381c170d24aaee4e|-
+mem|outrun|opr-10188.71|bad30ad9|f70dd3a6362c314adef313b064102f7a250401c8|-

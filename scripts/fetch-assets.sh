@@ -16,6 +16,13 @@
 # bad artifact is deleted and that asset reported FAILED (the run continues).
 # next.img is the sole checksum-exempt asset (a live image whose version
 # advances). Idempotent: an asset already present and valid is left untouched.
+#
+# A split-set clone (its zip carries only the members that differ from a
+# parent romset) declares its own zip as its first manifest source and the
+# parent's zip as a fallback source after it; members are located by CRC32,
+# so no per-member name mapping is needed. A member satisfied by a fallback
+# source is logged as PROVENANCE|<dest>|<target>|<crc32>|<source-url> in the
+# ledger, so which zip a shared member actually came from stays on record.
 
 set -u
 
@@ -74,7 +81,11 @@ note() { printf '  %s\n' "$1" >&2; }
 asset_srcs() { grep "^src|$1|" "$MANIFEST"; }
 asset_mems() { grep "^mem|$1|" "$MANIFEST"; }
 
-# Obtain one member into $1/<target>.  Tries each source in order.
+# Obtain one member into $1/<target>.  Tries each source in order (a split-set
+# clone's own zip first, then any fallback zip declared after it in the
+# manifest — a parent romset carrying the clone's shared members). Records
+# which source actually supplied the member in $1/.srcurl_<target>, so the
+# caller can attribute parent-sourced members instead of only proving the zip.
 # args: workdir name target crc sha raw
 obtain_member() {
     _wd="$1"; _name="$2"; _tgt="$3"; _crc="$4"; _sha="$5"; _raw="$6"
@@ -119,6 +130,7 @@ obtain_member() {
         # verify this member
         if [ "$(sha1_of "$_wd/$_tgt")" = "$_sha" ]; then
             printf 'ok\n' > "$_wd/.got_$_tgt"
+            printf '%s\n' "$surl" > "$_wd/.srcurl_$_tgt"
             return 0
         fi
         rm -f "$_wd/$_tgt"
@@ -153,10 +165,19 @@ do_zip() {
     fi
     _wd="$WORK/build_$_name"; rm -rf "$_wd"; mkdir -p "$_wd"
     _list="$_wd/.list"; : > "$_list"
-    _fail=""
+    _prov="$_wd/.provenance"; : > "$_prov"
+    # The manifest lists each asset's own zip first; any src after it is a
+    # fallback (a parent romset's zip, for a split-set clone's shared
+    # members). A member satisfied by any source other than this one is
+    # parent-sourced and gets attributed in the ledger.
+    _own_url=$(asset_srcs "$_name" | head -1 | cut -d'|' -f4)
     asset_mems "$_name" | while IFS='|' read -r _ _ tgt crc sha raw; do
         if obtain_member "$_wd" "$_name" "$tgt" "$crc" "$sha" "$raw"; then
             printf '%s\n' "$tgt" >> "$_list"
+            _srcurl=$(cat "$_wd/.srcurl_$tgt" 2>/dev/null)
+            if [ -n "$_srcurl" ] && [ "$_srcurl" != "$_own_url" ]; then
+                printf 'PROVENANCE|%s|%s|%s|%s\n' "$_dest" "$tgt" "$crc" "$_srcurl" >> "$_prov"
+            fi
         else
             echo "$tgt" > "$_wd/.missing"; break
         fi
@@ -172,6 +193,7 @@ do_zip() {
         mkdir -p "$(dirname "$_out")"
         mv "$_wd/out.zip" "$_out"
         log "FETCHED          $_dest"
+        [ -s "$_prov" ] && while IFS= read -r _pline; do log "$_pline"; done < "$_prov"
     else
         rm -f "$_wd/out.zip"
         log "FAILED           $_dest  (verification mismatch)"
