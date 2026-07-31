@@ -775,10 +775,11 @@ MACHINE_ASSETS_lynx128k     = lynx128k
 # keeps connectors 0/1 only. The pipe (tatung_pipe_cards), user port and
 # rs232 default to nullptr; centronics defaults to the ROM-less "printer".
 # No default slot device carries a ROM_START, so no device romset ships.
-# The TC-01 is PAL (TMS9129, 50Hz) — no mksd.sh NTSC case entry. The 256's
-# line standard is a dipswitch (S:1, 525/60 vs 625/50) whose MAME default is
-# "525 lines 60Hz" on its V9938: which regional canvas it fills is staged as
-# an open question — no mksd.sh entry until ruled.
+# The TC-01 is PAL (TMS9129, 50Hz) — undeclared, PAL canvas default. The
+# 256's line standard is a dipswitch (S:1, 525/60 vs 625/50) whose MAME
+# default is "525 lines 60Hz" on its V9938 — RULED: config follows the
+# driver's DIP defaults (the general porting rule, docs/new-platform.html),
+# so machines/einst256.conf declares the 720x480 NTSC canvas.
 
 # --- Tatung Einstein asset dependencies (manifest asset names) ---
 # One self-contained romset per machine (einst256 is its own parent, not a
