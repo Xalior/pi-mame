@@ -10,6 +10,7 @@ Public-tier only: every asset this platform needs is a public-tier (grey-mirror)
 |---|---|---|---|---|---|---|
 | `MACHINE=outrun` | Out Run (sitdown/upright, Rev B) | 1986 | `outrun.zip` | — | — | [details](outrun.md) |
 | `MACHINE=shangon` | Super Hang-On (sitdown/upright) (unprotected) | 1987 | `shangon.zip` | — | — | [details](shangon.md) |
+| `MACHINE=toutrun` | Turbo Out Run (Out Run upgrade) (FD1094 317-0118) | 1989 | `toutrun.zip` | — | — | [details](toutrun.md) |
 
 Click through to a machine's details page for its exact romset (CRC32 per ROM).
 
@@ -19,7 +20,8 @@ Click through to a machine's details page for its exact romset (CRC32 per ROM).
 my-assets/
 └── roms/
     ├── outrun.zip
-    └── shangon.zip
+    ├── shangon.zip
+    └── toutrun.zip
 ```
 
 `scripts/fetch-assets.sh` (see the [README](../../README.md#-fetching-them)) can fetch these for you — `make assets ASSETS=~/my-assets`.
