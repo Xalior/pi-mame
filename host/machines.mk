@@ -224,7 +224,8 @@ PLATFORM_MACHINES_trs = trs80 trs80dt1 agvision trsvidtx \
 # is a curation decision for later, not a bring-up one. outrun carries flags
 # 0 — no MACHINE_NOT_WORKING, no MACHINE_IMPERFECT_* — and its ROM_START
 # holds no NO_DUMP and no BAD_DUMP member.
-PLATFORM_MACHINES_sega = outrun shangon toutrun outrunra outrundx
+PLATFORM_MACHINES_sega = outrun shangon toutrun outrunra outrundx \
+	hangon
 
 # All machines, every platform — the roster `make kernels` bakes and CI verifies.
 MACHINES = $(foreach p,$(PLATFORMS),$(PLATFORM_MACHINES_$(p)))
@@ -376,7 +377,7 @@ PLATFORM_SOURCES_trs = \
 # the driver directory and ride the dependency scan, and the Out Run cabinet
 # artwork (src/mame/layout/outrun.lay -> outrun.lh) rides its #include.
 PLATFORM_SOURCES_sega = \
-	src/mame/sega/segaorun.cpp
+	src/mame/sega/segaorun.cpp src/mame/sega/segahang.cpp
 
 # Every shipped platform's SOURCES, joined. The shared-engine build
 # (scripts/build-mame.sh) compiles ONE mamedrivers SUBTARGET from this — the
@@ -1012,6 +1013,7 @@ MACHINE_ASSETS_toutrun      = toutrun
 # complaint on the serial log.
 MACHINE_ASSETS_outrunra     = outrunra
 MACHINE_ASSETS_outrundx     = outrundx
+MACHINE_ASSETS_hangon       = hangon
 
 # Query helpers. Lets scripts read these facts without pulling in the
 # Circle build.
