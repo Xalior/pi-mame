@@ -571,10 +571,10 @@ MACHINE_ASSETS_tc2048       = tc2048
 MACHINE_ASSETS_ts2068       = ts2068
 MACHINE_ASSETS_ts1000       = ts1000
 MACHINE_ASSETS_ts1500       = ts1500
-MACHINE_ASSETS_pentagon     = pentagon spec128 betadisk
-MACHINE_ASSETS_scorpio      = scorpio spec128 betadisk
-MACHINE_ASSETS_atmtb2       = atmtb2 spec128 betadisk
-MACHINE_ASSETS_pentevo      = pentevo spec128 betadisk
+MACHINE_ASSETS_pentagon     = pentagon betadisk
+MACHINE_ASSETS_scorpio      = scorpio betadisk
+MACHINE_ASSETS_atmtb2       = atmtb2 betadisk
+MACHINE_ASSETS_pentevo      = pentevo betadisk
 MACHINE_ASSETS_tsconf       = tsconf
 MACHINE_ASSETS_elwro800     = elwro800
 MACHINE_ASSETS_byte         = byte
@@ -852,15 +852,15 @@ MACHINE_ASSETS_ep128        = ep128
 # canvas case in scripts/mksd.sh; m5p and m5p_brno are PAL (TMS9929A).
 
 # --- Sord m.5 asset dependencies (manifest asset names) ---
-# m5.zip (parent) carries sordjap.ic21 + sordfd5.rom. m5p is a clone whose
-# ROM_START loads its own sordint.ic21 plus the parent's sordfd5.rom (same
-# name and hashes), which falls through to m5.zip in split-set mirrors —
-# so m5p lists both (the pentagon/spec128 precedent). m5p_brno's two
-# members (sordint.ic21 + brno_rom12.rom) are both absent from the PARENT
-# zip, so its split zip is self-contained — one asset. The manifest
-# stanzas await the ROM-sourcing parcel.
+# The fetcher's manifest names every ROM_START member, parent or not, so a
+# clone's own zip is always COMPLETE — no clone needs its parent's zip at
+# runtime (proven on hardware: a clone booted with its parent's zip absent
+# from the card). m5p's ROM_START declares both sordint.ic21 and
+# sordfd5.rom itself, so m5p.zip carries both; m5.zip is a separate asset
+# needed only when m5 itself ships. m5p_brno's two members (sordint.ic21 +
+# brno_rom12.rom) are likewise self-carried — one asset.
 MACHINE_ASSETS_m5           = m5
-MACHINE_ASSETS_m5p          = m5p m5
+MACHINE_ASSETS_m5p          = m5p
 MACHINE_ASSETS_m5p_brno     = m5p_brno
 
 # --- VTech defaults strings ---
@@ -945,18 +945,18 @@ MACHINE_ASSETS_itunlim      = itunlim
 # Brazilian PAL-M clones at 60Hz, so those fill the NTSC canvas.
 
 # --- TRS / Tandy asset dependencies (manifest asset names) ---
-# Own romset first, then split-set fall-through parents (the m5p/pentagon
-# precedent) and the device romsets MAME's stock slot defaults load (the
-# acorn precedent): coco_fdc (the coco/coco3 lines' default cart),
-# cp450_fdc, cd6809_fdc, dragon_fdc, sdtandy_fdc, and t4426's fixed
-# coco_t4426 multi-cart. coco2b/coco2bh load the parent's extbas11.rom
-# (same name+hash), so they list coco too; every other set's members are
-# self-carried. The pure-alias ROM_STARTs keep their own zip names (the
-# a800xlp/mtx500 precedent): cocoh=coco, coco2bh=coco2b, coco3h=coco3,
-# dragon64h=dragon64, tanodr64h=tanodr64, alice90=alice32. alice32 (and
-# alias alice90) carry a BAD_DUMP charset.rom (borrowed from dcvg5k) — it
-# loads, and whether it shows a blocking box is per-machine, the glass
-# decides. The manifest stanzas await the ROM-sourcing parcel.
+# Own romset first, then the device romsets MAME's stock slot defaults
+# load (the acorn precedent): coco_fdc (the coco/coco3 lines' default
+# cart), cp450_fdc, cd6809_fdc, dragon_fdc, sdtandy_fdc, and t4426's fixed
+# coco_t4426 multi-cart. A clone's own zip is always COMPLETE — the
+# fetcher's manifest names every ROM_START member, so coco2b/coco2bh never
+# need coco's zip at runtime even though extbas11.rom shares its name and
+# hash; every set's members are self-carried. The pure-alias ROM_STARTs
+# keep their own zip names (the a800xlp/mtx500 precedent): cocoh=coco,
+# coco2bh=coco2b, coco3h=coco3, dragon64h=dragon64, tanodr64h=tanodr64,
+# alice90=alice32. alice32 (and alias alice90) carry a BAD_DUMP
+# charset.rom (borrowed from dcvg5k) — it loads, and whether it shows a
+# blocking box is per-machine, the glass decides.
 MACHINE_ASSETS_trs80        = trs80
 MACHINE_ASSETS_trs80dt1     = trs80dt1
 MACHINE_ASSETS_agvision     = agvision
@@ -964,8 +964,8 @@ MACHINE_ASSETS_trsvidtx     = trsvidtx
 MACHINE_ASSETS_coco         = coco coco_fdc
 MACHINE_ASSETS_cocoh        = coco coco_fdc
 MACHINE_ASSETS_deluxecoco   = deluxecoco coco_fdc
-MACHINE_ASSETS_coco2b       = coco2b coco coco_fdc
-MACHINE_ASSETS_coco2bh      = coco2b coco coco_fdc
+MACHINE_ASSETS_coco2b       = coco2b coco_fdc
+MACHINE_ASSETS_coco2bh      = coco2b coco_fdc
 MACHINE_ASSETS_cp400        = cp400 cp450_fdc
 MACHINE_ASSETS_cp400c2      = cp400c2 cp450_fdc
 MACHINE_ASSETS_mx1600       = mx1600 coco_fdc
