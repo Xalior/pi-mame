@@ -73,11 +73,11 @@ MACHINE    ?= spectrum
 PLATFORM   ?= sinclair
 TIER       ?= free
 ASSETS     ?= ./my-assets
-# Separate from PLATFORM above: gen-machine-docs.py covers amiga, atari, acorn,
-# eaca, samcoupe, camputers, tatung, memotech, enterprise, sord, vtech and trs
-# so far (sinclair/amstrad/commodore stay hand-maintained until PoC4 ports
-# them on).
-DOCS_PLATFORM ?= amiga
+# Separate from PLATFORM above: which platform(s) `make docs` regenerates.
+# Every platform in host/machines.mk's PLATFORMS list is generated from its
+# own scripts/platform-docs/<p>.md data file — none are hand-maintained.
+# `all` (the default) regenerates every platform in one pass.
+DOCS_PLATFORM ?= all
 # Which board this build targets: rpi3 | rpi4 | rpi5. Selects the MAME source
 # tree (mame-<board>), the circle world, RASPPI and -mcpu, and the board-scoped
 # build tree every artifact lands in (host/build/<board>/, the picker's

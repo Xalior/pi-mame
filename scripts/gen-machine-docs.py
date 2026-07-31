@@ -5,6 +5,7 @@ docs/<platform>/<machine>.md pages straight from source, so they can never
 drift: every fact is read fresh, nothing is hand-typed.
 
 Usage: scripts/gen-machine-docs.py <platform>
+       scripts/gen-machine-docs.py all      # every platform in machines.mk
 
 Ground truth (read fresh every run, nothing cached or hand-maintained):
   host/machines.mk        the roster (PLATFORM_MACHINES_<platform>), each
@@ -14,6 +15,9 @@ Ground truth (read fresh every run, nothing cached or hand-maintained):
                            `make -f host/machines.mk print-<VAR>`, the same
                            mechanism scripts/gen-bootmenu.sh uses, so this
                            generator sees exactly what the build sees.
+  host/machines/<m>.conf  each machine's `--rapi-vdisplay` directive, if
+                           any — the TV standard a card must present it on
+                           (see derive_tv_standard below).
   scripts/assets.manifest each asset's tier (free/public) and destination
                            zip path.
   mame-rpi4/<SOURCES>      the platform's MAME driver files: GAME()/COMP()/
@@ -24,15 +28,101 @@ Ground truth (read fresh every run, nothing cached or hand-maintained):
                            just a bare reference to a #define'd macro (the
                            BIOS-root pattern) is expanded one level to
                            produce that shared asset's own table.
+  scripts/platform-docs/<platform>.md
+                           the platform's ONE data file for whatever this
+                           generator cannot derive from the sources above:
+                           hand-authored prose — the platform's intro,
+                           its "Quirks" section, and any per-machine caption
+                           or note that says something a mechanical scan of
+                           ROM/driver facts cannot. See "Platform data file
+                           format" below. One file per platform, the same
+                           shape as one host/machines/<m>.conf per machine —
+                           never a monolithic cross-platform file, never
+                           scattered fragments, and never code (this script
+                           carries no hand-authored prose of its own).
   ../docs/media/<platform> the meta repo's hardware-proof screenshots
-                           (<machine>.jpg), copied into
-                           docs/<platform>/images/ if present.
+                           (<machine>.jpg, plus any <machine>-<slug>.jpg
+                           extra captures a machine_sections body may
+                           reference), copied into docs/<platform>/images/
+                           if present.
 
-Nothing here is platform-specific by name: PLATFORM_SOURCES_<platform> tells
-the generator which driver files to scan, so a later platform (PoC4: sinclair
-/ amstrad / commodore) needs no code change, only its own machines.mk facts
-and driver source to already exist. Re-running regenerates byte-identical
-output from unchanged source — the generator is idempotent.
+Nothing here is platform-specific by name or in code: a new platform needs
+no code change, only its own machines.mk facts, driver source, and a
+platform-docs/<platform>.md (a minimal one carries just `## display` and
+`## intro` — see platform-docs/sega.md). Re-running regenerates
+byte-identical output from unchanged source — the generator is idempotent.
+
+Platform data file format (scripts/platform-docs/<platform>.md):
+  Plain text. A line that is exactly "## <name>" starts a section; its body
+  is everything up to the next such line or EOF (blank-trimmed at the ends,
+  otherwise verbatim). Recognised sections, all but the first two optional:
+
+  ## display            required, one line: the platform's short display
+                         name (e.g. "SAM Coupé").
+  ## intro               required: one or more hand-authored paragraphs
+                         introducing the platform. Wrap lines for
+                         readability if you like — they're rejoined into
+                         one line per paragraph on render, the same
+                         convention every generated paragraph already uses.
+                         Separate paragraphs with a blank line.
+  ## tier_note           overrides the generic "Public-tier only: every
+                         asset this platform needs is a public-tier
+                         (grey-mirror) source" sentence the generator would
+                         otherwise auto-append when every asset in the
+                         roster is public-tier. Use it only when the
+                         platform's real reason carries information the
+                         generic sentence doesn't (e.g. commodore's
+                         contrast with Sinclair's free-tier permission).
+  ## quirks              the platform's "## Quirks" section body, verbatim
+                         markdown (bullets, links, bold, code spans).
+  ## driver_note         overrides the generic "MAME driver: `<file>`."
+                         sentence in every roster machine's Notes section
+                         with this platform-wide sentence instead (used
+                         where the platform's own hardware story is the
+                         more useful fact than which driver file it's in).
+  ## boot_caption_shared and ## boot_caption_own
+                         a matched pair, only meaningful on a platform
+                         where machines either boot through a shared
+                         firmware/BIOS blob or carry their own — same
+                         mechanism uses_shared_bios() already detects.
+                         Each is one sentence with a `{fullname}`
+                         placeholder, used instead of the generic
+                         has-image/no-image caption when both are present.
+  ## machine_captions    one `<machine>: <caption>` line per machine whose
+                         "At power-on" text is more than the generic
+                         boilerplate — what a human actually sees on the
+                         glass. Highest-priority caption source (wins over
+                         boot_caption_shared/own and the generic ones, but
+                         not over a bench PARKED verdict).
+  ## machine_notes       one `<machine>: <note>` line per EXTRA Notes
+                         bullet beyond the generic driver/clone sentences.
+                         A machine may repeat across several lines; each
+                         becomes its own bullet, in file order.
+  ## machine_sections    extra, fully free-form machine sections this
+                         generator has no other slot for — a second capture
+                         showing third-party software running, a deep-dive
+                         explaining one machine's own hardware quirk, code
+                         blocks, whatever the source page carried. Marked by
+                         a `### <machine>: <heading>` sub-header inside this
+                         section's body, followed by the verbatim markdown
+                         to render under "## <heading>" — image markdown
+                         included; any <machine>-*.jpg file present in
+                         docs/media/<platform>/ is copied alongside the
+                         primary capture, so a body may reference
+                         `images/<machine>-<slug>.jpg` directly. A machine
+                         may repeat across several `### ` markers for more
+                         than one extra section, rendered in file order,
+                         after Notes.
+  ## withdrawn           one `<machine>: <banner>` line per machine that is
+                         NOT in this platform's PLATFORM_MACHINES roster
+                         (its driver stays in PLATFORM_SOURCES, its page is
+                         kept "for the record") — machines pulled from the
+                         roster by a policy ruling, not a MAME warning box
+                         (that's the bench PARKED.txt mechanism, unrelated).
+                         The banner renders as a blockquote at the top of
+                         the page; a machine listed here also needs a
+                         machine_captions entry, since these machines did
+                         reach a real screen worth describing.
 """
 
 import re
@@ -43,167 +133,11 @@ from pathlib import Path
 
 SCRIPT_ROOT = Path(__file__).resolve().parent.parent  # public/
 MACHINES_MK = SCRIPT_ROOT / "host" / "machines.mk"
+MACHINE_CONF_DIR = SCRIPT_ROOT / "host" / "machines"
 MANIFEST = SCRIPT_ROOT / "scripts" / "assets.manifest"
 MAME_ROOT = SCRIPT_ROOT / "mame-rpi4"  # RAPI_BOARD default (host/Makefile); one MAME source tree per board, identical drivers
 MEDIA_ROOT = SCRIPT_ROOT.parent / "docs" / "media"  # meta repo's hardware-proof screenshots
-
-PLATFORM_DISPLAY = {
-    "sinclair": "Sinclair",
-    "amstrad": "Amstrad",
-    "commodore": "Commodore",
-    "amiga": "Amiga",
-    "atari": "Atari",
-    "acorn": "Acorn",
-    "eaca": "EACA",
-    "samcoupe": "SAM Coupé",
-    "camputers": "Camputers",
-    "tatung": "Tatung",
-    "memotech": "Memotech",
-    "enterprise": "Enterprise",
-    "sord": "Sord",
-    "vtech": "VTech",
-    "trs": "TRS / Tandy",
-    "sega": "Sega",
-}
-
-# Per-platform README intro paragraph. The machines table, assets tree and
-# shared-asset tables below it are fully generic; this paragraph is the one
-# hand-authored fact block per platform.
-PLATFORM_INTRO = {
-    "amiga": (
-        "The Arcadia Multi Select arcade platform: Arcadia Systems' "
-        "ten-interchangeable-game coin-op cabinet built on Amiga A500 "
-        "hardware (an A500 motherboard driving an external ROM cage through "
-        "the expansion port). Each `make kernel MACHINE=<name>` below bakes "
-        "one machine into its own `kernel8-<name>.img` — see the "
-        "[top-level README](../../README.md) for the build and the regional "
-        "canvas."
-    ),
-    "atari": (
-        "The 8-bit Atari computer line: the 400/800 originals and the "
-        "XL/XE range that followed them (MOS 6502C SALLY + ANTIC/GTIA/POKEY, "
-        "`atari400.cpp` in MAME). Each `make kernel MACHINE=<name>` below "
-        "bakes one machine into its own `kernel8-<name>.img` — see the "
-        "[top-level README](../../README.md) for the build and the regional "
-        "canvas."
-    ),
-    "acorn": (
-        "The Acorn 8-bit line: the BBC Micro family — Model A/B, B+, Master, "
-        "Master Compact and their rehousings (`bbcb`/`bbcbp`/`bbcm`/"
-        "`bbcmc.cpp` in MAME) — plus the Electron (`electron.cpp`) and the "
-        "Atom (`atom.cpp`), all built on the 6502. Each `make kernel "
-        "MACHINE=<name>` below bakes one machine into its own "
-        "`kernel8-<name>.img` — see the [top-level README](../../README.md) "
-        "for the build and the regional canvas."
-    ),
-    "eaca": (
-        "The EACA Colour Genie EG2000 line (`cgenie.cpp` in MAME): EACA's "
-        "1982 Z80 home computer (HD6845 video, AY-3-8910 sound), in its "
-        "European original and New Zealand variants. Each `make kernel "
-        "MACHINE=<name>` below bakes one machine into its own "
-        "`kernel8-<name>.img` — see the [top-level README](../../README.md) "
-        "for the build and the regional canvas."
-    ),
-    "samcoupe": (
-        "The MGT SAM Coupé (`samcoupe.cpp` in MAME): Miles Gordon "
-        "Technology's 1989 Z80 home computer (6 MHz Z80, custom ASIC "
-        "video, SAA1099 sound, two front drive bays). Each `make kernel "
-        "MACHINE=<name>` below bakes one machine into its own "
-        "`kernel8-<name>.img` — see the [top-level README](../../README.md) "
-        "for the build and the regional canvas."
-    ),
-    "camputers": (
-        "The Camputers Lynx line (`camplynx.cpp` in MAME): the British "
-        "1983 Z80A home computer (Motorola 6845 video, one-voice beeper) "
-        "in its 48k original and the 96k/128k models that followed it. "
-        "Each `make kernel MACHINE=<name>` below bakes one machine into "
-        "its own `kernel8-<name>.img` — see the "
-        "[top-level README](../../README.md) for the build and the regional "
-        "canvas."
-    ),
-    "tatung": (
-        "The Tatung Einstein line (`einstein.cpp` in MAME): Tatung's 1984 "
-        "Z80A floppy-CP/M machine, the Einstein TC-01 (TMS9129 video, "
-        "AY-3-8910 sound, built-in 3\" drive), and the 1986 Einstein 256 "
-        "(V9938 video). Each `make kernel MACHINE=<name>` below bakes one "
-        "machine into its own `kernel8-<name>.img` — see the "
-        "[top-level README](../../README.md) for the build and the regional "
-        "canvas."
-    ),
-    "memotech": (
-        "The Memotech MTX line (`mtx.cpp` in MAME): Memotech's 1983 Z80A "
-        "home computers (TMS9929A video, SN76489A sound, aluminium case) — "
-        "the MTX 512, the 32K MTX 500 and the 1984 RS 128 with its "
-        "serial-board Z80DART. Each `make kernel MACHINE=<name>` below "
-        "bakes one machine into its own `kernel8-<name>.img` — see the "
-        "[top-level README](../../README.md) for the build and the regional "
-        "canvas."
-    ),
-    "enterprise": (
-        "The Enterprise line (`ep64.cpp` in MAME): Enterprise Computers' "
-        "1985 Z80A home computer with its NICK video and DAVE sound custom "
-        "chips \u2014 the Enterprise Sixty Four, its German Mephisto PHC 64 OEM "
-        "sibling, and the 1986 Enterprise One Two Eight. Each `make kernel "
-        "MACHINE=<name>` below bakes one machine into its own "
-        "`kernel8-<name>.img` \u2014 see the [top-level README](../../README.md) "
-        "for the build and the regional canvas."
-    ),
-    "sord": (
-        "The Sord m.5 line (`m5.cpp` in MAME): Sord's 1983 Z80A home "
-        "computer (TMS9928A/9929A video, SN76489A sound, twin cartridge "
-        "slots) — the Japanese m.5, the European m.5p and the Czech BRNO "
-        "mod with its WD2797 floppy and RAM disk. Each "
-        "`make kernel MACHINE=<name>` below bakes one machine into its own "
-        "`kernel8-<name>.img` — see the "
-        "[top-level README](../../README.md) for the build and the regional "
-        "canvas."
-    ),
-    "vtech": (
-        "The VTech (Video Technology) range: the Laser/VZ Z80 home "
-        "computers — Laser 110/200/210/310 and the Dick Smith VZ-200/300 "
-        "(`vtech1.cpp` in MAME), the banked-memory Laser 350/500/700 "
-        "(`vtech2.cpp`) — plus the 6502-based CreatiVision console family "
-        "with its Laser 2001/Salora Manager computer siblings "
-        "(`crvision.cpp`), the SPG24X V.Smile and V.Smile Motion consoles "
-        "(`vsmile.cpp`) and the VTech IT Unlimited learning computer "
-        "(`geniusiq.cpp`). Each `make kernel MACHINE=<name>` below bakes "
-        "one machine into its own `kernel8-<name>.img` — see the "
-        "[top-level README](../../README.md) for the build and the regional "
-        "canvas."
-    ),
-    "trs": (
-        "The TRS / Tandy Radio Shack catalog (`src/mame/trs/` in MAME): "
-        "the TRS-80 Model I (`trs80.cpp`) and DT-1 data terminal "
-        "(`trs80dt1.cpp`); the 6809 Color Computer "
-        "family — CoCo 1/2 and its Brazilian/Mexican/Swedish clones "
-        "(`coco12.cpp`), the GIME-based CoCo 3 line (`coco3.cpp`), the "
-        "AgVision/Videotex terminals (`agvision.cpp`) — with its Dragon "
-        "offshoots (`dragon.cpp`, `dgnalpha.cpp`); the 6803 MC-10 and the "
-        "Matra Alice family (`mc10.cpp`); the Polish Meritum I TRS-80 "
-        "clones (`meritum.cpp`); and the Tandy/Memorex VIS CD player "
-        "(`vis.cpp`). Each `make kernel MACHINE=<name>` below bakes one "
-        "machine into its own `kernel8-<name>.img` — see the "
-        "[top-level README](../../README.md) for the build and the regional "
-        "canvas."
-    ),
-    "sega": (
-        "Sega's mid-1980s arcade racing hardware — the boards behind Hang-On "
-        "and Out Run (`segahang.cpp` and `segaorun.cpp` in MAME). They share "
-        "a design: two Motorola 68000 processors, a video board that draws "
-        "the road and the scenery by scaling sprites, and a Z80 with a "
-        "Yamaha FM sound chip for the music. Scaling sprites is how these "
-        "games created a sense of speed and distance years before arcade "
-        "hardware could draw 3D. Some of these machines use an encrypted "
-        "processor, and where they do, the decryption key is a required part "
-        "of the romset — the machine's own page says so. Sega's directory in "
-        "MAME covers a great deal of other hardware as well; the machines "
-        "listed below are the ones brought over so far. Each `make kernel "
-        "MACHINE=<name>` below bakes one machine into its own "
-        "`kernel8-<name>.img` — see the "
-        "[top-level README](../../README.md) for the build and the regional "
-        "canvas."
-    ),
-}
+PLATFORM_DOCS_DIR = SCRIPT_ROOT / "scripts" / "platform-docs"  # one hand-authored data file per platform
 
 SYSTEM_MACROS = r"GAME|GAMEL|COMP|COMPX|COMPB|CONS|CONSX|SYST"
 
@@ -236,6 +170,122 @@ def load_manifest():
         _, name, tier, kind, dest = line.split("|", 4)
         assets[name] = {"tier": tier, "kind": kind, "path": dest}
     return assets
+
+
+def load_manifest_members():
+    """scripts/assets.manifest also carries one 'mem|<asset>|<filename>|
+    <crc32>|<sha1>|<source-name>' line per file inside that asset — the same
+    ground truth scripts/fetch-assets.sh itself fetches by. A romset scanned
+    from PLATFORM_SOURCES only sees systems this platform's own driver files
+    declare; a shared asset backed by a device ROM_START in some other file
+    (sx1541's is in src/devices/bus/cbmiec/c1541.cpp, well outside any
+    platform's own SOURCES) or that is not a MAME romset at all (a disk
+    image, a single cartridge file) has no such entry, so this is the
+    fallback member list for those -> {asset: [(filename, crc32), ...]},
+    skipping members with no CRC (an unverifiable disk image, "-")."""
+    members = {}
+    for line in MANIFEST.read_text().splitlines():
+        if not line.startswith("mem|"):
+            continue
+        parts = line.split("|")
+        if len(parts) < 4:
+            continue
+        _, name, fname, crc = parts[0], parts[1], parts[2], parts[3]
+        if crc and crc != "-":
+            members.setdefault(name, []).append((fname, crc))
+    return members
+
+
+# --- scripts/platform-docs/<platform>.md: the platform's one hand-authored data file ---
+
+def load_platform_data(platform):
+    """Parse the "## <name>" - delimited sections described in this file's
+    own docstring. Returns None if the platform has no data file at all —
+    the caller's cue that this platform's docs are not yet wired up."""
+    path = PLATFORM_DOCS_DIR / f"{platform}.md"
+    if not path.is_file():
+        return None
+    sections, name, body = {}, None, []
+    for line in path.read_text().splitlines():
+        m = re.match(r"^## (\w+)$", line)
+        if m:
+            if name:
+                sections[name] = "\n".join(body).strip("\n")
+            name, body = m.group(1), []
+        else:
+            body.append(line)
+    if name:
+        sections[name] = "\n".join(body).strip("\n")
+    return sections
+
+
+def unwrap_paragraphs(text):
+    """Blank-line-separated paragraphs, each hand-wrapped source line joined
+    into one continuous line — the convention every generated paragraph
+    already uses, so a data file may keep human-readable line wraps."""
+    if not text:
+        return []
+    paras = re.split(r"\n\s*\n", text.strip())
+    return [" ".join(line.strip() for line in p.splitlines() if line.strip())
+            for p in paras if p.strip()]
+
+
+def collapse(text):
+    """Join a hand-wrapped single-paragraph field into one line."""
+    return " ".join((text or "").split())
+
+
+def parse_kv_lines(text):
+    """'<machine>: <text>' lines, PARKED.txt's own convention: split on the
+    FIRST ':' only, so the text itself may contain colons -> {machine: text}.
+    A repeated machine keeps its last line."""
+    out = {}
+    for line in (text or "").splitlines():
+        line = line.strip()
+        if not line or ":" not in line:
+            continue
+        m, v = line.split(":", 1)
+        out[m.strip()] = v.strip()
+    return out
+
+
+def parse_kv_lines_multi(text):
+    """As parse_kv_lines, but a machine may repeat across several lines —
+    each becomes its own list entry, in file order (a machine can carry
+    more than one extra hand-authored Notes bullet)."""
+    out = {}
+    for line in (text or "").splitlines():
+        line = line.strip()
+        if not line or ":" not in line:
+            continue
+        m, v = line.split(":", 1)
+        out.setdefault(m.strip(), []).append(v.strip())
+    return out
+
+
+def parse_machine_sections(text):
+    """'### <machine>: <heading>' sub-markers inside the machine_sections
+    section body, each followed by a verbatim markdown block, up to the
+    next such marker or EOF -> {machine: [(heading, body), ...]}, in file
+    order (a machine may carry more than one extra section)."""
+    out = {}
+    machine = heading = None
+    body = []
+
+    def flush():
+        if machine is not None:
+            out.setdefault(machine, []).append((heading, "\n".join(body).strip("\n")))
+
+    for line in (text or "").splitlines():
+        m = re.match(r"^### (\S+): (.*)$", line)
+        if m:
+            flush()
+            machine, heading = m.group(1), m.group(2)
+            body = []
+        else:
+            body.append(line)
+    flush()
+    return out
 
 
 # --- MAME driver source: balanced-paren macro-call scanner ---
@@ -437,11 +487,23 @@ def uses_shared_bios(name, rom_starts, defines):
     return bool(bare_macro_refs(block, defines))
 
 
-# --- TV standard: derived from the driver, not guessed ---
+# --- TV standard: derived from each machine's own boot conf, not the driver ---
 
-def derive_tv_standard(text):
-    m = re.search(r"m_agnus_id\s*=\s*AGNUS_\w*_(NTSC|PAL)", text)
-    return m.group(1) if m else None
+def tv_standard_for_machine(machine):
+    """host/machines/<machine>.conf carries at most one --rapi-vdisplay=WxH
+    directive. Absent means the machine fills the default 720x576 PAL
+    canvas. 720x480 is the NTSC canvas the region sweep introduced. Any
+    other value is a machine's own native raster (an arcade board's video
+    timing, an LCD panel's own resolution) — not a broadcast TV standard at
+    all, so neither PAL nor NTSC is claimed for it; the caller renders
+    "—" for that case, same as it already does for "no extra assets"."""
+    conf = MACHINE_CONF_DIR / f"{machine}.conf"
+    if not conf.is_file():
+        return "PAL"
+    m = re.search(r"--rapi-vdisplay=(\S+)", conf.read_text())
+    if not m:
+        return "PAL"
+    return "NTSC" if m.group(1) == "720x480" else None
 
 
 # --- rendering helpers ---
@@ -453,14 +515,15 @@ def rom_table_md(entries):
     return "\n".join(lines)
 
 
-def machine_page(platform, machine, facts, rom_starts, defines, driver_text, manifest, images_dir_exists, parked):
-    display = PLATFORM_DISPLAY[platform]
+def machine_page(platform, machine, facts, rom_starts, defines, manifest,
+                  manifest_members, images_dir_exists, parked, pdata, withdrawn):
+    display = pdata["display"]
     sysinfo = facts["systems"].get(machine, {})
     fullname = sysinfo.get("fullname") or machine
     year = sysinfo.get("year")
     company = sysinfo.get("company")
     parent = sysinfo.get("parent")
-    tv = facts["tv_standard"]
+    tv = tv_standard_for_machine(machine)
 
     own_assets = [a for a in facts["machine_assets"][machine] if a != machine]
     own_entries = rom_table(machine, rom_starts, defines)
@@ -468,7 +531,10 @@ def machine_page(platform, machine, facts, rom_starts, defines, driver_text, man
 
     lines = [f"# {fullname}", ""]
 
-    img = MEDIA_ROOT / platform / f"{machine}.jpg"
+    if machine in withdrawn:
+        lines.append(f"> {withdrawn[machine]}")
+        lines.append("")
+
     if images_dir_exists.get(machine):
         lines.append(f"![{fullname} at power-on](images/{machine}.jpg)")
         lines.append("")
@@ -484,23 +550,19 @@ def machine_page(platform, machine, facts, rom_starts, defines, driver_text, man
 
     lines.append("## At power-on")
     lines.append("")
-    if platform == "amiga":
-        # Arcadia-specific boot description — every amiga roster machine is
-        # hardware-proven, so the caption may describe the capture.
-        if shared_bios:
-            caption = (f"`{fullname}` boots via the shared Arcadia System BIOS "
-                       f"into its attract/title sequence — see the capture above.")
-        else:
-            caption = (f"`{fullname}` boots directly from its own Kickstart into "
-                       f"its attract/title sequence (no shared OnePlay/TenPlay BIOS "
-                       f"menu) — see the capture above.")
-    elif machine in parked:
+    caption = pdata["machine_captions"].get(machine)
+    if machine in parked:
         # The bench observed MAME's blocking known-problems box (or another
         # documented stop): the capture shows the stop, and the page says
         # PARKED — a capture is a boot RESULT, never by itself a pass.
         caption = (f"**PARKED** — {parked[machine]} The capture above shows "
                    f"the observed stop; the machine is not offered until the "
                    f"park is lifted by a policy ruling.")
+    elif caption:
+        pass  # a hand-authored caption always wins over the generic ones
+    elif pdata["boot_caption_shared"] and pdata["boot_caption_own"]:
+        template = pdata["boot_caption_shared"] if shared_bios else pdata["boot_caption_own"]
+        caption = template.format(fullname=fullname)
     elif images_dir_exists.get(machine):
         # A hardware-proof capture exists (copied from the meta bench media):
         # the screenshot is the claim, the caption just points at it.
@@ -518,10 +580,16 @@ def machine_page(platform, machine, facts, rom_starts, defines, driver_text, man
 
     lines.append("## Required assets")
     lines.append("")
-    own_path = manifest.get(machine, {}).get("path", f"roms/{machine}.zip")
-    lines.append(f"- `{own_path}`")
-    lines.append("")
-    lines.append(rom_table_md(own_entries))
+    if not own_entries and machine not in manifest:
+        # Genuinely no romset — not a scanning gap (the CPC+ range's
+        # firmware lives entirely on the cartridge asset listed below).
+        lines.append(f"No romset zip: the `{machine}` romset is empty.")
+        lines.append("")
+    else:
+        own_path = manifest.get(machine, {}).get("path", f"roms/{machine}.zip")
+        lines.append(f"- `{own_path}`")
+        lines.append("")
+        lines.append(rom_table_md(own_entries or manifest_members.get(machine, [])))
     for a in own_assets:
         a_sysinfo = facts["systems"].get(a, {})
         a_fullname = a_sysinfo.get("fullname")
@@ -530,13 +598,8 @@ def machine_page(platform, machine, facts, rom_starts, defines, driver_text, man
         lines.append(f"- `{a_path}`{desc}")
     lines.append("")
 
-    if platform == "amiga":
-        notes = [
-            "Arcade coin-op on the Arcadia Multi Select hardware — an Amiga A500 "
-            "motherboard driving an external ROM cage through the expansion port "
-            "(see the driver header in `arsystems.cpp`) — hardware-proven on the "
-            "Pi 4 bench.",
-        ]
+    if pdata["driver_note"]:
+        notes = [pdata["driver_note"]]
     else:
         own_src = facts.get("machine_source", {}).get(machine)
         driver_files = (f"`{Path(own_src).name}`" if own_src else
@@ -546,37 +609,31 @@ def machine_page(platform, machine, facts, rom_starts, defines, driver_text, man
     parent_info = facts["systems"].get(parent, {}) if parent else {}
     if parent and parent != "0" and not parent_info.get("is_bios_root"):
         parent_fullname = parent_info.get("fullname", parent)
-        if platform == "amiga":
-            notes.append(
-                f"MAME clone of `{parent}` ({parent_fullname}) — see the `GAME()` "
-                f"parent field in `arsystems.cpp`. Its own `ROM_START` fully lists "
-                f"every ROM this zip needs; none are borrowed from the parent zip."
-            )
-        else:
-            notes.append(
-                f"MAME clone of `{parent}` ({parent_fullname}) — the system "
-                f"macro's parent field in the driver source. The ROM table "
-                f"above lists every member this machine's own zip needs."
-            )
-    if platform == "amiga" and not shared_bios:
         notes.append(
-            "Plugs directly into the A500 motherboard with its own Kickstart "
-            "copy — no shared OnePlay/TenPlay BIOS selection, unlike the rest "
-            "of the roster (see the driver's comment on `ROM_START( ar_argh )`)."
+            f"MAME clone of `{parent}` ({parent_fullname}) — the system "
+            f"macro's parent field in the driver source. The ROM table "
+            f"above lists every member this machine's own zip needs."
         )
+    notes.extend(pdata["machine_notes"].get(machine, []))
     lines.append("## Notes")
     lines.append("")
     for n in notes:
         lines.append(f"- {n}")
     lines.append("")
 
+    for heading, body in pdata["machine_sections"].get(machine, []):
+        lines.append(f"## {heading}")
+        lines.append("")
+        lines.append(body)
+        lines.append("")
+
     lines.append(f"[← back to {display}](README.md)")
     lines.append("")
     return "\n".join(lines)
 
 
-def readme_page(platform, roster, facts, manifest):
-    display = PLATFORM_DISPLAY[platform]
+def readme_page(platform, roster, facts, manifest, manifest_members, pdata):
+    display = pdata["display"]
     all_assets = set()
     for m in roster:
         all_assets.update(facts["machine_assets"][m])
@@ -584,14 +641,26 @@ def readme_page(platform, roster, facts, manifest):
     public_only = tiers == {"public"}
 
     lines = [f"# {display}", ""]
-    lines.append(PLATFORM_INTRO[platform])
-    if public_only:
+    lines.extend(unwrap_paragraphs(pdata["intro"]))
+    if pdata["tier_note"]:
+        lines.append("")
+        lines.append(collapse(pdata["tier_note"]))
+    elif public_only:
         lines.append("")
         lines.append(
             "Public-tier only: every asset this platform needs is a "
             "public-tier (grey-mirror) source — see [the top-level "
             "README](../../README.md#-fetching-them) for what that means."
         )
+    lines.append("")
+    lines.append(
+        "Prefer a download? Every [tagged release]"
+        "(https://github.com/Xalior/pi-mame/releases/latest) carries a "
+        "ready-to-boot card and a binary per platform — see [Download a "
+        "ready-made image](../../README.md#-download-a-ready-made-image) "
+        "in the top-level README. CI proves every release compiles; the "
+        "table below is the hardware proof, one HDMI capture per machine."
+    )
     lines.append("")
 
     lines.append("## Machines")
@@ -602,11 +671,16 @@ def readme_page(platform, roster, facts, manifest):
         sysinfo = facts["systems"].get(m, {})
         fullname = sysinfo.get("fullname", m)
         year = sysinfo.get("year", "—")
-        own_path = manifest.get(m, {}).get("path", f"roms/{m}.zip")
-        romset = f"`{Path(own_path).name}`"
+        m_has_rom = bool(rom_table(m, facts["rom_starts"], facts["defines"]))
+        if m in manifest:
+            romset = f"`{Path(manifest[m]['path']).name}`"
+        elif m_has_rom:
+            romset = f"`{m}.zip`"
+        else:
+            romset = "— (empty)"
         extra = [a for a in facts["machine_assets"][m] if a != m]
         extra_cell = ", ".join(f"`{Path(manifest.get(a, {}).get('path', a + '.zip')).name}`" for a in extra) or "—"
-        tv = facts["tv_standard"] or "—"
+        tv = tv_standard_for_machine(m) or "—"
         lines.append(f"| `MACHINE={m}` | {fullname} | {year} | {romset} | {extra_cell} | {tv} | [details]({m}.md) |")
     lines.append("")
     lines.append(
@@ -617,36 +691,73 @@ def readme_page(platform, roster, facts, manifest):
 
     lines.append("## Assets")
     lines.append("")
-    lines.append("```")
-    lines.append("my-assets/")
-    lines.append("└── roms/")
+
+    def asset_path(name):
+        return manifest.get(name, {}).get("path", f"roms/{name}.zip")
+
     # Shared assets are the ones no roster machine already lists as its own
     # romset zip: a parent romset doubling as a clone's extra asset (sord's
     # m5.zip under m5p) is already in the tree as its machine's own line and
     # already has its own details page, so it is not repeated here.
     shared = sorted({a for m in roster for a in facts["machine_assets"][m]
                      if a != m} - set(roster))
-    for i, m in enumerate(roster):
-        last = not shared and i == len(roster) - 1
-        lines.append(f"    {'└──' if last else '├──'} {m}.zip")
-    for i, a in enumerate(shared):
-        prefix = "    └──" if i == len(shared) - 1 else "    ├──"
-        lines.append(f"{prefix} {a}.zip")
+    # A roster machine only gets a tree entry if it actually has a
+    # downloadable romset — some don't (the CPC+ range's firmware lives
+    # entirely on a baked cartridge, listed below as that shared asset
+    # instead). Every entry's real destination comes from the manifest, not
+    # an assumed roms/<name>.zip — a cartridge file or an SD-card image
+    # lives elsewhere (carts/, next/), so the tree is grouped by each
+    # asset's actual directory rather than assumed to be one flat roms/.
+    tree_paths = [asset_path(m) for m in roster
+                  if m in manifest or rom_table(m, facts["rom_starts"], facts["defines"])]
+    tree_paths += [asset_path(a) for a in shared]
+    by_dir = {}
+    for path in tree_paths:
+        by_dir.setdefault(str(Path(path).parent), []).append(Path(path).name)
+
+    lines.append("```")
+    lines.append("my-assets/")
+    dirs = list(by_dir.items())
+    for i, (d, files) in enumerate(dirs):
+        last_dir = i == len(dirs) - 1
+        lines.append(f"{'└──' if last_dir else '├──'} {d}/")
+        branch = "    " if last_dir else "│   "
+        for j, f in enumerate(files):
+            last_file = j == len(files) - 1
+            lines.append(f"{branch}{'└──' if last_file else '├──'} {f}")
     lines.append("```")
     lines.append("")
     for a in shared:
+        if manifest.get(a, {}).get("kind") == "image":
+            # A disk/SD-card image, not a MAME romset — no member CRCs
+            # apply (next.img is exactly this: one 2GB card image).
+            continue
         a_sysinfo = facts["systems"].get(a, {})
-        a_fullname = a_sysinfo.get("fullname", a)
-        entries = rom_table(a, facts["rom_starts"], facts["defines"])
-        lines.append(f"`{a}.zip` — {a_fullname}, shared by every machine above:")
+        a_fullname = a_sysinfo.get("fullname")
+        # A shared asset's own ROM_START may live outside this platform's
+        # PLATFORM_SOURCES entirely (sx1541's is a device file under
+        # src/devices/, scanned nowhere) — assets.manifest's own member
+        # list is the same ground truth scripts/fetch-assets.sh fetches by,
+        # so it is the fallback source of truth here.
+        entries = rom_table(a, facts["rom_starts"], facts["defines"]) or manifest_members.get(a, [])
+        label = f"`{Path(asset_path(a)).name}`"
+        desc = f" — {a_fullname}," if a_fullname else ""
+        lines.append(f"{label}{desc} shared by every machine above:")
         lines.append("")
-        lines.append(rom_table_md(entries))
+        if entries:
+            lines.append(rom_table_md(entries))
         lines.append("")
     lines.append(
         "`scripts/fetch-assets.sh` (see the [README](../../README.md#-fetching-them)) "
         "can fetch these for you — `make assets ASSETS=~/my-assets`."
     )
     lines.append("")
+
+    if pdata["quirks"]:
+        lines.append("## Quirks")
+        lines.append("")
+        lines.append(pdata["quirks"])
+        lines.append("")
 
     lines.append(f"[← back to the top-level README](../../README.md)")
     lines.append("")
@@ -655,49 +766,64 @@ def readme_page(platform, roster, facts, manifest):
 
 def main():
     if len(sys.argv) != 2:
-        print("usage: gen-machine-docs.py <platform>", file=sys.stderr)
+        print("usage: gen-machine-docs.py <platform>|all", file=sys.stderr)
         sys.exit(2)
-    platform = sys.argv[1]
-    if platform not in PLATFORM_DISPLAY:
-        print(f"gen-machine-docs.py: unknown platform '{platform}'", file=sys.stderr)
-        sys.exit(2)
-    if platform not in PLATFORM_INTRO:
-        # A platform without generator coverage has hand-maintained pages
-        # (sinclair/amstrad/commodore) — refusing here keeps a stray run from
-        # clobbering them with half-generic output.
-        print(f"gen-machine-docs.py: platform '{platform}' has no PLATFORM_INTRO "
-              f"— its docs are hand-maintained; add an intro to generate them",
+    platform_arg = sys.argv[1]
+
+    manifest = load_manifest()
+    manifest_members = load_manifest_members()
+    platforms = make_list("PLATFORMS") if platform_arg == "all" else [platform_arg]
+
+    exit_code = 0
+    for platform in platforms:
+        exit_code |= generate(platform, manifest, manifest_members)
+    sys.exit(exit_code)
+
+
+def generate(platform, manifest, manifest_members):
+    raw = load_platform_data(platform)
+    if raw is None:
+        print(f"gen-machine-docs.py: no scripts/platform-docs/{platform}.md — "
+              f"write one first (see platform-docs/sega.md for the minimal shape)",
               file=sys.stderr)
-        sys.exit(2)
+        return 2
+    if "display" not in raw or "intro" not in raw:
+        print(f"gen-machine-docs.py: platform-docs/{platform}.md is missing "
+              f"'## display' or '## intro'", file=sys.stderr)
+        return 2
+
+    pdata = {
+        "display": raw["display"].strip(),
+        "intro": raw.get("intro", ""),
+        "tier_note": raw.get("tier_note"),
+        "quirks": raw.get("quirks"),
+        "driver_note": collapse(raw["driver_note"]) if raw.get("driver_note") else None,
+        "boot_caption_shared": collapse(raw["boot_caption_shared"]) if raw.get("boot_caption_shared") else None,
+        "boot_caption_own": collapse(raw["boot_caption_own"]) if raw.get("boot_caption_own") else None,
+        "machine_captions": parse_kv_lines(raw.get("machine_captions")),
+        "machine_notes": parse_kv_lines_multi(raw.get("machine_notes")),
+        "machine_sections": parse_machine_sections(raw.get("machine_sections")),
+        "withdrawn": parse_kv_lines(raw.get("withdrawn")),
+    }
 
     roster = make_list(f"PLATFORM_MACHINES_{platform}")
     if not roster:
         print(f"gen-machine-docs.py: empty roster for platform '{platform}' "
               f"(check PLATFORM_MACHINES_{platform} in host/machines.mk)", file=sys.stderr)
-        sys.exit(2)
+        return 2
+    withdrawn_machines = list(pdata["withdrawn"].keys())
+    all_machines = roster + [m for m in withdrawn_machines if m not in roster]
 
     sources = make_list(f"PLATFORM_SOURCES_{platform}")
     file_texts = {src: strip_disabled_blocks((MAME_ROOT / src).read_text())
                   for src in sources}
     driver_text = "\n".join(file_texts.values())
 
-    manifest = load_manifest()
     defines = parse_defines(driver_text)
     rom_starts = parse_rom_starts(driver_text)
     systems = parse_system_macros(driver_text)
 
-    # The TV standard must come only from the file(s) that actually define
-    # this roster's own machines — PLATFORM_SOURCES can include sibling
-    # driver files for OTHER, non-roster systems on the same platform (e.g.
-    # amiga.cpp's general-purpose Amiga models alongside arsystems.cpp's
-    # arcade boards), and those can hardcode a different region.
-    roster_text = "\n".join(
-        text for text in file_texts.values()
-        if any(re.search(rf"ROM_START\(\s*{re.escape(m)}\s*\)", text) for m in roster)
-    )
-    tv_standard = derive_tv_standard(roster_text)
-
-    machine_assets = {m: make_list(f"MACHINE_ASSETS_{m}") for m in roster}
+    machine_assets = {m: make_list(f"MACHINE_ASSETS_{m}") for m in all_machines}
 
     # Which single source file carries each machine's system macro, so a
     # multi-driver-file platform (the BBC line spans four) can attribute a
@@ -712,7 +838,6 @@ def main():
         "rom_starts": rom_starts,
         "defines": defines,
         "machine_assets": machine_assets,
-        "tv_standard": tv_standard,
         "sources": sources,
         "machine_source": machine_source,
     }
@@ -723,11 +848,21 @@ def main():
     media_dir = MEDIA_ROOT / platform
     if media_dir.is_dir():
         images_dir.mkdir(parents=True, exist_ok=True)
-        for m in roster:
+        for m in all_machines:
             src = media_dir / f"{m}.jpg"
             if src.is_file():
                 shutil.copy2(src, images_dir / f"{m}.jpg")
                 images_dir_exists[m] = True
+            # Any second, non-primary capture for this machine (a
+            # "Booting media" screenshot, a hardware deep-dive's own
+            # picture) that a machine_sections body actually references —
+            # only copied when this machine has such a section, so an
+            # unrelated <machine>-*.jpg sitting in the media store (forensic
+            # capture, abandoned draft) never lands as an unreferenced
+            # orphan in the published output.
+            if m in pdata["machine_sections"]:
+                for extra in media_dir.glob(f"{m}-*.jpg"):
+                    shutil.copy2(extra, images_dir / extra.name)
     # Bench verdicts ride beside the captures: PARKED.txt lists
     # "<machine>: <reason>" lines for machines whose capture shows an
     # observed stop (MAME's blocking known-problems box) rather than the
@@ -744,24 +879,29 @@ def main():
     out_dir.mkdir(parents=True, exist_ok=True)
 
     missing_facts = []
-    for m in roster:
+    for m in all_machines:
         if m not in systems:
             missing_facts.append(f"{m}: no GAME()/COMP()/... entry found")
         if not rom_table(m, rom_starts, defines):
             missing_facts.append(f"{m}: no ROM entries found in its ROM_START")
+    for m in withdrawn_machines:
+        if m not in pdata["machine_captions"]:
+            missing_facts.append(f"{m}: withdrawn but no machine_captions entry "
+                                  f"— it needs a real 'At power-on' description")
 
-    for m in roster:
-        page = machine_page(platform, m, facts, rom_starts, defines, driver_text, manifest, images_dir_exists, parked)
+    for m in all_machines:
+        page = machine_page(platform, m, facts, rom_starts, defines, manifest,
+                             manifest_members, images_dir_exists, parked, pdata,
+                             pdata["withdrawn"])
         (out_dir / f"{m}.md").write_text(page)
 
-    (out_dir / "README.md").write_text(readme_page(platform, roster, facts, manifest))
+    (out_dir / "README.md").write_text(
+        readme_page(platform, roster, facts, manifest, manifest_members, pdata))
 
-    print(f"generated {len(roster) + 1} files under {out_dir}")
-    if not tv_standard:
-        print("gen-machine-docs.py: could not derive a TV standard from the driver "
-              "(m_agnus_id assignment not found) — TV field omitted", file=sys.stderr)
+    print(f"generated {len(all_machines) + 1} files under {out_dir}")
     for w in missing_facts:
         print(f"gen-machine-docs.py: WARNING: {w}", file=sys.stderr)
+    return 0
 
 
 if __name__ == "__main__":
