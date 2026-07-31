@@ -2113,3 +2113,63 @@ mem|hangon|315-5119.bin|a37f00e1|129b10f6cb48e1a1fefd69009380516cf2c677b5|-
 mem|hangon|315-5120.bin|ba5f92ec|74e1fb137ac2ab6dbdad2e8111c27b836e2ff14b|-
 mem|hangon|315-5103.6e|85284c32|45bcc6745b3540777eed02374064d2f853b4fe1f|-
 mem|hangon|315-5121.2a|5dd89643|b94bbed9fca269d198788e0a5e995ce7cbc453d7|-
+
+# Space Harrier (Sega, 1985), Rev A. Copyrighted commercial arcade game:
+# public tier, never free. Self-contained set — sharrier declares PARENT 0.
+# Includes 315-5163a.ic32, the dumped internal program of the board's Intel
+# 8751 protection microcontroller: a required member, not an extra.
+# Unlike its sibling hangon, the 0.250 mirror IS complete for this machine.
+asset|sharrier|public|zip|roms/sharrier.zip
+src|sharrier|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/sharrier.zip
+mem|sharrier|epr-7188a.ic97|45e173c3|cbab555c5053f3e4a3f75ff78c41528e2d9d34c7|-
+mem|sharrier|epr-7184a.ic84|e1934a51|67817a360b3f1f6c2440986272975bd696a38e70|-
+mem|sharrier|epr-7189.ic98|40b1309f|9b050983f043a88f414745d02c912b59bbf1b121|-
+mem|sharrier|epr-7185.ic85|ce78045c|ce640f05bed64ff5b47f1064b5fc13e58bc422a4|-
+mem|sharrier|epr-7190.ic99|f6391091|3160b342b6447cccf67c932c7c1a42354cdfb058|-
+mem|sharrier|epr-7186.ic86|79b367d7|e901036b1b9fac460415d513837c8f852f7750b0|-
+mem|sharrier|epr-7191.ic100|6171e9d3|72f8736f421dc93139859fd47f0c8c3c32b6ff0b|-
+mem|sharrier|epr-7187.ic87|70cb72ef|d1d89bd133b6905f81c25513d852b7e3a05a7312|-
+mem|sharrier|epr-7182.ic54|d7c535b6|c0659a678c0c3776387a4a675016e9a2e9c67ee3|-
+mem|sharrier|epr-7183.ic67|a6153af8|b56ba472e4afb474c7a3f7dc11d7428ebbe1a9c7|-
+mem|sharrier|epr-7196.ic31|347fa325|9076b16de9598b52a75e5084651ee5a220b0e88b|-
+mem|sharrier|epr-7197.ic46|39d98bd1|5aab91bdd08b0f1ea537cd43ccc2e82fd01dd031|-
+mem|sharrier|epr-7198.ic60|3da3ea6b|9a6ce304a14e6ef0be41d867284a63b941f960fb|-
+mem|sharrier|epr-7230.ic36|93e2d264|ca56de13756ab77408506d88f291da1da8134435|-
+mem|sharrier|epr-7222.ic28|edbf5fc3|a93f8c431075741c181eb422b24c9303487ca16c|-
+mem|sharrier|epr-7214.ic18|e8c537d8|c9b3c0f33272c47d32e6aa349d72f7e355468e0e|-
+mem|sharrier|epr-7206.ic8|22844fa4|6d0f177082084c8c92085cd53e1d7ddc62d09a4c|-
+mem|sharrier|epr-7229.ic35|cd6e7500|6f0e42eb28ad3f5df93d8bb39dc41aba66eee144|-
+mem|sharrier|epr-7221.ic27|41f25a9c|bebbd4c4600028205aeff54190b32b664e4710d0|-
+mem|sharrier|epr-7213.ic17|5bb09a67|8bedefd2fa29a1a5e36f1d81c4e9067e3c7f28e9|-
+mem|sharrier|epr-7205.ic7|dcaa2ebf|9cf77bb966859febc5e5f1447cb719db64aa4db4|-
+mem|sharrier|epr-7228.ic34|d5e15e66|2bd81c5c736d725577adf85532de7802bef057f2|-
+mem|sharrier|epr-7220.ic26|ac62ae2e|d472dcc1d9b7889d04870920d5c6e5578597b8dc|-
+mem|sharrier|epr-7212.ic16|9c782295|c1627f3d849d2fdb02a590502bafbe133212b943|-
+mem|sharrier|epr-7204.ic6|3711105c|075197f614786f89bee28ed944371223bc75c9be|-
+mem|sharrier|epr-7227.ic33|60d7c1bb|19ddc1d8f269b50343266d508ad04d4c0fff69d1|-
+mem|sharrier|epr-7219.ic25|f6330038|805d4ed664972c0773c837d62f094858c1804148|-
+mem|sharrier|epr-7211.ic15|60737b98|5e91498bc473f099a1b2887baf980486e922af97|-
+mem|sharrier|epr-7203.ic5|70fb5ebb|38755a9be92865d2c5da8112d8d9c0fe8e778cff|-
+mem|sharrier|epr-7226.ic32|6d7b5c97|94c27e4ef1e197ee136f9399b07520cae00a366f|-
+mem|sharrier|epr-7218.ic24|cebf797c|d3d5aeba1a0e70a322ec86b930814fa8bc744829|-
+mem|sharrier|epr-7210.ic14|24596a8b|f580022c4f7dcaefb7209058c310a329479b5fcd|-
+mem|sharrier|epr-7202.ic4|b537d082|f87a644d9af8477c9eb94e5d3aeb5f6376264418|-
+mem|sharrier|epr-7225.ic31|5e784271|063bd83b7f42dec556a7bdf736cb51456ba7184b|-
+mem|sharrier|epr-7217.ic23|510e5e10|47b9f1bc8df0690c37d1d045bd361f8599e8a903|-
+mem|sharrier|epr-7209.ic13|7a2dad15|227865447027f8669aa0d06d059f3d61da6d59dd|-
+mem|sharrier|epr-7201.ic3|f5ba4e08|443b07c996cbb213fe57dfdd3879c1d4da27c001|-
+mem|sharrier|epr-7224.ic30|ec42c9ef|313d908f3a964529b18e09825552879817a2e159|-
+mem|sharrier|epr-7216.ic22|6d4a7d7a|997ac38e47d84f0166ca3ece50ac5f2d3435d8d3|-
+mem|sharrier|epr-7208.ic12|0f732717|6a19c88d5d52f4ec4adb32c511fed4caae81c65f|-
+mem|sharrier|epr-7200.ic2|fc3bf8f3|d9168b9bce110bfd531410179a107895c641e105|-
+mem|sharrier|epr-7223.ic29|ed51fdc4|a2696b15a0911ac3b6b330b7d8df58ca51d629de|-
+mem|sharrier|epr-7215.ic21|dfe75f3d|ff908419066494bc28cbd6afe72bd30350b20c4b|-
+mem|sharrier|epr-7207.ic11|a2c07741|747c029ab399c4110dbe360b8913f5c2e57c87cc|-
+mem|sharrier|epr-7199.ic1|b191e22f|406c7f4eed0b8fe93fa0bef370e496894f4d46a4|-
+mem|sharrier|epr-7181.ic2|b4740419|8ece2dc85692e32d0ba0b427c260c3d10ac0b7cc|-
+mem|sharrier|epr-7234.ic73|d6397933|b85bb47efb6c113b3676b10ab86f1798a89d45b4|-
+mem|sharrier|epr-7233.ic72|504e76d9|302af9101da01c97ca4be6acd21fb5b8e8f0b7ef|-
+mem|sharrier|epr-7231.ic5|871c6b14|6d04ddc32fdf1db409cb519890821bd10fc9e58b|-
+mem|sharrier|epr-7232.ic6|4b59340c|a01ba8580b65dd17bfd92560265e502d95d3ff16|-
+mem|sharrier|315-5163a.ic32|203dffeb|73801db79756b0ffdd54b298814e3eeb088fe8c2|-
+mem|sharrier|epr-6844.ic123|e3ec7bd6|feec0fe664e16fac0fde61cf64b401b9b0575323|-
