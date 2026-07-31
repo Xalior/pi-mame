@@ -39,6 +39,6 @@
 ## Notes
 
 - Arcade coin-op on the Arcadia Multi Select hardware — an Amiga A500 motherboard driving an external ROM cage through the expansion port (see the driver header in `arsystems.cpp`) — hardware-proven on the Pi 4 bench.
-- MAME clone of `ar_ldrb` (Leader Board Golf (Arcadia, set 1, V 2.5)) — see the `GAME()` parent field in `arsystems.cpp`. Its own `ROM_START` fully lists every ROM this zip needs; none are borrowed from the parent zip.
+- MAME clone of `ar_ldrb` (Leader Board Golf (Arcadia, set 1, V 2.5)) — the system macro's parent field in the driver source. The ROM table above lists every member this machine's own zip needs.
 
 [← back to Amiga](README.md)

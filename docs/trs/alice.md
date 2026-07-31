@@ -5,6 +5,7 @@
 - **`make kernel MACHINE=alice`** — TRS / Tandy
 - **Year**: 1983
 - **Manufacturer**: Matra & Hachette
+- **Television**: NTSC
 
 ## At power-on
 

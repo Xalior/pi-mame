@@ -17,11 +17,13 @@ An FPGA-based Spectrum clone with the TS-Configuration video/DMA extensions, boo
 
   | ROM | CRC32 |
   |---|---|
+  | `ts-bios.rom` | `b060b0d9` |
   | `ts-bios.240728.rom` | `19f8ad7b` |
   | `cram-init.bin` | `8b96ffb7` |
 
 ## Notes
 
+- MAME driver: `tsconf.cpp`.
 - Self-contained: TS-BIOS + CRAM init, no shared parent romset.
 
 [← back to Sinclair](README.md)

@@ -3,6 +3,7 @@
 - **`make kernel MACHINE=dolphinm`** — Acorn
 - **Year**: 1989
 - **Manufacturer**: Hope Computers
+- **Television**: PAL
 
 ## At power-on
 

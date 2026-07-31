@@ -5,6 +5,7 @@
 - **`make kernel MACHINE=tanodr64`** — TRS / Tandy
 - **Year**: 1983
 - **Manufacturer**: Dragon Data Ltd / Tano Ltd
+- **Television**: NTSC
 
 ## At power-on
 

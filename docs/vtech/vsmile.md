@@ -5,6 +5,7 @@
 - **`make kernel MACHINE=vsmile`** — VTech
 - **Year**: 2005
 - **Manufacturer**: VTech
+- **Television**: NTSC
 
 ## At power-on
 

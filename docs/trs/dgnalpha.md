@@ -5,6 +5,7 @@
 - **`make kernel MACHINE=dgnalpha`** — TRS / Tandy
 - **Year**: 1984
 - **Manufacturer**: Dragon Data Ltd
+- **Television**: PAL
 
 ## At power-on
 

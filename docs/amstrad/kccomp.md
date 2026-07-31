@@ -4,7 +4,7 @@
 
 - **`make kernel MACHINE=kccomp`** — Amstrad
 - **Year**: 1989
-- **Manufacturer**: VEB Mikroelektronik "Wilhelm Pieck" Mühlhausen
+- **Manufacturer**: VEB Mikroelektronik \"Wilhelm Pieck\" Mühlhausen
 - **Television**: PAL
 
 ## At power-on
@@ -23,6 +23,8 @@ The East German CPC clone — a cpc464 clone whose reworked firmware carries its
 
 ## Notes
 
+- MAME driver: `amstrad.cpp`.
+- MAME clone of `cpc464` (Amstrad CPC464) — the system macro's parent field in the driver source. The ROM table above lists every member this machine's own zip needs.
 - `farben.rom` is the colour PROM.
 
 [← back to Amstrad](README.md)

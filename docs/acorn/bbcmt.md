@@ -3,6 +3,7 @@
 - **`make kernel MACHINE=bbcmt`** — Acorn
 - **Year**: 1986
 - **Manufacturer**: Acorn Computers
+- **Television**: PAL
 
 ## At power-on
 
@@ -23,6 +24,7 @@ Built into the platform kernel, awaiting hardware verification — no boot captu
   | `mos350.ic24` | `141027b9` |
   | `mos320.cmos` | `c7f9e85a` |
   | `mos350.cmos` | `e84c1854` |
+- `roms/bbcm.zip` — the shared BBC Master 128
 - `roms/saa5050.zip`
 
 ## Notes

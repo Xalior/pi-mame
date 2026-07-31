@@ -5,6 +5,7 @@
 - **`make kernel MACHINE=alice90`** — TRS / Tandy
 - **Year**: 1985
 - **Manufacturer**: Matra & Hachette
+- **Television**: NTSC
 
 ## At power-on
 
@@ -18,6 +19,7 @@
   |---|---|
   | `alice32.rom` | `c3854ddf` |
   | `charset.rom` | `b2f49eb3` |
+- `roms/alice32.zip` — the shared Alice 32
 
 ## Notes
 

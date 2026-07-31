@@ -5,6 +5,7 @@
 - **`make kernel MACHINE=dragon200`** — TRS / Tandy
 - **Year**: 1985
 - **Manufacturer**: Eurohard S.A.
+- **Television**: PAL
 
 ## At power-on
 

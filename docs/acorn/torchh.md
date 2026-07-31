@@ -3,6 +3,7 @@
 - **`make kernel MACHINE=torchh`** — Acorn
 - **Year**: 1983
 - **Manufacturer**: Torch Computers
+- **Television**: PAL
 
 ## At power-on
 

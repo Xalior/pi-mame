@@ -1,19 +1,8 @@
 # Amstrad
 
-The Amstrad CPC family — the classic range, the cartridge-booting Plus
-range and its GX4000 console, and the East German clone — plus two other
-Amstrad-badged machine built on different hardware: the PC1512,
-Amstrad's 8086 IBM PC-compatible. Each
-`make kernel MACHINE=<name>` below bakes one machine into its own
-`kernel8-<name>.img` — see the [top-level README](../../README.md) for the
-build and the regional canvas.
+The Amstrad CPC family — the classic range, the cartridge-booting Plus range and its GX4000 console, and the East German clone — plus another Amstrad-badged machine built on different hardware: the PC1512, Amstrad's 8086 IBM PC-compatible. Each `make kernel MACHINE=<name>` below bakes one machine into its own `kernel8-<name>.img` — see the [top-level README](../../README.md) for the build and the regional canvas.
 
-Prefer a download? Every [tagged release](https://github.com/Xalior/pi-mame/releases/latest)
-ships this platform's ready-to-boot card (free and public tiers) and a
-bare `kernel8-<machine>.img` for each machine below — see the [top-level
-README](../../README.md#-download-a-ready-made-image). CI proves those
-images compile; the table below is the hardware proof, one HDMI capture
-per machine.
+Prefer a download? Every [tagged release](https://github.com/Xalior/pi-mame/releases/latest) carries a ready-to-boot card and a binary per platform — see [Download a ready-made image](../../README.md#-download-a-ready-made-image) in the top-level README. CI proves every release compiles; the table below is the hardware proof, one HDMI capture per machine.
 
 ## Machines
 
@@ -22,38 +11,42 @@ per machine.
 | `MACHINE=cpc464` | Amstrad CPC464 | 1984 | `cpc464.zip` | — | PAL | [details](cpc464.md) |
 | `MACHINE=cpc664` | Amstrad CPC664 | 1985 | `cpc664.zip` | — | PAL | [details](cpc664.md) |
 | `MACHINE=cpc6128` | Amstrad CPC6128 | 1985 | `cpc6128.zip` | — | PAL | [details](cpc6128.md) |
-| `MACHINE=cpc464p` | Amstrad CPC464+ | 1990 | — (empty) | `carts/sysukpd.bin` | PAL | [details](cpc464p.md) |
-| `MACHINE=cpc6128p` | Amstrad CPC6128+ | 1990 | — (empty) | `carts/sysukpd.bin` | PAL | [details](cpc6128p.md) |
-| `MACHINE=gx4000` | Amstrad GX4000 | 1990 | — (empty) | `carts/sysukpd.bin` | PAL | [details](gx4000.md) |
+| `MACHINE=cpc464p` | Amstrad CPC464+ | 1990 | — (empty) | `sysukpd.bin` | PAL | [details](cpc464p.md) |
+| `MACHINE=cpc6128p` | Amstrad CPC6128+ | 1990 | — (empty) | `sysukpd.bin` | PAL | [details](cpc6128p.md) |
+| `MACHINE=gx4000` | Amstrad GX4000 | 1990 | — (empty) | `sysukpd.bin` | PAL | [details](gx4000.md) |
 | `MACHINE=kccomp` | KC Compact | 1989 | `kccomp.zip` | — | PAL | [details](kccomp.md) |
-| `MACHINE=pc1512` | Amstrad PC1512 SD | 1986 | `pc1512.zip` | `pc1512kb.zip` | PAL | [details](pc1512.md) |
+| `MACHINE=pc1512` | PC1512 SD | 1986 | `pc1512.zip` | `pc1512kb.zip` | NTSC | [details](pc1512.md) |
 
-Click through to a machine's details page for its exact romset (CRC32 per
-ROM) and what appears on the glass at power-on. Kernel sizes barely differ
-per machine — every image carries the platform's full driver set, so they
-are all much the same size.
+Click through to a machine's details page for its exact romset (CRC32 per ROM).
 
 ## Assets
 
 ```
 my-assets/
 ├── roms/
-│   ├── cpc464.zip    # Amstrad CPC464 (self-contained: the 32K OS + Locomotive BASIC ROM)
-│   ├── cpc664.zip    # Amstrad CPC664 (self-contained: its own 32K OS + BASIC 1.1 + 16K AMSDOS ROM)
-│   ├── cpc6128.zip   # Amstrad CPC6128 (self-contained: its own 32K OS + BASIC 1.1 + 16K AMSDOS ROM)
-│   ├── kccomp.zip    # KC Compact (self-contained: its own 32K OS + BASIC 1.1 + colour PROM)
-│   ├── pc1512.zip    # Amstrad PC1512 SD (self-contained for its BIOS)
-│   └── pc1512kb.zip  # PC1512's keyboard-controller ROM — a separate MAME device set
+│   ├── cpc464.zip
+│   ├── cpc664.zip
+│   ├── cpc6128.zip
+│   ├── kccomp.zip
+│   ├── pc1512.zip
+│   └── pc1512kb.zip
 └── carts/
-    └── sysukpd.bin   # the CPC+ default cartridge (cpc464p, cpc6128p, gx4000)
-                      #   — Locomotive BASIC + ParaDOS
+    └── sysukpd.bin
 ```
 
-Only supplying some assets is fine: machines without their ROMs simply
-won't run.
+`pc1512kb.zip` shared by every machine above:
 
-`scripts/fetch-assets.sh` (see the [README](../../README.md#-fetching-them))
-can fetch these for you — `make assets ASSETS=~/my-assets`.
+  | ROM | CRC32 |
+  |---|---|
+  | `40042.ic801` | `607edaf6` |
+
+`sysukpd.bin` shared by every machine above:
+
+  | ROM | CRC32 |
+  |---|---|
+  | `sysukpd.bin` | `e9c5e30e` |
+
+`scripts/fetch-assets.sh` (see the [README](../../README.md#-fetching-them)) can fetch these for you — `make assets ASSETS=~/my-assets`.
 
 ## Quirks
 

@@ -5,6 +5,7 @@
 - **`make kernel MACHINE=samcoupe`** — SAM Coupé
 - **Year**: 1989
 - **Manufacturer**: Miles Gordon Technology plc
+- **Television**: PAL
 
 ## At power-on
 

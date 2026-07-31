@@ -3,6 +3,7 @@
 - **`make kernel MACHINE=bbcb_us`** — Acorn
 - **Year**: 1983
 - **Manufacturer**: Acorn Computers
+- **Television**: NTSC
 
 ## At power-on
 

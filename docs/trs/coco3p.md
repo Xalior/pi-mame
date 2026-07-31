@@ -5,6 +5,7 @@
 - **`make kernel MACHINE=coco3p`** — TRS / Tandy
 - **Year**: 1986
 - **Manufacturer**: Tandy Radio Shack
+- **Television**: PAL
 
 ## At power-on
 

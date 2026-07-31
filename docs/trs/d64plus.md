@@ -5,6 +5,7 @@
 - **`make kernel MACHINE=d64plus`** — TRS / Tandy
 - **Year**: 1985
 - **Manufacturer**: Dragon Data Ltd / Compusense
+- **Television**: PAL
 
 ## At power-on
 

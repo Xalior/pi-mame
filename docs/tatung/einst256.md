@@ -5,6 +5,7 @@
 - **`make kernel MACHINE=einst256`** — Tatung
 - **Year**: 1986
 - **Manufacturer**: Tatung
+- **Television**: PAL
 
 ## At power-on
 

@@ -1,6 +1,6 @@
-# Elwro 800-3 Junior
+# 800-3 Junior
 
-![Elwro 800-3 Junior at power-on](images/elwro800.jpg)
+![800-3 Junior at power-on](images/elwro800.jpg)
 
 - **`make kernel MACHINE=elwro800`** — Sinclair
 - **Year**: 1986
@@ -26,6 +26,7 @@ A Polish Spectrum clone built for schools, boots to an `ELWRO 800-3 Junior` bann
 
 ## Notes
 
+- MAME driver: `elwro800.cpp`.
 - Self-contained: BASIC/boot EPROMs + I/O, memory, and TV PROMs.
 
 [← back to Sinclair](README.md)

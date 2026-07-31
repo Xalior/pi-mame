@@ -3,6 +3,7 @@
 - **`make kernel MACHINE=m5p`** — Sord
 - **Year**: 1983
 - **Manufacturer**: Sord
+- **Television**: PAL
 
 ## At power-on
 
@@ -16,7 +17,6 @@
   |---|---|
   | `sordint.ic21` | `78848d39` |
   | `sordfd5.rom` | `7263bbc5` |
-- `roms/m5.zip` — the shared m.5 (Japan)
 
 ## Notes
 

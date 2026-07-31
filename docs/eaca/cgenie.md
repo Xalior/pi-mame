@@ -5,6 +5,7 @@
 - **`make kernel MACHINE=cgenie`** — EACA
 - **Year**: 1982
 - **Manufacturer**: EACA
+- **Television**: PAL
 
 ## At power-on
 

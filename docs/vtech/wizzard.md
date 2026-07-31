@@ -3,6 +3,7 @@
 - **`make kernel MACHINE=wizzard`** — VTech
 - **Year**: 1982
 - **Manufacturer**: Dick Smith Electronics
+- **Television**: PAL
 
 ## At power-on
 
@@ -15,6 +16,7 @@ Built into the platform kernel, awaiting hardware verification — no boot captu
   | ROM | CRC32 |
   |---|---|
   | `crvision.u20` | `c3c590c6` |
+- `roms/crvision.zip` — the shared CreatiVision
 
 ## Notes
 

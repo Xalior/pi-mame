@@ -5,6 +5,7 @@
 - **`make kernel MACHINE=trs80`** — TRS / Tandy
 - **Year**: 1977
 - **Manufacturer**: Tandy Radio Shack
+- **Television**: NTSC
 
 ## At power-on
 

@@ -3,6 +3,7 @@
 - **`make kernel MACHINE=pro128s`** — Acorn
 - **Year**: 1987
 - **Manufacturer**: Olivetti
+- **Television**: PAL
 
 ## At power-on
 

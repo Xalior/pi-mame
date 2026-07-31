@@ -5,6 +5,7 @@
 - **`make kernel MACHINE=manager`** — VTech
 - **Year**: 1983
 - **Manufacturer**: Salora
+- **Television**: PAL
 
 ## At power-on
 

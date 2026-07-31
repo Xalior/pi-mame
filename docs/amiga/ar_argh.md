@@ -47,6 +47,6 @@
 ## Notes
 
 - Arcade coin-op on the Arcadia Multi Select hardware — an Amiga A500 motherboard driving an external ROM cage through the expansion port (see the driver header in `arsystems.cpp`) — hardware-proven on the Pi 4 bench.
-- Plugs directly into the A500 motherboard with its own Kickstart copy — no shared OnePlay/TenPlay BIOS selection, unlike the rest of the roster (see the driver's comment on `ROM_START( ar_argh )`).
+- Plugs directly into the A500 motherboard with its own Kickstart copy — no shared OnePlay/TenPlay BIOS selection, unlike the rest of the roster.
 
 [← back to Amiga](README.md)

@@ -3,6 +3,7 @@
 - **`make kernel MACHINE=phc64`** — Enterprise
 - **Year**: 1985
 - **Manufacturer**: Intelligent Software / Hegener + Glaser
+- **Television**: PAL
 
 ## At power-on
 
@@ -15,6 +16,7 @@
   | ROM | CRC32 |
   |---|---|
   | `9256ds-0038_enter05-23-a.u2` | `d421795f` |
+- `roms/ep64.zip` — the shared Enterprise Sixty Four
 
 ## Notes
 

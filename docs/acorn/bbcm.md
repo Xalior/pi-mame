@@ -3,6 +3,7 @@
 - **`make kernel MACHINE=bbcm`** — Acorn
 - **Year**: 1986
 - **Manufacturer**: Acorn Computers
+- **Television**: PAL
 
 ## At power-on
 

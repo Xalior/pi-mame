@@ -4,6 +4,8 @@ The Arcadia Multi Select arcade platform: Arcadia Systems' ten-interchangeable-g
 
 Public-tier only: every asset this platform needs is a public-tier (grey-mirror) source — see [the top-level README](../../README.md#-fetching-them) for what that means.
 
+Prefer a download? Every [tagged release](https://github.com/Xalior/pi-mame/releases/latest) carries a ready-to-boot card and a binary per platform — see [Download a ready-made image](../../README.md#-download-a-ready-made-image) in the top-level README. CI proves every release compiles; the table below is the hardware proof, one HDMI capture per machine.
+
 ## Machines
 
 | `make kernel` | System | Year | Romset | Extra assets | TV | |

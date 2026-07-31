@@ -5,6 +5,7 @@
 - **`make kernel MACHINE=electron`** — Acorn
 - **Year**: 1983
 - **Manufacturer**: Acorn Computers
+- **Television**: PAL
 
 ## At power-on
 

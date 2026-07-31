@@ -3,10 +3,11 @@
 - **`make kernel MACHINE=m5p_brno`** — Sord
 - **Year**: 1983
 - **Manufacturer**: Sord
+- **Television**: PAL
 
 ## At power-on
 
-**PARKED** — same driver family; additionally its brno_rom12.rom is unsourceable (MAME PR #14491 outpaced public mirrors). The capture above shows the observed stop; the machine is not offered until the park is lifted by a policy ruling.
+**PARKED** — same runtime cartridge refusal as m5 (its brno_rom12.rom gap is CLOSED — sourced from mdk.cab, CRC/SHA1 verified). The capture above shows the observed stop; the machine is not offered until the park is lifted by a policy ruling.
 
 ## Required assets
 

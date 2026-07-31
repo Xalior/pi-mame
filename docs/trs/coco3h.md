@@ -5,6 +5,7 @@
 - **`make kernel MACHINE=coco3h`** — TRS / Tandy
 - **Year**: 19??
 - **Manufacturer**: Tandy Radio Shack
+- **Television**: NTSC
 
 ## At power-on
 
@@ -17,6 +18,7 @@
   | ROM | CRC32 |
   |---|---|
   | `coco3.rom` | `b4c88d6c` |
+- `roms/coco3.zip` — the shared Color Computer 3 (NTSC)
 - `roms/coco_fdc.zip`
 
 ## Notes

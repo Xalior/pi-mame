@@ -3,6 +3,7 @@
 - **`make kernel MACHINE=fnvision`** — VTech
 - **Year**: 1982
 - **Manufacturer**: Video Technology
+- **Television**: PAL
 
 ## At power-on
 

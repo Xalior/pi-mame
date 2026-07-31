@@ -5,6 +5,7 @@
 - **`make kernel MACHINE=laser200`** — VTech
 - **Year**: 1983
 - **Manufacturer**: Video Technology
+- **Television**: PAL
 
 ## At power-on
 
@@ -18,6 +19,7 @@
   |---|---|
   | `vtechv12.u09` | `99412d43` |
   | `vtechv12.u10` | `e4c24e8b` |
+- `roms/laser110.zip` — the shared Laser 110
 
 ## Notes
 

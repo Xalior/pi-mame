@@ -5,6 +5,7 @@
 - **`make kernel MACHINE=meritum1`** — TRS / Tandy
 - **Year**: 1983
 - **Manufacturer**: Mera-Elzab
+- **Television**: PAL
 
 ## At power-on
 

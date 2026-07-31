@@ -3,6 +3,7 @@
 - **`make kernel MACHINE=rameses`** — VTech
 - **Year**: 1982
 - **Manufacturer**: Hanimex
+- **Television**: PAL
 
 ## At power-on
 
@@ -15,6 +16,7 @@ Built into the platform kernel, awaiting hardware verification — no boot captu
   | ROM | CRC32 |
   |---|---|
   | `funboot.rom` | `05602697` |
+- `roms/fnvision.zip` — the shared FunVision
 
 ## Notes
 

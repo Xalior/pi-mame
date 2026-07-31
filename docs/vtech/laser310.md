@@ -5,6 +5,7 @@
 - **`make kernel MACHINE=laser310`** — VTech
 - **Year**: 1984
 - **Manufacturer**: Video Technology
+- **Television**: PAL
 
 ## At power-on
 

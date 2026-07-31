@@ -3,6 +3,7 @@
 - **`make kernel MACHINE=a800pal`** — Atari
 - **Year**: 1979
 - **Manufacturer**: Atari
+- **Television**: PAL
 
 ## At power-on
 

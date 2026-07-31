@@ -5,6 +5,7 @@
 - **`make kernel MACHINE=atom`** — Acorn
 - **Year**: 1979
 - **Manufacturer**: Acorn Computers
+- **Television**: NTSC
 
 ## At power-on
 

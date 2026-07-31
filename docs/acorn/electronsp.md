@@ -3,6 +3,7 @@
 - **`make kernel MACHINE=electronsp`** — Acorn
 - **Year**: 1991
 - **Manufacturer**: Acorn Computers / Slogger
+- **Television**: PAL
 
 ## At power-on
 

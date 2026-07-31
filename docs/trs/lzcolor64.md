@@ -5,6 +5,7 @@
 - **`make kernel MACHINE=lzcolor64`** — TRS / Tandy
 - **Year**: 1983
 - **Manufacturer**: Novo Tempo / LZ Equipamentos
+- **Television**: NTSC
 
 ## At power-on
 

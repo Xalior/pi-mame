@@ -3,6 +3,7 @@
 - **`make kernel MACHINE=a800xlp`** — Atari
 - **Year**: 1983
 - **Manufacturer**: Atari
+- **Television**: PAL
 
 ## At power-on
 
@@ -16,6 +17,7 @@ Built into the platform kernel, awaiting hardware verification — no boot captu
   |---|---|
   | `co60302a.rom` | `f0202fb3` |
   | `co61598b.rom` | `1f9cd270` |
+- `roms/a800xl.zip` — the shared Atari 800XL (NTSC)
 
 ## Notes
 

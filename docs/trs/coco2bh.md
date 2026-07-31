@@ -5,6 +5,7 @@
 - **`make kernel MACHINE=coco2bh`** — TRS / Tandy
 - **Year**: 19??
 - **Manufacturer**: Tandy Radio Shack
+- **Television**: NTSC
 
 ## At power-on
 
@@ -18,7 +19,7 @@
   |---|---|
   | `bas13.rom` | `d8f4d15e` |
   | `extbas11.rom` | `a82a6254` |
-- `roms/coco.zip` — the shared Color Computer 1/2
+- `roms/coco2b.zip` — the shared Color Computer 2B
 - `roms/coco_fdc.zip`
 
 ## Notes

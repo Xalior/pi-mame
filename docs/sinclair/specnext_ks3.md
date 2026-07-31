@@ -1,6 +1,6 @@
-# ZX Spectrum Next, KS3 board (2025 Kickstarter)
+# ZX Spectrum Next: KS3
 
-![ZX Spectrum Next, KS3 board (2025 Kickstarter) at power-on](images/specnext_ks3.jpg)
+![ZX Spectrum Next: KS3 at power-on](images/specnext_ks3.jpg)
 
 - **`make kernel MACHINE=specnext_ks3`** — Sinclair
 - **Year**: 2025
@@ -13,15 +13,18 @@ ZX Spectrum Next / NextZXOS on the KS3 board, booting from its attached SD card 
 
 ## Required assets
 
-- `roms/tbblue.zip` (shared with `tbblue`)
+- `roms/specnext_ks3.zip`
 
   | ROM | CRC32 |
   |---|---|
   | `boot-30204.bin` | `95118eb6` |
-- `next/next.img` — the Next's SD card image, attached as its hard disk
+  | `boot-30204-ab.bin` | `96c32007` |
+- `roms/tbblue.zip` — the shared ZX Spectrum Next: Emulators ID
+- `next/next.img`
 
 ## Notes
 
-- Its own ROM_START, but a trimmed BIOS list naming only files `tbblue.zip` already carries (`boot-30204.bin`, `boot-30204-ab.bin`) — no separate romset.
+- MAME driver: `specnext.cpp`.
+- MAME clone of `tbblue` (ZX Spectrum Next: Emulators ID) — the system macro's parent field in the driver source. The ROM table above lists every member this machine's own zip needs.
 
 [← back to Sinclair](README.md)

@@ -5,6 +5,7 @@
 - **`make kernel MACHINE=tanodr64h`** — TRS / Tandy
 - **Year**: 19??
 - **Manufacturer**: Dragon Data Ltd / Tano Ltd
+- **Television**: NTSC
 
 ## At power-on
 
@@ -18,6 +19,7 @@
   |---|---|
   | `tano_1.ic18` | `84f68bf9` |
   | `tano_2.ic17` | `17893a42` |
+- `roms/tanodr64.zip` — the shared Tano Dragon 64 (NTSC)
 - `roms/sdtandy_fdc.zip`
 
 ## Notes

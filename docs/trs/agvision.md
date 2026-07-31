@@ -5,6 +5,7 @@
 - **`make kernel MACHINE=agvision`** — TRS / Tandy
 - **Year**: 1979
 - **Manufacturer**: Elanco
+- **Television**: NTSC
 
 ## At power-on
 

@@ -3,6 +3,7 @@
 - **`make kernel MACHINE=xegs`** — Atari
 - **Year**: 1987
 - **Manufacturer**: Atari
+- **Television**: NTSC
 
 ## At power-on
 

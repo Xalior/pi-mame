@@ -17,6 +17,7 @@ A Soviet Spectrum clone from the Brest Electromechanical Plant, its Prusak firmw
 
   | ROM | CRC32 |
   |---|---|
+  | `byte.rom` | `c13ba473` |
   | `dd72.bin` | `2464d537` |
   | `dd73.bin` | `bd430288` |
   | `dd71_rt7.bin` | `c91b07c2` |
@@ -27,6 +28,8 @@ A Soviet Spectrum clone from the Brest Electromechanical Plant, its Prusak firmw
 
 ## Notes
 
+- MAME driver: `byte.cpp`.
+- MAME clone of `spectrum` (ZX Spectrum) — the system macro's parent field in the driver source. The ROM table above lists every member this machine's own zip needs.
 - Self-contained: Prusak boot ROMs + the DD66/DD71 and TBD PROMs.
 
 [← back to Sinclair](README.md)

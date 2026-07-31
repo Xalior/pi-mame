@@ -19,9 +19,11 @@ ZX Spectrum 128 startup menu (128 BASIC, Tape Loader, …).
   |---|---|
   | `zx128_0.rom` | `e76799d2` |
   | `zx128_1.rom` | `b96a36be` |
+  | `zx128s0.rom` | `453d86b2` |
+  | `zx128s1.rom` | `6010e796` |
 
 ## Notes
 
-- Its romset is also the shared parent for `pentagon`, `scorpio`, `atmtb2`, and `pentevo` — those four need `spec128.zip` on the card alongside their own zip.
+- MAME driver: `spec128.cpp`.
 
 [← back to Sinclair](README.md)

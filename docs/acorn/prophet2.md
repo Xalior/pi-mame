@@ -3,6 +3,7 @@
 - **`make kernel MACHINE=prophet2`** — Acorn
 - **Year**: 1983
 - **Manufacturer**: Busicomputers
+- **Television**: NTSC
 
 ## At power-on
 

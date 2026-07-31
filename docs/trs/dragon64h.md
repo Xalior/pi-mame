@@ -5,6 +5,7 @@
 - **`make kernel MACHINE=dragon64h`** — TRS / Tandy
 - **Year**: 19??
 - **Manufacturer**: Dragon Data Ltd
+- **Television**: PAL
 
 ## At power-on
 
@@ -18,6 +19,7 @@
   |---|---|
   | `d64_1.rom` | `60a4634c` |
   | `d64_2.rom` | `17893a42` |
+- `roms/dragon64.zip` — the shared Dragon 64
 - `roms/dragon_fdc.zip`
 
 ## Notes

@@ -3,6 +3,7 @@
 - **`make kernel MACHINE=bbcbp`** — Acorn
 - **Year**: 1985
 - **Manufacturer**: Acorn Computers
+- **Television**: PAL
 
 ## At power-on
 

@@ -5,6 +5,7 @@
 - **`make kernel MACHINE=lynx128k`** — Camputers
 - **Year**: 1983
 - **Manufacturer**: Camputers
+- **Television**: PAL
 
 ## At power-on
 

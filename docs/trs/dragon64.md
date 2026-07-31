@@ -5,6 +5,7 @@
 - **`make kernel MACHINE=dragon64`** — TRS / Tandy
 - **Year**: 1983
 - **Manufacturer**: Dragon Data Ltd
+- **Television**: PAL
 
 ## At power-on
 

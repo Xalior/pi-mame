@@ -5,6 +5,7 @@
 - **`make kernel MACHINE=crvision`** — VTech
 - **Year**: 1982
 - **Manufacturer**: Video Technology
+- **Television**: PAL
 
 ## At power-on
 

@@ -5,6 +5,7 @@
 - **`make kernel MACHINE=vis`** — TRS / Tandy
 - **Year**: 1992
 - **Manufacturer**: Tandy/Memorex
+- **Television**: NTSC
 
 ## At power-on
 

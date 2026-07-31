@@ -3,6 +3,7 @@
 - **`make kernel MACHINE=electron64`** — Acorn
 - **Year**: 1987
 - **Manufacturer**: Acorn Computers / Slogger
+- **Television**: PAL
 
 ## At power-on
 

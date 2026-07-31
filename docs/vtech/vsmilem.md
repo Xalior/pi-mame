@@ -3,6 +3,7 @@
 - **`make kernel MACHINE=vsmilem`** — VTech
 - **Year**: 2008
 - **Manufacturer**: VTech
+- **Television**: NTSC
 
 ## At power-on
 

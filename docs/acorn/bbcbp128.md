@@ -3,6 +3,7 @@
 - **`make kernel MACHINE=bbcbp128`** — Acorn
 - **Year**: 1985
 - **Manufacturer**: Acorn Computers
+- **Television**: PAL
 
 ## At power-on
 
@@ -17,6 +18,7 @@ Built into the platform kernel, awaiting hardware verification — no boot captu
   | `bpos2.ic71` | `9f356396` |
   | `ddfs223.rom` | `7891f9b7` |
   | `cm62024.bin` | `98e1bf9e` |
+- `roms/bbcbp.zip` — the shared BBC Micro Model B+ 64K
 - `roms/saa5050.zip`
 
 ## Notes

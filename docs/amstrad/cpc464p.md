@@ -13,16 +13,13 @@ The Plus-range CPC, whose hardware boots from a cartridge: the image bakes `-car
 
 ## Required assets
 
-No romset zip: the `cpc464p` romset is empty — the Plus firmware lives on the cartridge.
+No romset zip: the `cpc464p` romset is empty.
 
-- `carts/sysukpd.bin` — the baked default cartridge, Locomotive BASIC + ParaDOS (MAME softlist entry `sysukpd`: `engpados.bin`, renamed)
-
-  | File | CRC32 |
-  |---|---|
-  | `sysukpd.bin` | `e9c5e30e` |
+- `carts/sysukpd.bin`
 
 ## Notes
 
+- MAME driver: `amstrad.cpp`.
 - Other carts load through MAME's UI at runtime (Scroll Lock → Tab → file manager).
 
 [← back to Amstrad](README.md)

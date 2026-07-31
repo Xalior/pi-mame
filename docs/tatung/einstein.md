@@ -5,6 +5,7 @@
 - **`make kernel MACHINE=einstein`** — Tatung
 - **Year**: 1984
 - **Manufacturer**: Tatung
+- **Television**: PAL
 
 ## At power-on
 

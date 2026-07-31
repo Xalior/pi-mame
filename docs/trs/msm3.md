@@ -5,6 +5,7 @@
 - **`make kernel MACHINE=msm3`** — TRS / Tandy
 - **Year**: 1987
 - **Manufacturer**: ILCE / SEP
+- **Television**: NTSC
 
 ## At power-on
 

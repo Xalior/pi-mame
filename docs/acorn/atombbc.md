@@ -5,6 +5,7 @@
 - **`make kernel MACHINE=atombbc`** — Acorn
 - **Year**: 1982
 - **Manufacturer**: Acorn Computers
+- **Television**: NTSC
 
 ## At power-on
 
