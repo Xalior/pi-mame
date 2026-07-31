@@ -14,6 +14,7 @@ Public-tier only: every asset this platform needs is a public-tier (grey-mirror)
 | `MACHINE=outrunra` | Out Run (sitdown/upright, Rev A) | 1986 | `outrunra.zip` | — | — | [details](outrunra.md) |
 | `MACHINE=outrundx` | Out Run (deluxe sitdown) | 1986 | `outrundx.zip` | — | — | [details](outrundx.md) |
 | `MACHINE=hangon` | Hang-On (Rev A) | 1985 | `hangon.zip` | — | — | [details](hangon.md) |
+| `MACHINE=sharrier` | Space Harrier (Rev A, 8751 315-5163A) | 1985 | `sharrier.zip` | — | — | [details](sharrier.md) |
 
 Click through to a machine's details page for its exact romset (CRC32 per ROM).
 
@@ -27,7 +28,8 @@ my-assets/
     ├── toutrun.zip
     ├── outrunra.zip
     ├── outrundx.zip
-    └── hangon.zip
+    ├── hangon.zip
+    └── sharrier.zip
 ```
 
 `scripts/fetch-assets.sh` (see the [README](../../README.md#-fetching-them)) can fetch these for you — `make assets ASSETS=~/my-assets`.

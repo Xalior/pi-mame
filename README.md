@@ -80,7 +80,7 @@ Prefer building it yourself? See
 
 Delightfully small. Let's be precise about what this actually is:
 
-- **Sixteen platforms, 199 machines.** Each platform is a family of machines
+- **Sixteen platforms, 200 machines.** Each platform is a family of machines
   built on related hardware, sharing a MAME driver lineage and, often, ROMs.
   Every machine on the roster carries a verdict from real hardware: it is
   either proven on the glass with an HDMI capture on its details page, or
@@ -152,7 +152,7 @@ Every machine belongs to one of sixteen platforms:
 | Sord — the m5 | 3 | [docs/sord/](docs/sord/README.md) |
 | VTech — the Laser / VZ family and friends | 24 | [docs/vtech/](docs/vtech/README.md) |
 | TRS — the TRS-80, CoCo, Dragon and MC-10 | 37 | [docs/trs/](docs/trs/README.md) |
-| Sega — the Hang-On and Out Run arcade boards | 6 | [docs/sega/](docs/sega/README.md) |
+| Sega — the Hang-On and Out Run arcade boards | 7 | [docs/sega/](docs/sega/README.md) |
 
 Each platform page carries its own machine table (`make kernel MACHINE=` target,
 system, year, romset, TV region) and a details page per machine covering
