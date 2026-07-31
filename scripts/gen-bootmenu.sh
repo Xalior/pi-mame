@@ -68,5 +68,5 @@ for m in $ROSTER; do
     if [ "$TIER" = free ] && ! machine_is_free "$m"; then
         continue
     fi
-    printf '%s|%s\n' "$m" "$(q "MACHINE_STRING_$m")"
+    printf '%s|%s\n' "$m" "$(q "string-$m")"
 done

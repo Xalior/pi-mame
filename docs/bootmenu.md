@@ -140,9 +140,9 @@ author writes it like a shell command line, with a few fixed rules:
 
 ### Real examples
 
-These are genuine `MACHINE_STRING_*` values from `host/machines.mk`, the
-same strings `scripts/gen-bootmenu.sh` writes into a generated
-`bootmenu.cfg`:
+These are genuine defaults lines from `host/machines/*.conf` (one config
+file per machine), the same strings `scripts/gen-bootmenu.sh` writes into a
+generated `bootmenu.cfg`:
 
 ```
 c64|c64 -iec8 ""

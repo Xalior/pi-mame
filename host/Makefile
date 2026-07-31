@@ -330,19 +330,20 @@ $(PATCH_DEFAULTS): patch-defaults.cpp ../rapi-bootloader/defaultsblock/defaultsb
 # machine is patched from ITS platform's binary ($(TARGET).img, this invocation's
 # platform); a machine belonging to another platform is refused, because its
 # defaults must never be stamped into the wrong vendor's engine.
-$(OBJDIR)/kernel8-%.img: $(TARGET).img $(PATCH_DEFAULTS) machines.mk | $(OBJDIR)
-	@if [ -z "$(MACHINE_STRING_$*)" ]; then \
-		echo "unknown machine '$*' — not in machines.mk MACHINE_STRING_*"; \
-		exit 1; \
-	fi
+# The machine's defaults line lives in machines/<machine>.conf (a prerequisite,
+# so editing a machine's config re-patches its image); print-string-% in
+# machines.mk normalizes it to the one line the block carries. An unknown
+# machine fails on the missing conf prerequisite.
+$(OBJDIR)/kernel8-%.img: $(TARGET).img $(PATCH_DEFAULTS) machines/%.conf machines.mk | $(OBJDIR)
 	@if [ "$(MACHINE_PLATFORM_$*)" != "$(PLATFORM)" ]; then \
 		echo "machine '$*' belongs to platform '$(MACHINE_PLATFORM_$*)', not '$(PLATFORM)'"; \
 		echo "  build it with: make -C host RAPI_BOARD=$(RAPI_BOARD) PLATFORM=$(MACHINE_PLATFORM_$*) $@"; \
 		exit 1; \
 	fi
-	@echo '  PATCH $@ <= [$(MACHINE_STRING_$*)]'
-	@cp $(TARGET).img $@
-	@$(PATCH_DEFAULTS) $@ '$(MACHINE_STRING_$*)'
+	@STR="$$($(MAKE) --no-print-directory -s -f machines.mk print-string-$*)" && \
+	echo "  PATCH $@ <= [$$STR]" && \
+	cp $(TARGET).img $@ && \
+	$(PATCH_DEFAULTS) $@ "$$STR"
 
 # This platform's machines, each patched from this platform's binary. (The top
 # Makefile invokes `machines` once per platform, so the full roster is covered.)
