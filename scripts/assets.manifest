@@ -1312,6 +1312,14 @@ mem|atombbc|afloat.ic21|81d86af7|ebcde5b36cb3a3344567cbba4c7b9fde015f4802|-
 mem|atombbc|mos3.rom|20158bd8|5ee4c0d2b65be72646e17d69b76fb00a0e5298df|-
 mem|atombbc|bbcbasic.rom|79434781|4a7393f3a45ea309f744441c16723e2ef447a281|-
 
+asset|prophet2|public|zip|roms/prophet2.zip
+src|prophet2|zip|https://archive.org/download/mame-roms-split_/MAME%20ROMs%20(split)/prophet2.zip
+src|prophet2|zip|https://archive.org/download/mame-roms-split_/MAME%20ROMs%20(split)/atom.zip
+mem|prophet2|abasic.ic20|289b7791|0072c83458a9690a3ea1f6094f0f38cf8e96a445|-
+mem|prophet2|p2fp.ic21|8be45181|b033e2b0b0690e3e4c1f1ec3036f8d83da619f68|-
+mem|prophet2|a_69ed.rom|006010b7|1e25c451baad92b74e946cb8dd48abfcaed59d91|-
+mem|prophet2|e_61e5.rom|ecd2d08b|d3fe606db1c3372d1e2c62e1143682d33b9fff38|-
+
 asset|bbca|public|zip|roms/bbca.zip
 src|bbca|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/bbcb.zip
 mem|bbca|os12.rom|3c14fc70|0d9bcaf6a393c9ce2359ed700ddb53c232c2c45d|-
@@ -1320,6 +1328,11 @@ mem|bbca|os092.rom|59ef7eb8|dca33995c0d008a527efe923d03333394b01022c|-
 mem|bbca|os01.rom|45ee0980|4b0ece6dc139d5d3f4fabd023716fb6f25149b80|-
 mem|bbca|basic2.rom|79434781|4a7393f3a45ea309f744441c16723e2ef447a281|-
 mem|bbca|basic1.rom|b3364108|890f6e3e7fab3340f75b85e93ff29332bc9ecb2e|-
+
+asset|dolphinm|public|zip|roms/dolphinm.zip
+src|dolphinm|zip|https://archive.org/download/mame-roms-split_/MAME%20ROMs%20(split)/dolphinm.zip
+mem|dolphinm|hope_os_basic.rom|8b30f9e5|0a07161fa2fbc102fb306233bd81790c7b04f793|-
+mem|dolphinm|hope_dfs.rom|5d404973|4c9f7cf141ad028fe5e517c45e6e3a43b1a76d24|-
 
 asset|bbcb|public|zip|roms/bbcb.zip
 src|bbcb|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/bbcb.zip
