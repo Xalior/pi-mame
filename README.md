@@ -49,12 +49,12 @@ tells you which is which.
   zips; it is here for anyone assembling a card by hand or replacing the core
   on one they built. Copy it onto the card as `kernel-<board>.img`, the name
   the picker chain-boots. The board is in this filename for the same reason it
-  is in the zips': all three boards build a file called
+  is in the zips': every board builds a file called
   `kernel8-<platform>.img`, so the release names them apart.
 
-A release does **not** carry a separate download per machine. One image per
-machine would be 193 near-identical files per board, each about 84 MB,
-differing only by a few bytes of baked-in defaults. If you want a card that
+A release does **not** carry a separate download per machine: that would mean
+near-identical files per board, each about 84 MB, differing only by a few
+bytes of baked-in defaults. If you want a card that
 powers straight on into one machine with no picker, build it from the
 published sources with `make kernel MACHINE=<name>` — see
 [Building from source](#-building-from-source-the-long-way).
@@ -67,7 +67,7 @@ machines with a details page each — start at
 [docs/amiga/](docs/amiga/README.md), or see
 [the platform table](#-the-default-images) below.
 
-CI **compiles** every release on a clean Ubuntu runner, all three boards —
+CI **compiles** every release on a clean Ubuntu runner, every board —
 that's what's proven for every asset there. It does not boot-test them:
 hardware proof lives in the platform tables, where every screenshot is an
 HDMI capture from a real Pi (more in
@@ -80,19 +80,19 @@ Prefer building it yourself? See
 
 Delightfully small. Let's be precise about what this actually is:
 
-- **Sixteen platforms, 201 machines.** Each platform is a family of machines
+- **Every platform, every machine.** Each platform is a family of machines
   built on related hardware, sharing a MAME driver lineage and, often, ROMs.
   Every machine on the roster carries a verdict from real hardware: it is
   either proven on the glass with an HDMI capture on its details page, or
   parked with the reason recorded. Parked is a real category and an honest
   one — most parked machines are held by a MAME warnings box the appliance
   has no way to dismiss, not by a broken emulator.
-- **Three boards.** 🥧 Raspberry Pi 3, 4 and 5. MAME is compiled separately
+- **Every board.** 🥧 Raspberry Pi 3, 4 and 5. MAME is compiled separately
   for each — they are Cortex-A53, -A72 and -A76 — so a card is built for one
   board and boots that board only.
-- **Two cores, and silent.** 🔇 The emulation gets a CPU core to itself while
-  another core does nothing but push finished frames to the display, so the
-  two never wait on each other. MAME itself still runs single-threaded
+- **Split cores, and silent.** 🔇 The emulation gets a CPU core to itself while
+  another core does nothing but push finished frames to the display, so they
+  never wait on each other. MAME itself still runs single-threaded
   (`-numprocessors 1`) on its core. There is no sound yet: the shim has a
   working HDMI audio path, but no shipped image connects MAME's output to it,
   and wiring that up is deliberately the next milestone's job.
@@ -113,7 +113,7 @@ fixed-size **defaults string** at offset `0x800` in the image, written before
 boot. "Which machine" is not configuration you edit at runtime — there is no
 CLI and no config files of ours — it's what got stamped into that block. 💾
 
-Three shapes come out of that one binary per platform:
+What comes out of that one binary per platform:
 
 | Image | Powers on into |
 |---|---|
@@ -121,7 +121,7 @@ Three shapes come out of that one binary per platform:
 | `kernel8-<machine>.img` | one machine — the same platform binary with that machine's defaults stamped in (`make kernel MACHINE=<name>`, built locally; not a release download) |
 | the **boot picker** (`make picker`) | a menu of the platform's machines read from `bootmenu.cfg`; a pick patches the platform binary and chain-boots it |
 
-Those `kernel8-*.img` names are the build products. **On a card, two fixed
+Those `kernel8-*.img` names are the build products. **On a card, fixed
 names matter instead**, both carrying the board token so a card is
 self-describing:
 
@@ -133,34 +133,34 @@ self-describing:
 `make sd` and `make card` put them there for you; do the rename by hand only
 if you're dropping a bare kernel onto a card you already built.
 
-Every machine belongs to one of sixteen platforms:
+Every machine belongs to one of these platforms:
 
-| Platform | Machines | Details |
-|---|---|---|
-| Sinclair — the ZX Spectrum family and its clones | 23 | [docs/sinclair/](docs/sinclair/README.md) |
-| Amstrad — the CPC family, the KC Compact, and the PC1512 | 8 | [docs/amstrad/](docs/amstrad/README.md) |
-| Commodore — the C64 line, the VIC-20s, and the TED machines | 29 | [docs/commodore/](docs/commodore/README.md) |
-| Amiga — the Arcadia Multi Select arcade system | 19 | [docs/amiga/](docs/amiga/README.md) |
-| Atari — the 8-bit computer line, 400 through XEGS | 10 | [docs/atari/](docs/atari/README.md) |
-| Acorn — the BBC Micro family, the Electron, and the Atom | 26 | [docs/acorn/](docs/acorn/README.md) |
-| EACA — the Colour Genie | 2 | [docs/eaca/](docs/eaca/README.md) |
-| SAM Coupé — MGT's Spectrum successor | 1 | [docs/samcoupe/](docs/samcoupe/README.md) |
-| Camputers — the Lynx | 3 | [docs/camputers/](docs/camputers/README.md) |
-| Tatung — the Einstein | 2 | [docs/tatung/](docs/tatung/README.md) |
-| Memotech — the MTX line | 3 | [docs/memotech/](docs/memotech/README.md) |
-| Enterprise — the 64 and 128 | 3 | [docs/enterprise/](docs/enterprise/README.md) |
-| Sord — the m5 | 3 | [docs/sord/](docs/sord/README.md) |
-| VTech — the Laser / VZ family and friends | 24 | [docs/vtech/](docs/vtech/README.md) |
-| TRS — the TRS-80, CoCo, Dragon and MC-10 | 37 | [docs/trs/](docs/trs/README.md) |
-| Sega — the Hang-On and Out Run arcade boards | 8 | [docs/sega/](docs/sega/README.md) |
+| Platform | Details |
+|---|---|
+| Sinclair — the ZX Spectrum family and its clones | [docs/sinclair/](docs/sinclair/README.md) |
+| Amstrad — the CPC family, the KC Compact, and the PC1512 | [docs/amstrad/](docs/amstrad/README.md) |
+| Commodore — the C64 line, the VIC-20s, and the TED machines | [docs/commodore/](docs/commodore/README.md) |
+| Amiga — the Arcadia Multi Select arcade system | [docs/amiga/](docs/amiga/README.md) |
+| Atari — the 8-bit computer line, 400 through XEGS | [docs/atari/](docs/atari/README.md) |
+| Acorn — the BBC Micro family, the Electron, and the Atom | [docs/acorn/](docs/acorn/README.md) |
+| EACA — the Colour Genie | [docs/eaca/](docs/eaca/README.md) |
+| SAM Coupé — MGT's Spectrum successor | [docs/samcoupe/](docs/samcoupe/README.md) |
+| Camputers — the Lynx | [docs/camputers/](docs/camputers/README.md) |
+| Tatung — the Einstein | [docs/tatung/](docs/tatung/README.md) |
+| Memotech — the MTX line | [docs/memotech/](docs/memotech/README.md) |
+| Enterprise — the 64 and 128 | [docs/enterprise/](docs/enterprise/README.md) |
+| Sord — the m5 | [docs/sord/](docs/sord/README.md) |
+| VTech — the Laser / VZ family and friends | [docs/vtech/](docs/vtech/README.md) |
+| TRS — the TRS-80, CoCo, Dragon and MC-10 | [docs/trs/](docs/trs/README.md) |
+| Sega — the Hang-On and Out Run arcade boards | [docs/sega/](docs/sega/README.md) |
 
 Each platform page carries its own machine table (`make kernel MACHINE=` target,
 system, year, romset, TV region) and a details page per machine covering
 exactly what appears on the glass at power-on and exactly which assets it
 needs. Every screenshot in those pages is an HDMI capture from a real
 Raspberry Pi running that machine's image — not an emulator window, not a
-mockup. 📸 The four original platforms were captured on a Pi 4; the twelve
-that followed were captured on a Pi 5.
+mockup. 📸 The original platforms were captured on a Pi 4; the ones that
+followed were captured on a Pi 5.
 
 A platform card's menu and the mechanism behind it are documented
 separately: [docs/bootmenu.md](docs/bootmenu.md) covers the boot picker
@@ -174,10 +174,9 @@ image.
 The framebuffer geometry is Raspberry Pi boot configuration
 (`width=`/`height=` in `cmdline.txt`, a documented Circle option), set per
 **region**, not per machine — exactly the contract an 80s home computer had
-with the family television. 📼 Two canvases ship: `cmdline-pal.txt` is the
-720×576 PAL canvas that every PAL machine stretches to fill, and
-`cmdline-ntsc.txt` is the 720×480 NTSC canvas for the American 60Hz
-machines. Every card this release builds uses the PAL canvas, including
+with the family television. 📼 `cmdline-pal.txt` is the 720×576 PAL canvas
+that every PAL machine stretches to fill, and `cmdline-ntsc.txt` is the
+720×480 NTSC canvas for the American 60Hz machines. Every card this release builds uses the PAL canvas, including
 the ones carrying American machines; serving those their own canvas is
 work still to come. The GPU outputs that geometry as the video signal; your display's own
 controller stretches it to the glass. `socmaxtemp=70` in the same file is
@@ -255,8 +254,8 @@ platform pages); leave it off and the tree still builds — you'll just add
 `roms/` (and any platform extras) to the card yourself.
 
 Both targets take `RAPI_BOARD=rpi3|rpi4|rpi5` and build for that board;
-`make dist` fans the whole matrix — every platform, both tiers, all three
-boards — into one zip per combination in `dist/`.
+`make dist` fans the whole matrix — every platform, both tiers, every
+board — into one zip per combination in `dist/`.
 
 Then, concretely: 💾
 
@@ -274,7 +273,7 @@ Then, concretely: 💾
 Every version tag (`v*`) on `main` is built from scratch on a clean Ubuntu
 runner — a stranger test at every release cut: if these published sources
 can't build pi-mame with nothing but the toolchain, the tag goes red. 🚦
-One job per board, three at once, and a break on one board still reports the
+One job per board, all at once, and a break on one board still reports the
 others. CI runs the same `make` targets you would run locally, so the release
 path is the tested path. Each tag's build cuts a GitHub Release whose assets
 are the card zips and the per-platform binaries, so you can grab one and skip
@@ -302,8 +301,8 @@ some assets is fine: machines without their ROMs simply won't run.
 it *shows you where the free soda is* and, on request, fetches it into an
 assets directory you own, verifying every ROM member (CRC32 + SHA1 against
 [`scripts/assets.manifest`](scripts/assets.manifest), whose checksums come
-from MAME's own `ROM_START` definitions) before it installs anything. Two
-tiers, because provenance differs:
+from MAME's own `ROM_START` definitions) before it installs anything. Tiers
+exist because provenance differs:
 
 - **free** — content whose redistribution is properly blessed, fetched from
   a proper upstream: the Sinclair/Amstrad 8-bit ROMs under Amstrad's
@@ -313,8 +312,8 @@ tiers, because provenance differs:
   archive.org. Widely used, not formally blessed; your call whether to
   drink.
 
-Be aware how lopsided that split is: nine assets are free-tier and the rest
-are public. Amstrad's standing permission is the reason the Sinclair and
+Be aware how lopsided that split is: most assets are public-tier, with only
+a handful free. Amstrad's standing permission is the reason the Sinclair and
 Amstrad machines have a free card at all — no comparable blessing exists for
 most other platforms, so their machines are public-tier only. A platform
 whose free menu would be empty simply ships no free card.
@@ -335,8 +334,8 @@ same directory.
 **`next.img` is checksum-exempt.** The ZX Spectrum Next's 2 GB SD image is
 a live filesystem whose contents advance, so it isn't byte-pinned like the
 ROMs: the fetcher downloads a hosted ready-to-boot image, extracts it,
-sanity-checks the size, and installs it as `next/next.img` — see
-[docs/sinclair/tbblue.md](docs/sinclair/tbblue.md).
+sanity-checks the size, and installs it as `media/hard/tbblue/next.img` —
+see [docs/sinclair/tbblue.md](docs/sinclair/tbblue.md).
 
 ## ⌨️ At the keyboard
 
@@ -347,7 +346,7 @@ Spectrum, Left Shift is CAPS SHIFT and Right Shift is SYMBOL SHIFT. 🌈
 
 ## 🚧 Status
 
-Video, input, and media loading are proven on hardware, on all three boards.
+Video, input, and media loading are proven on hardware, on every board.
 The core split is integrated and shipping: MAME emulates on a core of its
 own while another core presents frames. MAME itself remains single-threaded
 (`-numprocessors 1`) on that core. Sound is the notable gap — the audio path

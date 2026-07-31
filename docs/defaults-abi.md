@@ -12,8 +12,9 @@ rule.
 
 The block's layout, magic, and writer contract are **defined and owned by the
 [rapi-bootloader](https://github.com/Xalior/rapi-bootloader) project** — the
-building block that owns the ABI both loaders and the build system write
-through. That is the single source of truth; this page does not restate it:
+building block that owns the ABI every writer, loaders and the build system
+alike, writes through. That is the single source of truth; this page does
+not restate it:
 
 - **[The 0x800 defaults-block ABI](https://github.com/Xalior/rapi-bootloader#the-0x800-defaults-block-abi)**
   — the authoritative field table (`Magic` / `Capacity` / `Length` / `Text` at

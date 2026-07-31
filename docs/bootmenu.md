@@ -39,10 +39,11 @@ the one that does.
 | `roms/`, `next/`, `carts/` | the tier's assets, copied in from the assets directory you supply |
 
 The card ships our own `config.txt`: its `[pi4]` section names
-`pi-mame-boot-rpi4.img` as the kernel the firmware boots. Two vocabularies
-name the board here, and they are not the same word — the `[pi4]` section is
-the Raspberry Pi firmware's board filter (fixed by the firmware), while the
-`rpi4` in the filename is Circle's image-suffix token (also read as "RPi").
+`pi-mame-boot-rpi4.img` as the kernel the firmware boots. The firmware and
+the filename each name the board in their own vocabulary, and the words are
+not the same — the `[pi4]` section is the Raspberry Pi firmware's board
+filter (fixed by the firmware), while the `rpi4` in the filename is Circle's
+image-suffix token (also read as "RPi").
 
 The picker reads `bootmenu.cfg` from `SD:/bootmenu.cfg` and, on a pick,
 loads and patches `SD:/pi-mame-core-rpi4.img` (the MAME core's on-card
