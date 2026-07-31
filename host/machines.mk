@@ -224,7 +224,7 @@ PLATFORM_MACHINES_trs = trs80 trs80dt1 agvision trsvidtx \
 # is a curation decision for later, not a bring-up one. outrun carries flags
 # 0 — no MACHINE_NOT_WORKING, no MACHINE_IMPERFECT_* — and its ROM_START
 # holds no NO_DUMP and no BAD_DUMP member.
-PLATFORM_MACHINES_sega = outrun shangon toutrun
+PLATFORM_MACHINES_sega = outrun shangon toutrun outrunra outrundx
 
 # All machines, every platform — the roster `make kernels` bakes and CI verifies.
 MACHINES = $(foreach p,$(PLATFORMS),$(PLATFORM_MACHINES_$(p)))
@@ -1002,6 +1002,14 @@ MACHINE_ASSETS_vis          = vis
 MACHINE_ASSETS_outrun       = outrun
 MACHINE_ASSETS_shangon      = shangon
 MACHINE_ASSETS_toutrun      = toutrun
+# outrunra/outrundx are true clones of outrun (their GAMEL lines name it as
+# PARENT), but each still lists only its OWN asset. MAME's romof fallback
+# matters to whoever BUILDS a set, not to the card: the zips this project
+# stages and fetch-assets.sh produces are always COMPLETE — the manifest
+# names every ROM_START member, so the parent's zip is a fetch-time source,
+# never a runtime dependency.
+MACHINE_ASSETS_outrunra     = outrunra
+MACHINE_ASSETS_outrundx     = outrundx
 
 # Query helpers. Lets scripts read these facts without pulling in the
 # Circle build.

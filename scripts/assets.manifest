@@ -1962,3 +1962,109 @@ mem|toutrun|opr-12303.68|8384205c|c1f9d52bc587eab5a97867198e9aa7c19e973429|-
 mem|toutrun|opr-12304.69|e1762ac3|855f06c082a17d90857e6efa3cf95b0eda0e634d|-
 mem|toutrun|opr-12305.70|ba9ce677|056781f92450c902e1d279a02bda28337815cba9|-
 mem|toutrun|opr-12306.71|e49249fd|ff36e4dba4e9d3d354e3dd528edeb50ad9c18ee4|-
+
+# Out Run (Sega, 1986), sitdown/upright Rev A. A true clone of outrun (its GAMEL line names outrun as PARENT),
+# so the split-set mirror spreads this set over TWO zips: the clone's own
+# zip holds only what differs, and the rest lives in the parent's. Both are
+# listed as sources and members are located by CRC32 across them, which is
+# how the produced zip ends up complete. Copyrighted commercial arcade game:
+# public tier, never free.
+asset|outrunra|public|zip|roms/outrunra.zip
+src|outrunra|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/outrunra.zip
+src|outrunra|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/outrun.zip
+mem|outrunra|epr-10380a.133|434fadbc|83c861d331e69ef4f2452c313ae4b5ea9d8b7948|-
+mem|outrunra|epr-10382a.118|1ddcc04e|945d207d8d602d7fdb6d25f6b93c9c0b995e8d5a|-
+mem|outrunra|epr-10381a.132|be8c412b|bf3ff05bbf81bdd44567f3b9bb4919ed4a499624|-
+mem|outrunra|epr-10383a.117|dcc586e7|d6e1de6b562359574d94b88ce6101646c506e701|-
+mem|outrunra|epr-10327a.76|e28a5baf|f715bde96c73ed47035acf5a41630fdeb41bb2f9|-
+mem|outrunra|epr-10329a.58|da131c81|57d5219bd0e2fd886217e37e8773fd76be9b40eb|-
+mem|outrunra|epr-10328a.75|d5ec5e5d|a4e3cfca4d803e72bc4fcf91ab00e21bf3f8959f|-
+mem|outrunra|epr-10330a.57|ba9ec82a|2136c9572e26b7ae6de402c0cd53174407cc6018|-
+mem|outrunra|opr-10268.99|95344b04|b3480714b11fc49b449660431f85d4ba92f799ba|-
+mem|outrunra|opr-10232.102|776ba1eb|e3477961d19e694c97643066534a1f720e0c4327|-
+mem|outrunra|opr-10267.100|a85bb823|a7e0143dee5a47e679fd5155e58e717813912692|-
+mem|outrunra|opr-10231.103|8908bcbf|8e1237b640a6f26bdcbfd5e201dadb2687c4febb|-
+mem|outrunra|opr-10266.101|9f6f1a74|09164e858ebeedcff4d389524ddf89e7c216dcae|-
+mem|outrunra|opr-10230.104|686f5e50|03697b892f911177968aa40de6c5f464eb0258e7|-
+mem|outrunra|mpr-10371.9|7cc86208|21320f945f7c8e990c97c9b1232a0f4b6bd00f8f|-
+mem|outrunra|mpr-10373.10|b0d26ac9|3a9ce8547cd43b7b04abddf9a9ab5634e0bbfaba|-
+mem|outrunra|mpr-10375.11|59b60bd7|e5d8c67e020608edd24ba87b7687b2ac2483ee7f|-
+mem|outrunra|mpr-10377.12|17a1b04a|9f7210cb4153ac9029a785dcd4b45f4513a4b008|-
+mem|outrunra|mpr-10372.13|b557078c|a3746a2da077a8df4932348f650a061f413e8430|-
+mem|outrunra|mpr-10374.14|8051e517|9c8509fbed170b4ac74c169da573393e54774f49|-
+mem|outrunra|mpr-10376.15|f3b8f318|a5f2532613f33a64441e0f75443c10ba78dccc6e|-
+mem|outrunra|mpr-10378.16|a1062984|4399030a155caf71f2dec7f75c4b65531ab53576|-
+mem|outrunra|opr-10186.47|22794426|a554d4b68e71861a0d0da4d031b3b811b246f082|-
+mem|outrunra|opr-10185.11|22794426|a554d4b68e71861a0d0da4d031b3b811b246f082|-
+mem|outrunra|epr-10187.88|a10abaa9|01c8a819587a66d2ee4d255656e36fa0904377b0|-
+mem|outrunra|opr-10193.66|bcd10dde|417ce1d7242884640c5b14f4db8ee57cde7d085d|-
+mem|outrunra|opr-10192.67|770f1270|686bdf44d45c1d6002622f6658f037735382f3e0|-
+mem|outrunra|opr-10191.68|20a284ab|7c9027416d4122791ba53782fe2230cf02b7d506|-
+mem|outrunra|opr-10190.69|7cab70e2|a3c581d2b438630d0d4c39481dcfd85681c9f889|-
+mem|outrunra|opr-10189.70|01366b54|f467a6b807694d5832a985f5381c170d24aaee4e|-
+mem|outrunra|opr-10188.71|bad30ad9|f70dd3a6362c314adef313b064102f7a250401c8|-
+
+# Out Run (Sega, 1986), deluxe sitdown. A true clone of outrun (its GAMEL line names outrun as PARENT),
+# so the split-set mirror spreads this set over TWO zips: the clone's own
+# zip holds only what differs, and the rest lives in the parent's. Both are
+# listed as sources and members are located by CRC32 across them, which is
+# how the produced zip ends up complete. Copyrighted commercial arcade game:
+# public tier, never free.
+asset|outrundx|public|zip|roms/outrundx.zip
+src|outrundx|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/outrundx.zip
+src|outrundx|zip|https://archive.org/download/mame-0.250-roms-split_202212/MAME%200.250%20ROMs%20(split)/outrun.zip
+mem|outrundx|epr-10380.133|e339e87a|ac319cdafb156adcf6be29ae1b82d46d3048022e|-
+mem|outrundx|epr-10382.118|65248dd5|4b75526df71bba0d588f47a65790a3d21b236302|-
+mem|outrundx|epr-10381.132|be8c412b|bf3ff05bbf81bdd44567f3b9bb4919ed4a499624|-
+mem|outrundx|epr-10383.117|dcc586e7|d6e1de6b562359574d94b88ce6101646c506e701|-
+mem|outrundx|epr-10327.76|da99d855|77d18092e3c10a400e62eeba562f161398fe37a7|-
+mem|outrundx|epr-10329.58|fe0fa5e2|e63fe5f7950af35131539836f18fa056767c2c80|-
+mem|outrundx|epr-10328.75|3c0e9a7f|0e182fdac70423a85dc2b996c70bcb3954e75e10|-
+mem|outrundx|epr-10330.57|59786e99|834bf361ca67cee3793c324bb26cf0ec82a72068|-
+mem|outrundx|opr-10268.99|95344b04|b3480714b11fc49b449660431f85d4ba92f799ba|-
+mem|outrundx|opr-10232.102|776ba1eb|e3477961d19e694c97643066534a1f720e0c4327|-
+mem|outrundx|opr-10267.100|a85bb823|a7e0143dee5a47e679fd5155e58e717813912692|-
+mem|outrundx|opr-10231.103|8908bcbf|8e1237b640a6f26bdcbfd5e201dadb2687c4febb|-
+mem|outrundx|opr-10266.101|9f6f1a74|09164e858ebeedcff4d389524ddf89e7c216dcae|-
+mem|outrundx|opr-10230.104|686f5e50|03697b892f911177968aa40de6c5f464eb0258e7|-
+mem|outrundx|epr-10194.26|f0eda3bd|173e10a10372d42da81e6eb48c3e23a117638c0c|-
+mem|outrundx|epr-10203.38|8445a622|1187dee7db09a42446fc75872d49936310141eb8|-
+mem|outrundx|epr-10212.52|dee7e731|f09d18f8d8405025b87dd01488ad2098e28410b0|-
+mem|outrundx|epr-10221.66|43431387|a28896e888bc4d4f67babd49003d663c1ceabb71|-
+mem|outrundx|epr-10195.27|0de75cdd|a97faea76aca663ccbbde327f3d1d8ae256649d3|-
+mem|outrundx|epr-10204.39|5f4b5abb|f81637b2eb6a4bde76c43eedfad7e5375594c7bd|-
+mem|outrundx|epr-10213.53|1d1b22f0|d3b1c36d08c4b7b08f9969a521e62eebd5b2238d|-
+mem|outrundx|epr-10222.67|a254c706|e2801a0a7fd5546a48cd53ad7e4743d821d985ff|-
+mem|outrundx|epr-10196.28|8688bb59|0aaa90c5101aa1db00db776a15a0a525587dfc43|-
+mem|outrundx|epr-10205.40|74bd93ca|6a02ea3b977e56cfd61302afa2abf6c2dc766ba7|-
+mem|outrundx|epr-10214.54|57527e18|4cc95c4b741f495e5b9c3b9d4d9ab9a6fded9aeb|-
+mem|outrundx|epr-10223.68|3850690e|0f92743f848edc8deaeeef3afca5f662ceba61e7|-
+mem|outrundx|epr-10197.29|009165a6|987b91e8c5c54bb7c4520b13a72f1f47c34278f4|-
+mem|outrundx|epr-10206.41|954542c5|3c67e3568c04ba083f4aacad2e8857cdd16b3b2f|-
+mem|outrundx|epr-10215.55|69be5a6c|2daac5877a71de04878f231f03361f697552431f|-
+mem|outrundx|epr-10224.69|5cffc346|0481f864bb584c96cd92c260a62c0c1d4030bde8|-
+mem|outrundx|epr-10198.30|d894992e|451469f743a0019b8797d16ba7b26a267d13fe06|-
+mem|outrundx|epr-10207.42|ca61cea4|7c39e2863f5c7be290522acdaf046b1dab7a3542|-
+mem|outrundx|epr-10216.56|d394134d|42f768a9c9eb9f556d197548c35b3a0cd5414734|-
+mem|outrundx|epr-10225.70|0a5d1f2b|43d9c7539b6cebbac3395a4ba71a702300c9e644|-
+mem|outrundx|epr-10199.31|86376af6|971f4b0d9a01ca7ffb50cefbe1ab41b703a4a41a|-
+mem|outrundx|epr-10208.43|6830b7fa|3ece1971a4f025104ebd026da6751caea9aa8a64|-
+mem|outrundx|epr-10217.57|bf2c9b76|248e273255968115a60855b1fffcce1dbeacc3d4|-
+mem|outrundx|epr-10226.71|5a452474|6789a33b55a1693ec9cc196b3ebd220b14169e08|-
+mem|outrundx|epr-10200.32|1e5d4f73|79deddf4461dad5784441c2839894207b7d2ecac|-
+mem|outrundx|epr-10209.44|5c15419e|7b4e9c0cb430afae7f927c0224021add0a627251|-
+mem|outrundx|epr-10218.58|db4bdb39|b4661611b28e7ff1c721565175038cfd1e99d383|-
+mem|outrundx|epr-10227.72|c7def392|fa7d1245eefdc3abb9520118bbb0d025ca62901e|-
+mem|outrundx|epr-10201.33|1d9d4b9c|3264b66c87aa7de4c140450b96adbe3071231d4a|-
+mem|outrundx|epr-10210.45|39422931|8d8a3f4597945c92aebd20c0784180696b6c9c1c|-
+mem|outrundx|epr-10219.59|e73b9224|1904a71a0c18ab2a3a5929e72b1c215dbb0fa213|-
+mem|outrundx|epr-10228.73|25803978|1a18922aeb516e8deb026d52e3cdcc4e69385af5|-
+mem|outrundx|opr-10186.47|22794426|a554d4b68e71861a0d0da4d031b3b811b246f082|-
+mem|outrundx|opr-10185.11|22794426|a554d4b68e71861a0d0da4d031b3b811b246f082|-
+mem|outrundx|epr-10187.88|a10abaa9|01c8a819587a66d2ee4d255656e36fa0904377b0|-
+mem|outrundx|opr-10193.66|bcd10dde|417ce1d7242884640c5b14f4db8ee57cde7d085d|-
+mem|outrundx|opr-10192.67|770f1270|686bdf44d45c1d6002622f6658f037735382f3e0|-
+mem|outrundx|opr-10191.68|20a284ab|7c9027416d4122791ba53782fe2230cf02b7d506|-
+mem|outrundx|opr-10190.69|7cab70e2|a3c581d2b438630d0d4c39481dcfd85681c9f889|-
+mem|outrundx|opr-10189.70|01366b54|f467a6b807694d5832a985f5381c170d24aaee4e|-
+mem|outrundx|opr-10188.71|bad30ad9|f70dd3a6362c314adef313b064102f7a250401c8|-
