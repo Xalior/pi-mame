@@ -182,11 +182,11 @@ work still to come. The GPU outputs that geometry as the video signal; your disp
 controller stretches it to the glass. `socmaxtemp=70` in the same file is
 load-bearing thermal configuration: don't remove it. 🌡️
 
-The same `cmdline.txt` also configures the keyboard layout. Circle defaults to US, but supports UK, German, Spanish, French, Italian and Dvorak. If your keyboard is not US, add `keymap=` to the file:
+The same `cmdline.txt` also configures the keyboard layout. Circle reads this setting at boot and uses a German layout if the name is missing or not recognised. If your keyboard is not US, add `keymap=` to the file:
 
-    keymap=uk
+    keymap=UK
 
-Valid values are: `us` (default), `uk`, `de`, `es`, `fr`, `it`, `dv` (Dvorak). Without the correct layout, keyboard input reads as the wrong characters — arrow keys and number keys become unusable, making the menu hard to navigate.
+Valid values are: `US`, `UK`, `DE`, `ES`, `FR`, `IT` and `DV` (Dvorak). Names are case-sensitive; an unrecognised or lowercase name falls back to German instead. Without the correct layout, keyboard input reads as the wrong characters — arrow keys and number keys become unusable, making the menu hard to navigate.
 
 ## 💾 It remembers
 
