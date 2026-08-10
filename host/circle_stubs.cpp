@@ -255,95 +255,20 @@ int nanosleep(const struct timespec *req, struct timespec *rem)
     return 0;
 }
 
-// ---- SDL2: windows ---------------------------------------------------------
-// (display information, window identity and the software-renderer extras
-// are real implementations in circle-libsdl2 now)
-
-int SDL_GetWindowDisplayMode(SDL_Window *, SDL_DisplayMode *) { return -1; }
-int SDL_SetWindowDisplayMode(SDL_Window *, const SDL_DisplayMode *) { return -1; }
-int SDL_SetWindowFullscreen(SDL_Window *, Uint32) { return -1; }
-void SDL_SetWindowSize(SDL_Window *, int, int) {}
-void SDL_RaiseWindow(SDL_Window *) {}
-void SDL_SetWindowGrab(SDL_Window *, SDL_bool) {}
-SDL_bool SDL_GetWindowWMInfo(SDL_Window *, SDL_SysWMinfo *) { return SDL_FALSE; }
-
-// ---- SDL2: mouse / cursor / touch -------------------------------------------
-
-int SDL_ShowCursor(int) { return SDL_DISABLE; }
-void SDL_SetCursor(SDL_Cursor *) {}
-int SDL_SetRelativeMouseMode(SDL_bool) { return -1; }
-void SDL_WarpMouseInWindow(SDL_Window *, int, int) {}
-int SDL_GetNumTouchDevices(void) { return 0; }
-SDL_TouchID SDL_GetTouchDevice(int) { return 0; }
-
-// ---- SDL2: OpenGL glue -------------------------------------------------------
-
-int SDL_GL_LoadLibrary(const char *) { return -1; }
-void *SDL_GL_GetProcAddress(const char *) { return nullptr; }
-SDL_GLContext SDL_GL_CreateContext(SDL_Window *) { return nullptr; }
-void SDL_GL_DeleteContext(SDL_GLContext) {}
-int SDL_GL_MakeCurrent(SDL_Window *, SDL_GLContext) { return -1; }
-int SDL_GL_SetAttribute(SDL_GLattr, int) { return -1; }
-int SDL_GL_SetSwapInterval(int) { return -1; }
-void SDL_GL_SwapWindow(SDL_Window *) {}
-
-// ---- SDL2: haptic ------------------------------------------------------------
-
-// Joysticks and game controllers are NOT stubbed here: the shim implements
-// both (circle-libsdl2 src/joystick.cpp, src/gamecontroller.cpp). Stubbing a
-// symbol the shim implements is a duplicate-symbol link error — the Makefile
-// links libSDL2 whole (APP_WHOLE_ARCHIVES) for exactly that seatbelt.
-// Haptics the shim leaves unimplemented on purpose — Circle offers rumble,
-// not force feedback — so these fail honestly.
-
-SDL_Haptic *SDL_HapticOpenFromJoystick(SDL_Joystick *) { return nullptr; }
-void SDL_HapticClose(SDL_Haptic *) {}
-
-// ---- SDL2: audio extras --------------------------------------------------------
-
-// SDL_GetDefaultAudioInfo and SDL_GetAudioDeviceSpec are NOT stubbed here:
-// the shim implements them (circle-libsdl2 src/audio.cpp). Historically a
-// stub here silently beat the archive member; the whole-archive link
-// (APP_WHOLE_ARCHIVES in the Makefile) now makes that a loud duplicate-
-// symbol error instead.
-int SDL_GetNumAudioDrivers(void) { return 1; }
-const char *SDL_GetAudioDriver(int) { return "circle"; }
-
-// ---- SDL2: misc -----------------------------------------------------------------
-
-// SDL_free and SDL_RWFromFile are NOT stubbed here: the shim implements both
-// (SDL_RWops arrived with the game-controller mapping database). Their stubs
-// shadowed the shim SILENTLY — the linker never pulled the members, so no
-// error fired; that class is what the whole-archive link now catches.
-
-const char *SDL_GetScancodeName(SDL_Scancode) { return ""; }
-
-SDL_bool SDL_HasClipboardText(void) { return SDL_FALSE; }
-
-char *SDL_GetClipboardText(void)
-{
-    // caller SDL_free()s the result: heap-allocated empty string
-    return static_cast<char *>(calloc(1, 1));
-}
-
-int SDL_SetClipboardText(const char *) { return 0; }
-
-SDL_bool SDL_IntersectRect(const SDL_Rect *A, const SDL_Rect *B, SDL_Rect *result)
-{
-    if (A == nullptr || B == nullptr || result == nullptr)
-        return SDL_FALSE;
-
-    int left   = A->x > B->x ? A->x : B->x;
-    int top    = A->y > B->y ? A->y : B->y;
-    int right  = (A->x + A->w) < (B->x + B->w) ? (A->x + A->w) : (B->x + B->w);
-    int bottom = (A->y + A->h) < (B->y + B->h) ? (A->y + A->h) : (B->y + B->h);
-
-    result->x = left;
-    result->y = top;
-    result->w = right - left;
-    result->h = bottom - top;
-    return (result->w > 0 && result->h > 0) ? SDL_TRUE : SDL_FALSE;
-}
+// ---- SDL2 ------------------------------------------------------------------
+//
+// Nothing of SDL is stubbed here any more. Windows, the mouse and cursor,
+// touch, the OpenGL entry points, haptics, the audio driver list, clipboard,
+// scancode names and rectangle arithmetic are all circle-libsdl2's, and a stub
+// of any of them is a duplicate-symbol error at link time — the library is
+// linked whole (LIBS in the Makefile) for exactly that seatbelt. An object
+// linked straight into the kernel beats an archive member of the same name and
+// does it silently, so without the whole-archive link a stub left here would go
+// on being called and nothing would say so.
+//
+// What remains below is what the library does not implement and never will:
+// OpenGL 1.x itself, which MAME's renderer references and this appliance never
+// uses.
 
 // ---- OpenGL 1.x -----------------------------------------------------------------
 
