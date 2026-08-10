@@ -17,9 +17,16 @@
 //
 //  3. CONSUME the text: DefaultsBuildArgv() verifies magic-at-offset FIRST
 //     (the seatbelt: absent or wrong => the block is ignored and MAME boots
-//     its system list), tokenises the length-bounded text, consumes the
-//     kernel's own --rapi-* switches, and appends the rest (the machine name
-//     and its media) to MAME's argv.
+//     its system list), tokenises the length-bounded text, takes out this
+//     kernel's own switches and every --rapi-* one, and appends the rest
+//     (the machine name and its media) to MAME's argv.
+//
+//     --rapi-* is the LIBRARY's namespace. circle-libsdl2 reads this same
+//     block, at the same offset, and acts on the switches that describe what
+//     IT does — serial key injection, performance reports. Reading the block
+//     twice is the design: those are stripped here because they are not
+//     MAME's arguments and MAME treats an unknown option as fatal, and they
+//     are not interpreted here because the library has already done it.
 //
 #include "defaults.h"
 #include "../rapi-bootloader/defaultsblock/defaultsblock.h"
@@ -60,34 +67,20 @@ TDefaultsBlock _pimame_defaults =
 	{0}			// Text: NUL — appends nothing, MAME's system list
 };
 
-// Kernel flags settable by injected --rapi-* switches
+// Kernel flags settable by injected switches
 int rapi_show_fps = 0;
-int rapi_debug_uart = 0;
-int rapi_perf_interval = 0;   // seconds between the shim's per-core receipts
 int rapi_vdisplay_w = 0;      // the machine's declared virtual display —
 int rapi_vdisplay_h = 0;      // 0x0 means the region canvas (kernel default)
 
 }
 
-// The --rapi-* namespace belongs to the kernel by construction: every such
-// token is consumed here (a typo'd kernel switch must not leak into MAME's
-// CLI parser, which treats an unknown option as a fatal error). Recognised
-// switches set their flag; unrecognised ones are logged and dropped.
+// This kernel's own switches, taken out of the string before MAME sees it (a
+// typo'd switch must not leak into MAME's CLI parser, which treats an unknown
+// option as a fatal error). Recognised switches set their flag; unrecognised
+// ones are logged and dropped.
 static void DispatchKernelSwitch (const char *pSwitch)
 {
-	if (strcmp (pSwitch, "--rapi-fps") == 0)
-	{
-		rapi_show_fps = 1;
-		CLogger::Get ()->Write (From, LogNotice,
-					"--rapi-fps consumed: MAME FPS/speed readout on");
-	}
-	else if (strcmp (pSwitch, "--rapi-debug-uart") == 0)
-	{
-		rapi_debug_uart = 1;
-		CLogger::Get ()->Write (From, LogNotice,
-					"--rapi-debug-uart consumed: serial key injection on");
-	}
-	else if (strncmp (pSwitch, "--rapi-vdisplay=", 16) == 0)
+	if (strncmp (pSwitch, "--virtual-resolution=", 21) == 0)
 	{
 		// The machine's virtual display, WxH — the resolution MAME is
 		// given, a fact about the machine that rides the defaults block
@@ -95,7 +88,7 @@ static void DispatchKernelSwitch (const char *pSwitch)
 		// core scales it to the glass, aspect preserved. Malformed
 		// values are dropped (logged), leaving the region-canvas
 		// default standing.
-		const char *p = pSwitch + 16;
+		const char *p = pSwitch + 21;
 		int w = atoi (p);
 		const char *x = strchr (p, 'x');
 		int h = x ? atoi (x + 1) : 0;
@@ -104,31 +97,35 @@ static void DispatchKernelSwitch (const char *pSwitch)
 			rapi_vdisplay_w = w;
 			rapi_vdisplay_h = h;
 			CLogger::Get ()->Write (From, LogNotice,
-						"--rapi-vdisplay consumed: virtual display %dx%d",
+						"--virtual-resolution consumed: virtual display %dx%d",
 						w, h);
 		}
 		else
 			CLogger::Get ()->Write (From, LogWarning,
-						"--rapi-vdisplay \"%s\" malformed (want WxH), ignored",
+						"--virtual-resolution \"%s\" malformed (want WxH), ignored",
 						p);
 	}
-	else if (strncmp (pSwitch, "--rapi-perf", 11) == 0
-		 && (pSwitch[11] == '\0' || pSwitch[11] == '='))
+	else if (strcmp (pSwitch, "--rapi-fps") == 0)
 	{
-		// The shim reads no boot config for its receipts by design; the
-		// host arms them. Bare switch: a 10-second cadence.
-		rapi_perf_interval = (pSwitch[11] == '=') ? atoi (pSwitch + 12) : 10;
-		if (rapi_perf_interval <= 0)
-			rapi_perf_interval = 10;
+		rapi_show_fps = 1;
 		CLogger::Get ()->Write (From, LogNotice,
-					"--rapi-perf consumed: per-core receipts every %ds",
-					rapi_perf_interval);
+					"--rapi-fps consumed: MAME FPS/speed readout on");
 	}
 	else
 	{
 		CLogger::Get ()->Write (From, LogWarning,
 					"unrecognised kernel switch \"%s\" ignored", pSwitch);
 	}
+}
+
+// Every --rapi- token is the library's to act on, and it has already read
+// this same block for itself. Take them out of MAME's argv and say nothing:
+// two complaints about one token would be worse than none, and the library
+// reports on the ones it recognises.
+static boolean IsLibrarySwitch (const char *pSwitch)
+{
+	return strncmp (pSwitch, "--rapi-", 7) == 0
+	       && strcmp (pSwitch, "--rapi-fps") != 0;
 }
 
 // ---------------------------------------------------------------------------
@@ -240,7 +237,12 @@ int DefaultsBuildArgv (const char **pBaked, unsigned nBaked,
 		}
 		*pWrite = '\0';		// terminate the compacted token
 
-		if (strncmp (pToken, "--rapi-", 7) == 0)
+		if (IsLibrarySwitch (pToken))
+		{
+			nConsumed++;
+		}
+		else if (   strncmp (pToken, "--rapi-", 7) == 0
+			 || strncmp (pToken, "--virtual-resolution", 20) == 0)
 		{
 			DispatchKernelSwitch (pToken);
 			nConsumed++;

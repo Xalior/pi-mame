@@ -39,7 +39,7 @@
 # claim a mode it is not scanning out) and the shim's presentation core
 # scales the picture onto it, aspect preserved. Region is a VIRTUAL
 # resolution now: the kernel declares what MAME renders — the machine's own
-# raster where its defaults string carries --rapi-vdisplay=WxH, the region
+# raster where its defaults string carries --virtual-resolution=WxH, the region
 # canvas (720x576 PAL) otherwise.
 
 set -e

@@ -17,7 +17,7 @@
 #   machines/<machine>.conf       the machine's defaults line, ONE CONFIG FILE
 #                                 PER MACHINE (machine name + its media:
 #                                 -hard1 / -cart; a curated machine also
-#                                 carries its raster as --rapi-vdisplay=WxH —
+#                                 carries its raster as --virtual-resolution=WxH —
 #                                 the virtual display MAME renders 1:1, which
 #                                 the shim's presentation core scales to the
 #                                 glass; absent, the kernel declares the
