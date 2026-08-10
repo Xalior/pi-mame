@@ -62,14 +62,45 @@
 #
 # Requires the Arm GNU aarch64-none-elf toolchain on PATH (see README.md).
 
+# ---------------------------------------------------------------------------
+# Shared build resources.
+#
+# One toolchain, one libc++ checkout, one set of per-board worlds and one build
+# of the shim serve every consumer on a machine that is building several. All
+# four are honoured with ?=, so unset each resolves inside this repository and
+# a fresh clone and CI stay self-contained. Overriding them is a local
+# development convenience and changes nothing about the rule that every repo
+# carries its own nested submodule copy.
+# ---------------------------------------------------------------------------
+
+# Where the Arm GNU cross toolchain lives. The default is this repository's
+# own; a meta checkout carrying one for several projects names that instead.
+export RAPI_TOOLCHAIN_DIR ?= $(CURDIR)/toolchains
+
+# The libc++ sources the board worlds are built from. Named here rather than
+# left to circle-libsdl2's own default so every world on a machine shares a
+# single checkout — one fetch off a small volunteer-run forge instead of one
+# per world per project.
+export CIRCLE_LLVM ?= $(abspath $(CURDIR)/../circle-llvm)
+
+# One build of the shim, and one set of built worlds. A world is a configured,
+# compiled circle-stdlib: newlib and libc++ from source, gigabytes of it, one
+# per board. Unset, both are this repository's own pinned copy, which is what a
+# clone and a CI runner get and the whole point of pinning it.
+export SHIM ?= $(abspath $(CURDIR)/circle-libsdl2)
+export CIRCLE_WORLDS ?= $(SHIM)
+
 # The Arm GNU aarch64-none-elf toolchain: a stranger installs it on PATH
-# (README) and CI does the same, but the meta checkout carries a project-local
-# copy one level up. If the compiler is NOT already on PATH and that local
-# install exists, prepend it — conditionally, same pattern as the sub-Makefiles'
-# keg-only gnu-getopt handling, so CI and stranger builds are untouched and a
-# meta-checkout build needs no manual PATH exports.
+# (README) and CI does the same, but a meta checkout carries a project-local
+# copy. If the compiler is NOT already on PATH and a local install exists,
+# prepend it — conditionally, same pattern as the sub-Makefiles' keg-only
+# gnu-getopt handling, so CI and stranger builds are untouched and a meta
+# checkout needs no manual PATH exports.
 ifeq ($(shell command -v aarch64-none-elf-gcc 2>/dev/null),)
-TOOLCHAIN_BIN := $(firstword $(wildcard ../toolchains/arm-gnu-toolchain-*-aarch64-none-elf/bin))
+TOOLCHAIN_BIN := $(firstword \
+	$(wildcard $(RAPI_TOOLCHAIN_DIR)/arm-gnu-toolchain-*-aarch64-none-elf/bin) \
+	$(wildcard $(RAPI_TOOLCHAIN_DIR)/bin) \
+	$(wildcard ../toolchains/arm-gnu-toolchain-*-aarch64-none-elf/bin))
 ifneq ($(TOOLCHAIN_BIN),)
 export PATH := $(abspath $(TOOLCHAIN_BIN)):$(PATH)
 endif

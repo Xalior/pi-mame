@@ -45,7 +45,7 @@
 #
 # Prerequisite: scripts/build-mame.sh <board> has produced
 # mame-<board>/build/mamedrivers/rapi-circle/, and circle-libsdl2 has built the board's
-# world + libSDL2-<board>.a (make -C ../circle-libsdl2 deps).
+# world + libSDL2-<board>.a (make -C $(SHIM) deps).
 #
 
 # Board selects the circle world, the MAME source tree, and (via mk/cross,
@@ -56,10 +56,27 @@
 RAPI_BOARD ?= rpi4
 export RAPI_BOARD
 
-include ../circle-libsdl2/circle-stdlib-$(RAPI_BOARD)/Config.mk
-include machines.mk
-
 ROOT = ..
+
+# WHERE THE SHIM COMES FROM.
+#
+# Unset, this repository's own pinned copy — what a clone gets and what CI
+# builds. A parent proving one shim across several projects points SHIM at the
+# single checkout it is proving, so the library is built once rather than once
+# per consumer.
+SHIM ?= $(ROOT)/circle-libsdl2
+
+# WHERE THE BUILT WORLDS COME FROM.
+#
+# A world is a configured, compiled circle-stdlib — newlib and libc++ from
+# source, gigabytes of it, one per board. The default is the shim's own, so a
+# clone of this repository alone builds and uses its own and nothing needs
+# setting; a parent keeping ONE set for several consumers points this at them.
+CIRCLE_WORLDS ?= $(SHIM)
+WORLD = $(CIRCLE_WORLDS)/circle-stdlib-$(RAPI_BOARD)
+
+include $(WORLD)/Config.mk
+include machines.mk
 
 # Board-scoped build directory. EVERY artifact this invocation generates —
 # the fixed-name objects (kernel.o, main.o, …), the per-platform driver
@@ -93,7 +110,7 @@ TARGET = $(OBJDIR)/kernel8-$(PLATFORM)
 # No machine is baked: the kernel object is the same for every image and every
 # platform. The defaults receiver (defaults.o) carries the 0x800 block and the
 # entry trampoline the linker script pins. All board-scoped, under $(OBJDIR).
-OBJS = $(addprefix $(OBJDIR)/,main.o kernel.o defaults.o mamemain.o circlefile.o circle_stubs.o xthreading.o)
+OBJS = $(addprefix $(OBJDIR)/,main.o kernel.o defaults.o mamemain.o circlefile.o circle_stubs.o circle_syscalls.o)
 
 STANDARD = -std=gnu++23 -Wno-volatile
 
@@ -132,43 +149,84 @@ MAME_ARCHIVES = \
 	$(filter-out %/libosd_sdl.a %/libocore_sdl.a %/libprecompile.a, \
 		$(wildcard $(MAMEBUILD)/bin/*.a))
 
-# Rules.mk's link recipe already wraps $(LIBS) in --start-group/--end-group,
-# which covers MAME's mutually referential archives. LIBS is also part of
-# the .img rule's prerequisite list: file paths only, defined before Rules.mk.
-# liblibcxx-threading.a is filtered out: xthreading.o provides the complete
-# external-threading ABI (objects always beat archive members), giving MAME
-# hardware threads pinned to cores by pure link substitution — no
-# circle-stdlib change.
+# sdl-app.mk's link recipe wraps $(LIBS) in --start-group/--end-group, which
+# covers MAME's mutually referential archives. LIBS is also where the shim's
+# whole-archive flags ride: sdl-app.mk takes the file subset of this list for
+# the .img rule's prerequisites, so a flag in it is not mistaken for a file.
+#
+# The shim comes in WHOLE. An object linked straight into the kernel beats an
+# archive member of the same name and does it silently, so a circle_stubs.cpp
+# stub left behind after the library implemented the real thing would quietly
+# win and nothing would say so — the SDL_RWFromFile failure mode. Pulling
+# every member in turns that into a duplicate-symbol error at link time.
+#
+# circle-stdlib's liblibcxx-threading.a is NOT filtered here: sdl-app.mk takes
+# it out for every consumer of the library, because the C++ threading runtime
+# is the library's own and valid on every core.
+SHIM_LIB = $(SHIM)/libSDL2-$(RAPI_BOARD).a
+
 LIBS = $(MAME_OBJS) \
 	$(LIBOSD_NOMAIN) \
 	$(LIBOCORE_NOFILE) \
 	$(MAME_ARCHIVES) \
-	$(ROOT)/circle-libsdl2/libSDL2-$(RAPI_BOARD).a \
-	$(CIRCLEHOME)/lib/sound/libsound.a \
-	$(filter-out %/liblibcxx-threading.a,$(CIRCLE_STDLIB_LIBS))
+	--whole-archive $(SHIM_LIB) --no-whole-archive \
+	$(CIRCLE_STDLIB_LIBS)
 
-# The shim links WHOLE (mk/ld/circle-app.mk): every libSDL2 member loads, so
-# a circle_stubs.cpp stub of a symbol the shim implements is a duplicate-
-# symbol error at link time instead of silently shadowing the working
-# implementation — the SDL_RWFromFile failure mode, made impossible.
-APP_WHOLE_ARCHIVES = $(ROOT)/circle-libsdl2/libSDL2-$(RAPI_BOARD).a
+# The platform image carries the patchable-defaults block, so it links with
+# the defaults linker script (trampoline + block pinned at 0x800) rather than
+# the library's own. Everything else about the script — including the TLS
+# adjacency binutils 2.44 and later require — is inherited from the library's.
+SDL_APP_LDSCRIPT = $(CURDIR)/../mk/ld/circle-defaults.ld
 
-# The platform image carries the patchable-defaults block: link with the
-# defaults linker script (trampoline + block pinned at 0x800) and gate every
-# produced image on the 0x800 magic (mk/ld/circle-app.mk).
-APP_LDSCRIPT = ../mk/ld/circle-defaults.ld
-APP_DEFAULTS_BLOCK = 1
+# Two things want a link rule for $(TARGET).img: Circle's Rules.mk and the
+# library's sdl-app.mk, which is the one this build uses. Make warns about the
+# overridden recipe — twice, on every board of every build, reading like a
+# fault when it is not. Pointing TARGET at a name nothing builds while
+# Rules.mk is read attaches its rule there instead, so the image has exactly
+# one recipe and nothing warns.
+SDL_APP_IMAGE := $(TARGET)
+TARGET := $(OBJDIR)/.circle-unused
+
+# The card's read cache, which lives in circle-libsdl2 rather than here. It is
+# no part of SDL and never calls it: it is Circle device-layer code that wraps
+# the card and is found by name, so FatFs and every file MAME opens go through
+# it without knowing.
+#
+# On the line BEFORE Rules.mk because that is where its own fragment says to
+# put it: Rules.mk works out its dependency list from OBJS as it reads it, so a
+# source added afterwards is one make never checks.
+include $(SHIM)/circle-diskcache/diskcache.mk
 
 include $(CIRCLEHOME)/Rules.mk
+TARGET := $(SDL_APP_IMAGE)
 
 # MAME is multicore by design: this kernel must link a multicore-configured
 # circle-stdlib world. circle-libsdl2 owns it (ARM_ALLOW_MULTI_CORE); build it
-# with `make -C ../circle-libsdl2 deps`.
+# with `make -C $(SHIM) deps`.
 ifeq ($(findstring ARM_ALLOW_MULTI_CORE,$(DEFINE)),)
-$(error the payload requires the multicore circle-stdlib world — build it with 'make -C ../circle-libsdl2 deps')
+$(error the payload requires the multicore circle-stdlib world — build it with 'make -C $(SHIM) deps')
 endif
 
-INCLUDE := -I $(ROOT)/circle-libsdl2/include $(CIRCLE_STDLIB_INCLUDES) $(INCLUDE)
+INCLUDE := -I $(SHIM)/include $(CIRCLE_STDLIB_INCLUDES) $(INCLUDE)
+
+# THE CONSOLE, ROUTED OFF MAME's CORE.
+#
+# MAME's files already leave through osd_file (circlefile.cpp over the shim's
+# any-core I/O service), so this build wraps ONE syscall: _write, for
+# descriptors 0 to 2. Those are the serial console rather than files, they are
+# written from MAME's core, and a device may only be touched from core 0 —
+# circle_syscalls.cpp sends them to the library's log instead.
+#
+# --wrap rather than redefinition, because redefinition cannot work here:
+# newlib's glue defines _write beside _open, _read and the rest in a SINGLE
+# object file, so replacing part of that set either collides at link time or
+# leaves the originals linked in beside the replacement with no diagnostic.
+# --wrap renames the references and leaves the vendored glue untouched, and it
+# is what keeps __real__write reachable for every descriptor that is a file.
+#
+# The link is driven by the cross ld directly (Rules.mk sets LD = <prefix>ld),
+# so this is a plain linker option and not a compiler-driver -Wl, one.
+LDFLAGS += --wrap=_write
 
 $(LIBOSD_NOMAIN): $(MAMEBUILD)/bin/libosd_sdl.a | $(OBJDIR)
 	@echo "  AR    $@ (libosd_sdl.a minus sdlmain.o)"
@@ -214,7 +272,7 @@ MAME_INCLUDES = \
 	-I $(MAMESRC)/src/osd/modules/render \
 	-I $(MAMESRC)/3rdparty \
 	-I $(MAMESRC)/src/osd/sdl \
-	-I $(ROOT)/circle-libsdl2/include
+	-I $(SHIM)/include
 
 # The same -Wall + suppression set genie applies to the osd_sdl project (the
 # group that compiled sdlmain.cpp, which mamemain.o replaces). Without these,
@@ -284,7 +342,7 @@ $(DRIVLIST_OBJ): $(DRIVLIST_SRC) | $(OBJDIR)
 		-c -o $@ $<
 
 # Board-scoped compile into $(OBJDIR) for the plain (Circle-env) objects and
-# their deps — kernel.o, main.o, defaults.o, circle_stubs.o, xthreading.o. These
+# their deps — kernel.o, main.o, defaults.o, circle_stubs.o, circle_syscalls.o. These
 # more-specific pattern rules win over Rules.mk's in-place %.o/%.d (GNU make
 # prefers the shortest stem), so nothing lands in the source dir. The MAME-env
 # objects (mamemain.o, circlefile.o, the drivlist) have explicit rules above
@@ -301,8 +359,31 @@ $(OBJDIR):
 
 -include $(DEPS)
 
-# pi-mame link rule: pristine Circle tree, TLS-adjacent linker script.
-include ../mk/ld/circle-app.mk
+# The image link rule, from the library. SDL_APP_LDSCRIPT above hands it this
+# build's own linker script — the library's, with room made at image offset
+# 0x800 for the patchable-defaults block.
+include $(SHIM)/sdl-app.mk
+
+# Stated explicitly because the TARGET swap above attached Rules.mk's own
+# $(TARGET).img rule to a throwaway name, and that rule is the first explicit
+# target make reads here — it would otherwise decide the default goal.
+.DEFAULT_GOAL := image
+
+# The other half of the guarantee the linker script's ASSERTs begin: check the
+# BYTES of the finished image, not just the link. A pre-boot writer refuses to
+# stamp an image whose magic is not at 0x800, so an image that lost it would
+# boot and then quietly ignore everything ever sent to it — the machine name
+# included. Better to have no image than that one.
+.PHONY: image
+image: $(TARGET).img
+	@if [ "`dd if=$(TARGET).img bs=4 skip=512 count=1 2>/dev/null`" = "PM8D" ]; \
+	then \
+		echo "  GATE  $(TARGET).img defaults magic at 0x800: OK"; \
+	else \
+		echo "  GATE  $(TARGET).img: defaults magic ABSENT at 0x800 — image deleted"; \
+		rm -f $(TARGET).img; \
+		exit 1; \
+	fi
 
 # ---------------------------------------------------------------------------
 # Per-machine single-purpose images: one byte-patch of the platform binary.
@@ -325,8 +406,8 @@ $(PATCH_DEFAULTS): patch-defaults.cpp ../rapi-bootloader/defaultsblock/defaultsb
 	@$(HOST_CXX) -std=c++17 -I $(CIRCLEHOME)/include \
 		-o $@ patch-defaults.cpp ../rapi-bootloader/defaultsblock/defaultsblock.cpp
 
-# The explicit kernel8-$(PLATFORM).img rule (Rules.mk + circle-app.mk) wins for
-# the platform binary, so this pattern only ever fires for real machines. Each
+# The explicit kernel8-$(PLATFORM).img rule (sdl-app.mk) wins for the platform
+# binary, so this pattern only ever fires for real machines. Each
 # machine is patched from ITS platform's binary ($(TARGET).img, this invocation's
 # platform); a machine belonging to another platform is refused, because its
 # defaults must never be stamped into the wrong vendor's engine.
