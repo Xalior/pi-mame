@@ -3,8 +3,8 @@
  * patchable-defaults block (docs/pi-mame-poc2.html, shared ABI in
  * boot-picker/defaultsblock.h).
  *
- * Derived from circle-tls.ld (itself from Circle's circle.ld, GPLv3,
- * (C) R. Stange); differs in the .init layout only:
+ * Derived from Circle's circle.ld (GPLv3, (C) R. Stange) by way of the
+ * library's own application script; differs in the .init layout only:
  *
  *   image offset 0x000  four-byte trampoline (`b _start`) — the image
  *                       opens with a branch over the boot furniture
@@ -19,7 +19,7 @@
  * The ASSERTs are the link-time half of the build gate: a kernel that
  * links this script without the trampoline/block objects, or with the
  * block anywhere but 0x800, refuses to link. The image-byte half
- * (magic verified in the produced .img) lives in mk/ld/circle-app.mk.
+ * (magic verified in the produced .img) is host/Makefile's `image` goal.
  */
 
 ENTRY(_pimame_entry)

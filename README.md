@@ -232,9 +232,10 @@ cd pi-mame
 make deps      # circle-stdlib worlds + SDL2 shim (multicore, per board) and the picker's single-core world
 make mame      # the board's ONE shared mamedrivers engine — the long one; logs:
                #   build/mame-build-<board>.log. Default RAPI_BOARD=rpi4; add
-               #   RAPI_BOARD=rpi3|rpi5 to build another board (each in its own
-               #   mame-<board> tree). (genie's final host-style link fails by
-               #   design; the archives are the product and the kernel links itself)
+               #   RAPI_BOARD=rpi3|rpi5 to build another board (all three share
+               #   the mame tree, each with its own mame/build/<board>/).
+               #   (genie's final host-style link fails by design; the archives
+               #   are the product and the kernel links itself)
 make kernels   # every platform binary + every machine's kernel8-<machine>.img
                #   + the boot picker — each platform kernel links the shared
                #   mamedrivers engine with its own drivlist. Each platform's

@@ -395,7 +395,7 @@ PLATFORM_SOURCES_MAMEDRIVERS = $(foreach p,$(PLATFORMS),$(PLATFORM_SOURCES_$(p))
 
 # The subtarget name of that one mamedrivers engine. scripts/build-mame.sh builds it
 # once per board (SUBTARGET=$(MAMEDRIVERS_SUBTARGET), SOURCES=$(PLATFORM_SOURCES_MAMEDRIVERS))
-# into mame-<board>/build/mamedrivers/rapi-circle; genie scopes the driver archive and
+# into mame/build/<board>/rapi-circle; genie scopes the driver archive and
 # generated dir by it (bin/mame_$(MAMEDRIVERS_SUBTARGET)/, generated/mame/$(MAMEDRIVERS_SUBTARGET)/).
 # host/Makefile links that shared engine and swaps in a per-PLATFORM drivlist it
 # generates itself, so each kernel carries only its own platform's machines.

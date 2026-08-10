@@ -20,7 +20,7 @@ Ground truth (read fresh every run, nothing cached or hand-maintained):
                            (see derive_tv_standard below).
   scripts/assets.manifest each asset's tier (free/public) and destination
                            zip path.
-  mame-rpi4/<SOURCES>      the platform's MAME driver files: GAME()/COMP()/
+  mame/<SOURCES>           the platform's MAME driver files: GAME()/COMP()/
                            CONS()/SYST() macro invocations give YEAR,
                            MANUFACTURER and TITLE; ROM_START(<machine>)
                            blocks give the ROM filenames + CRC32 for that
@@ -140,7 +140,7 @@ SCRIPT_ROOT = Path(__file__).resolve().parent.parent  # public/
 MACHINES_MK = SCRIPT_ROOT / "host" / "machines.mk"
 MACHINE_CONF_DIR = SCRIPT_ROOT / "host" / "machines"
 MANIFEST = SCRIPT_ROOT / "scripts" / "assets.manifest"
-MAME_ROOT = SCRIPT_ROOT / "mame-rpi4"  # RAPI_BOARD default (host/Makefile); one MAME source tree per board, identical drivers
+MAME_ROOT = SCRIPT_ROOT / "mame"  # the one MAME source tree; drivers are board-independent
 MEDIA_ROOT = SCRIPT_ROOT.parent / "docs" / "media"  # meta repo's hardware-proof screenshots
 PLATFORM_DOCS_DIR = SCRIPT_ROOT / "scripts" / "platform-docs"  # one hand-authored data file per platform
 

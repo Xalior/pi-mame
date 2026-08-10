@@ -15,15 +15,19 @@
 # linker keeps only that platform's machines and the kernel stays its usual size.
 # One engine + N drivers, not N x full-engine.
 #
-# BOARD IS THE ISOLATION UNIT. Circle's newlib+libc++ sysroot is baked per
-# architecture, so MAME must be compiled once per board (Pi 3/4/5 = cortex-a53/
-# -a72/-a76, RASPPI 3/4/5). Each board builds in its OWN MAME source tree
-# (mame-rpi3 / mame-rpi4 / mame-rpi5) — genie generates into the tree and cannot
-# share one across concurrent builds — so the three boards are fully independent
-# and dispatchable to concurrent CI jobs, one board per runner. Per-board
-# differentiation is entirely in mk/cross's wrapper flags (-mcpu, -DRASPPI) plus
-# the hoisted circle world (circle-libsdl2/circle-stdlib-<board>): nothing
-# board-specific is baked into the MAME source.
+# BOARD IS THE ISOLATION UNIT, BUILDDIR IS HOW IT IS ISOLATED. Circle's
+# newlib+libc++ sysroot is baked per architecture, so MAME must be compiled once
+# per board (Pi 3/4/5 = cortex-a53/-a72/-a76, RASPPI 3/4/5). All three boards
+# share ONE MAME source tree (mame) and keep their artifacts apart under
+# BUILDDIR=build/<board>: genie puts its generated project files, its generated
+# sources and the whole object tree under BUILDDIR, so a board's build reads and
+# writes nothing another board's build owns. Per-board differentiation is
+# entirely in mk/cross's wrapper flags (-mcpu, -DRASPPI) plus the circle world
+# (circle-libsdl2/circle-stdlib-<board>): nothing board-specific is baked into
+# the MAME source.
+#
+# Two boards building AT THE SAME TIME in this tree is untested. Build them one
+# after another.
 
 set -e
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -47,9 +51,9 @@ esac
 # mk/cross's wrappers read RAPI_BOARD to pick RASPPI, -mcpu and the circle world.
 export RAPI_BOARD="$BOARD"
 
-MAMETREE="$ROOT/mame-$BOARD"
-[ -d "$MAMETREE" ] || {
-    echo "build-mame.sh: MAME tree '$MAMETREE' not checked out (git submodule update --init $MAMETREE)" >&2
+MAMETREE="$ROOT/mame"
+[ -d "$MAMETREE/src" ] || {
+    echo "build-mame.sh: MAME tree '$MAMETREE' not checked out (git submodule update --init mame)" >&2
     exit 2
 }
 
@@ -73,11 +77,12 @@ SOURCES="$(q PLATFORM_SOURCES_MAMEDRIVERS | tr -s ' ' ',')"
 mkdir -p "$ROOT/build"
 cd "$MAMETREE"
 
-echo "=== building $BOARD mamedrivers engine (subtarget=$SUBTARGET, tree=mame-$BOARD, build-dir=build/mamedrivers) ==="
-# BUILDDIR=build/mamedrivers: the board tree's single build. genie appends the TARGETOS
-# subdir, so archives land in mame-$BOARD/build/mamedrivers/rapi-circle/.
+echo "=== building $BOARD mamedrivers engine (subtarget=$SUBTARGET, tree=mame, build-dir=build/$BOARD) ==="
+# BUILDDIR=build/$BOARD: this board's whole artifact tree inside the shared
+# source tree. genie appends the TARGETOS subdir, so archives land in
+# mame/build/$BOARD/rapi-circle/.
 make -j"$(getconf _NPROCESSORS_ONLN)" \
-    BUILDDIR="build/mamedrivers" \
+    BUILDDIR="build/$BOARD" \
     TARGETOS=rapi-circle \
     PLATFORM=arm64 \
     OSD=sdl \

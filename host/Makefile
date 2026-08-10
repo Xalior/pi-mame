@@ -6,10 +6,11 @@
 # platform, CI a job per board). Platform is the logical unit — a MAME
 # src/mame/<vendor>/ directory, with no crossover — so each platform is its own
 # binary. All platforms of a board link the ONE shared mamedrivers engine that
-# scripts/build-mame.sh builds once into mame-<board>/build/mamedrivers/rapi-circle;
+# scripts/build-mame.sh builds once into mame/build/<board>/rapi-circle;
 # this Makefile swaps in a per-platform drivlist it generates itself, so each
 # kernel carries only its own machines (build the engine once, link per platform).
-# Board picks the MAME source tree (mame-<board>), the circle world
+# There is one MAME source tree (mame) for all three boards; board picks the
+# artifact tree inside it (build/<board>/), the circle world
 # (circle-libsdl2/circle-stdlib-<board>) and, via mk/cross reading RAPI_BOARD,
 # the RASPPI value and -mcpu.
 #
@@ -44,15 +45,15 @@
 # fill, the way a CRT was filled. Every card built today uses the PAL canvas.
 #
 # Prerequisite: scripts/build-mame.sh <board> has produced
-# mame-<board>/build/mamedrivers/rapi-circle/, and circle-libsdl2 has built the board's
+# mame/build/<board>/rapi-circle/, and circle-libsdl2 has built the board's
 # world + libSDL2-<board>.a (make -C $(SHIM) deps).
 #
 
-# Board selects the circle world, the MAME source tree, and (via mk/cross,
+# Board selects the circle world, the MAME artifact tree, and (via mk/cross,
 # which reads RAPI_BOARD from the environment) the RASPPI value and -mcpu. Each
 # board's newlib+libc++ sysroot is baked per architecture, so the kernel is
-# per-board; the three build in complete isolation (own tree, own world). One
-# board per invocation — CI dispatches a job per board. Default rpi4.
+# per-board; the three build in complete isolation (own artifact tree, own
+# world). One board per invocation — CI dispatches a job per board. Default rpi4.
 RAPI_BOARD ?= rpi4
 export RAPI_BOARD
 
@@ -98,12 +99,15 @@ ifeq ($(SUBTARGET),)
 $(error unknown PLATFORM '$(PLATFORM)' — not in machines.mk PLATFORMS ($(PLATFORMS)))
 endif
 
-# This board's MAME source tree, and its ONE shared mamedrivers engine tree. The
-# engine + 3rdparty + superset device closure are built once per board by
+# The one MAME source tree, and this board's mamedrivers engine build inside it.
+# All three boards share the source and keep their artifacts apart under
+# build/<board>/ (genie puts its generated project files, generated sources and
+# object tree all under BUILDDIR, so the boards never touch each other's).
+# The engine + 3rdparty + superset device closure are built once per board by
 # scripts/build-mame.sh (SUBTARGET=$(MAMEDRIVERS_SUBTARGET)); every platform kernel of
 # this board links that same tree and swaps in its own per-platform drivlist.
-MAMESRC   = $(ROOT)/mame-$(RAPI_BOARD)
-MAMEBUILD = $(MAMESRC)/build/mamedrivers/rapi-circle
+MAMESRC   = $(ROOT)/mame
+MAMEBUILD = $(MAMESRC)/build/$(RAPI_BOARD)/rapi-circle
 
 TARGET = $(OBJDIR)/kernel8-$(PLATFORM)
 
@@ -125,18 +129,15 @@ MAME_OBJS = \
 	$(DRIVLIST_OBJ) \
 	$(MAMEBUILD)/obj/Release/generated/version.o
 
-# Archive surgery, mame tree untouched:
-#  - libosd_sdl.a ships sdlmain.o (MAME's own main() + sdl_entered_debugger,
-#    which mamemain.cpp provides instead);
-#  - libocore_sdl.a ships posixfile.o/posixdir.o (the osd_file surface, which
-#    circlefile.cpp reimplements over the shim's core-0 I/O service — the core
-#    split's file seam: the cut is osd_file, never below. MAME runs on core 1
-#    and must not touch FatFs directly).
-# Both are local copies with the member deleted, named per platform so the
-# platforms' copies never collide in this shared build directory.
-LIBOSD_NOMAIN   = $(OBJDIR)/libosd_sdl-nomain-$(PLATFORM).a
-LIBOCORE_NOFILE = $(OBJDIR)/libocore_sdl-nofile-$(PLATFORM).a
-
+# The sources this build replaces are excluded by genie, not by archive
+# surgery: mame's scripts/src/osd/sdl.lua drops sdlmain.cpp (MAME's own main()
+# + sdl_entered_debugger, which mamemain.cpp provides instead) and
+# posixfile.cpp/posixdir.cpp (the osd_file surface, which circlefile.cpp
+# reimplements over the shim's core-0 I/O service — the core split's file seam:
+# the cut is osd_file, never below; MAME runs on core 1 and must not touch
+# FatFs directly) for TARGETOS rapi-circle. libosd_sdl.a and libocore_sdl.a
+# therefore link straight in.
+#
 # libprecompile.a is excluded (PCH carrier, nothing to link). libqtdbg_sdl.a
 # stays in: built with USE_QTDEBUG=0 it holds only the not-supported debugger
 # module (DEBUG_QT), which osdobj_common.cpp registers unconditionally. The
@@ -146,8 +147,7 @@ LIBOCORE_NOFILE = $(OBJDIR)/libocore_sdl-nofile-$(PLATFORM).a
 # board — the per-platform drivlist.o alone decides which members link in.
 MAME_ARCHIVES = \
 	$(wildcard $(MAMEBUILD)/bin/mame_$(MAMEDRIVERS_SUBTARGET)/*.a) \
-	$(filter-out %/libosd_sdl.a %/libocore_sdl.a %/libprecompile.a, \
-		$(wildcard $(MAMEBUILD)/bin/*.a))
+	$(filter-out %/libprecompile.a, $(wildcard $(MAMEBUILD)/bin/*.a))
 
 # sdl-app.mk's link recipe wraps $(LIBS) in --start-group/--end-group, which
 # covers MAME's mutually referential archives. LIBS is also where the shim's
@@ -166,8 +166,6 @@ MAME_ARCHIVES = \
 SHIM_LIB = $(SHIM)/libSDL2-$(RAPI_BOARD).a
 
 LIBS = $(MAME_OBJS) \
-	$(LIBOSD_NOMAIN) \
-	$(LIBOCORE_NOFILE) \
 	$(MAME_ARCHIVES) \
 	--whole-archive $(SHIM_LIB) --no-whole-archive \
 	$(CIRCLE_STDLIB_LIBS)
@@ -227,18 +225,6 @@ INCLUDE := -I $(SHIM)/include $(CIRCLE_STDLIB_INCLUDES) $(INCLUDE)
 # The link is driven by the cross ld directly (Rules.mk sets LD = <prefix>ld),
 # so this is a plain linker option and not a compiler-driver -Wl, one.
 LDFLAGS += --wrap=_write
-
-$(LIBOSD_NOMAIN): $(MAMEBUILD)/bin/libosd_sdl.a | $(OBJDIR)
-	@echo "  AR    $@ (libosd_sdl.a minus sdlmain.o)"
-	@cp $< $@
-	@chmod u+w $@
-	@$(AR) d $@ sdlmain.o
-
-$(LIBOCORE_NOFILE): $(MAMEBUILD)/bin/libocore_sdl.a | $(OBJDIR)
-	@echo "  AR    $@ (libocore_sdl.a minus posixfile.o posixdir.o)"
-	@cp $< $@
-	@chmod u+w $@
-	@$(AR) d $@ posixfile.o posixdir.o
 
 # mamemain.cpp compiles the way genie compiled sdlmain.cpp: same cross
 # wrapper, and the `release` config's DEFINES/INCLUDES from
@@ -436,8 +422,7 @@ machines: $(MACHINE_IMAGES)
 .PHONY: clean-machines
 clean-machines:
 	rm -f $(MACHINE_IMAGES) $(PATCH_DEFAULTS) \
-		$(DRIVLIST_FLT) $(DRIVLIST_SRC) $(DRIVLIST_OBJ) \
-		$(LIBOSD_NOMAIN) $(LIBOCORE_NOFILE)
+		$(DRIVLIST_FLT) $(DRIVLIST_SRC) $(DRIVLIST_OBJ)
 
 # Board-scoped clean: drop just THIS board's entire build tree (build/<board>/),
 # leaving the sibling boards' images and objects untouched. The whole reason for

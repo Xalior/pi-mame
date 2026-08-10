@@ -18,7 +18,7 @@ BOARD="${1:-${RAPI_BOARD:-rpi4}}"
 # not narrate its directory changes into stdout (see gen-bootmenu.sh).
 st=$(make --no-print-directory -s -f "$ROOT/host/machines.mk" \
     print-MAMEDRIVERS_SUBTARGET)
-MB="$ROOT/mame-$BOARD/build/mamedrivers/rapi-circle"
+MB="$ROOT/mame/build/$BOARD/rapi-circle"
 ok=1
 [ -f "$MB/obj/Release/src/mame/mame.o" ]     || { echo "MISSING: $MB/obj/Release/src/mame/mame.o"; ok=0; }
 [ -f "$MB/obj/Release/generated/version.o" ] || { echo "MISSING: $MB/obj/Release/generated/version.o"; ok=0; }

@@ -6,7 +6,7 @@
 #                                shim) and rapi-bootloader (single-core, the
 #                                picker links it)
 #   make mame [RAPI_BOARD=<b>]    the board's ONE shared mamedrivers MAME engine
-#                                (mame-<b>/build/mamedrivers; long; log in build/).
+#                                (mame/build/<b>; long; log in build/).
 #                                Every platform kernel links it (build once,
 #                                link drivers per platform).
 #   make platform                one platform binary per vendor-class
@@ -119,7 +119,7 @@ ASSETS     ?= ./my-assets
 # `all` (the default) regenerates every platform in one pass.
 DOCS_PLATFORM ?= all
 # Which board this build targets: rpi3 | rpi4 | rpi5. Selects the MAME source
-# tree (mame-<board>), the circle world, RASPPI and -mcpu, and the board-scoped
+# artifact tree (mame/build/<board>), the circle world, RASPPI and -mcpu, and the board-scoped
 # build tree every artifact lands in (host/build/<board>/, the picker's
 # menu-loader/build/<board>/). One board per invocation; CI dispatches a job per
 # board. Default rpi4 (the proven board). Exported so the card/sd/dist scripts
@@ -193,13 +193,17 @@ kernels: platform machines picker
 
 # The CI matrix, locally. Each ci-board-<b> chain runs the workflow's job
 # steps in the workflow's order, against the same targets CI calls — the same
-# code path, on this machine. The wrapper fans the boards out in parallel,
-# exactly as the workflow's matrix does; each board's chain is serial within
-# itself, like its CI job. Boards are fully disjoint (mame-<board> tree,
-# host/build/<board>/, per-board picker build and mame-build log), so the
-# fan-out is collision-free.
+# code path, on this machine.
+#
+# ONE BOARD AT A TIME. The workflow gives every board its own runner and its
+# own checkout, so its matrix is genuinely parallel; here the three boards
+# share one working tree. Their ARTIFACTS are disjoint (mame/build/<board>,
+# host/build/<board>/, per-board picker build and mame-build log), but the
+# generators that produce them are not: MAME's build compiles genie itself into
+# the shared 3rdparty/genie, and two boards racing on that build one binary over
+# the other. Running the boards in sequence costs wall-clock and nothing else.
 ci:
-	$(MAKE) -j$(words $(BOARDS)) $(BOARDS:%=ci-board-%)
+	@for b in $(BOARDS); do $(MAKE) ci-board-$$b || exit 1; done
 
 ci-board-%:
 	$(MAKE) mame RAPI_BOARD=$*
