@@ -28,56 +28,27 @@
 // allowed to be.
 //
 #include "kernel.h"
-#include "xthreading.h"
 #include "defaults.h"
 #include <circle/startup.h>
 #include <circle/machineinfo.h>
 #include <SDL2/SDL_circle.h>
+#include <atomic>
 #include <cstdio>
-#include <thread>
 
 extern "C" int mame_circle_main(int argc, char **argv);
 void CGlueStdioInit(CConsole &rConsole);
 
-// --rapi-debug-uart (consumed in defaults.cpp) arms serial key injection: the
-// shim types serial-RX bytes into the running machine. Dev bench only — the
-// switch is never baked into a shipped image.
-extern "C" int rapi_debug_uart;
-extern "C" int rapi_perf_interval;
 extern "C" int rapi_vdisplay_w;
 extern "C" int rapi_vdisplay_h;
-void SDL2Circle_SetInjectSerial(CSerialDevice *pSerial);
 
 // The region canvas: the virtual display every machine gets unless its
-// defaults block names its own with --rapi-vdisplay=WxH. PAL, CRT-shaped —
-// the frame every PAL machine historically filled. (PoC3 rules the regional
-// canvas PAL-only; an NTSC canvas arrives with an NTSC card.)
+// defaults block names its own with --virtual-resolution=WxH. PAL,
+// CRT-shaped — the frame every PAL machine historically filled. (PoC3 rules
+// the regional canvas PAL-only; an NTSC canvas arrives with an NTSC card.)
 static const int CanvasWidth  = 720;
 static const int CanvasHeight = 576;
 
 static const char From[] = "mame-host";
-
-// Secondary-core dispatch: MAME's core and the spare worker core run the
-// threading library's dispatcher; the presentation core runs the shim's
-// worker. Role-to-core binding is a per-world constant.
-void CSplitCores::Run(unsigned nCore)
-{
-    // A freshly started core holds whatever the firmware left in its thread
-    // pointer, and C++ exception state is reached through it: arm the runtime
-    // before this core executes anything that can throw.
-    SDL2Circle_ArmCoreRuntime();
-
-    switch (nCore)
-    {
-    case 1:
-    case 3:
-        xthread_core_main(nCore);          // never returns
-        break;
-    case 2:
-        SDL2Circle_SplitPresentCore();     // never returns
-        break;
-    }
-}
 
 // The baked policy argv: evergreen appliance decrees only, no machine.
 // -numprocessors 1: one core, cooperative threads — nothing preempts.
@@ -107,6 +78,73 @@ static const char *MameArgv[] = {
 // Capacity-1 single-character tokens — on top of the baked set, plus NULL.
 static const char *s_FinalArgv[sizeof(MameArgv) / sizeof(MameArgv[0]) + 256 + 1];
 
+// ---------------------------------------------------------------------------
+// The gate between core 0 and MAME's core.
+//
+// The secondary cores are started at the end of Initialize(), because that is
+// where the Circle world is finished. MAME must not begin until the shim's
+// split is armed: until then its platform calls would run on a core with no
+// mailbox to carry them back to the hardware. So core 1 waits here and core 0
+// opens the gate once SDL2Circle_SplitInit has returned.
+//
+// The result travels back the same way. Core 0 cannot join a core, so core 1
+// publishes what MAME returned and core 0 watches for it while yielding to the
+// scheduler — which is what keeps the servo, the watchdog and every device
+// alive for as long as the machine runs.
+// ---------------------------------------------------------------------------
+static std::atomic<int> s_MameGate{0};     // core 0 -> MAME's core
+static std::atomic<int> s_MameDone{0};     // MAME's core -> core 0
+static int s_MameResult = -1;
+static int s_MameArgc = 0;
+
+static inline void PublishToOtherCores(void)
+{
+    asm volatile("dsb ish; sev" ::: "memory");
+}
+
+static void ParkCore(void)
+{
+    for (;;)
+        asm volatile("wfe" ::: "memory");
+}
+
+// Secondary-core dispatch. MAME is a direct call on its own core, not a
+// thread: at -numprocessors 1 it creates no worker threads, so there is
+// nothing for a dispatcher to place and nothing to pin.
+void CSplitCores::Run(unsigned nCore)
+{
+    // A freshly started core holds whatever the firmware left in its thread
+    // pointer, and C++ exception state is reached through it: arm the runtime
+    // before this core executes anything that can throw.
+    SDL2Circle_ArmCoreRuntime();
+
+    switch (nCore)
+    {
+    case 1:
+        // The application core. Wait for the gate, run the machine, publish
+        // what it returned, then go quiet — this core has no other purpose
+        // and must not fall through into anything.
+        while (!s_MameGate.load(std::memory_order_acquire))
+            asm volatile("wfe" ::: "memory");
+
+        s_MameResult = mame_circle_main(s_MameArgc,
+                                        const_cast<char **>(s_FinalArgv));
+
+        s_MameDone.store(1, std::memory_order_release);
+        PublishToOtherCores();
+        ParkCore();
+        break;
+
+    case 2:
+        SDL2Circle_SplitPresentCore();     // never returns
+        break;
+
+    default:
+        ParkCore();
+        break;
+    }
+}
+
 CKernel::CKernel(void)
     // Serial device 0 is the GPIO14/15 header UART on every board. Named
     // explicitly because Circle's RASPPI >= 5 default (SERIAL_DEVICE_DEFAULT
@@ -115,7 +153,8 @@ CKernel::CKernel(void)
       m_Timer(&m_Interrupt),
       m_Logger(m_Options.GetLogLevel(), &m_Timer),
       m_EMMC(&m_Interrupt, &m_Timer, &m_ActLED),
-      m_Console(&m_Serial, &m_Serial)    // stdio over the UART
+      m_Console(&m_Serial, &m_Serial),   // stdio over the UART
+      m_USB(&m_Interrupt, &m_Timer, TRUE /* plug-and-play */)
 {
     m_ActLED.Blink(3);
 }
@@ -165,6 +204,27 @@ boolean CKernel::Initialize(void)
     // construction, so this must happen here, ahead of mame_circle_main.
     if (bOK) m_Timer.SetTime(BuildEpoch(), FALSE /* universal */);
     if (bOK) bOK = m_EMMC.Initialize();
+
+    // The read cache goes in between the card and everything above it, after
+    // the card has registered its name and before the first mount reads a
+    // sector. FatFs finds its device by name and holds no pointer to the
+    // card, so taking the name over is the whole of the interposition: MAME's
+    // ROM loading, the C library and FatFs itself all arrive here without
+    // knowing. Configure() is what gives it memory; the library's own
+    // defaults are the sizes, there being nothing on this appliance to tune
+    // them from.
+    //
+    // Not fatal. A refusal leaves the name resolving to the card itself, and
+    // the machine runs uncached.
+    if (bOK && !m_DiskCache.Install())
+        m_Logger.Write(From, LogWarning,
+                       "disk cache did not install — the card is unwrapped "
+                       "and no disk figures will be reported");
+    if (bOK && !m_DiskCache.Configure(DISKCACHE_DEFAULT_KB,
+                                      DISKCACHE_DEFAULT_READAHEAD_KB))
+        m_Logger.Write(From, LogWarning,
+                       "disk cache refused its memory — running without it");
+
     if (bOK) bOK = (f_mount(&m_FileSystem, "SD:", 1) == FR_OK);
     if (bOK)
     {
@@ -180,8 +240,30 @@ boolean CKernel::Initialize(void)
     }
     if (bOK) bOK = m_Console.Initialize();
     if (bOK) CGlueStdioInit(m_Console);
-    // Start the secondary cores. They park in CSplitCores::Run until the
-    // split's rings and the threading dispatcher are armed, below.
+
+    // USB, here and not inside MAME's SDL_Init. Enumeration is slow and
+    // interrupt-driven, and right here it has core 0 to itself with nothing
+    // waiting on it — which is exactly what it does NOT have once the split
+    // is armed and core 0's servo is the only thing answering the other
+    // cores. Not fatal: a board with no working USB still runs the machine,
+    // with no keyboard and no pad, and that is worth saying rather than
+    // dying for.
+    if (bOK && !m_USB.Initialize())
+        m_Logger.Write(From, LogWarning,
+                       "USB did not come up — the machine will run without a "
+                       "keyboard or a joystick");
+
+    // Core 0 runs library and application code like any other core, so it
+    // arms itself too. Here rather than in main(): the call runs deferred
+    // constructors and creates a scheduler where the host has none, so it
+    // belongs after the card is mounted and stdio is wired — before the
+    // secondary cores start, and before the first thing that can throw.
+    if (bOK) SDL2Circle_ArmCoreRuntime();
+
+    // Start the secondary cores last: the world they are about to work in
+    // has to be complete first, because core 0 is busy serving them from the
+    // moment they run. They park in CSplitCores::Run until Run() below arms
+    // the split and opens the gate.
     if (bOK) bOK = m_Cores.Initialize();
     return bOK;
 }
@@ -192,26 +274,17 @@ TShutdownMode CKernel::Run(void)
     // BEFORE MAME sees argv: patched and unpatched boots run the identical
     // code path — an empty block appends nothing and MAME boots its system
     // list.
-    int argc = DefaultsBuildArgv(MameArgv, sizeof(MameArgv) / sizeof(MameArgv[0]),
-                                 s_FinalArgv,
-                                 sizeof(s_FinalArgv) / sizeof(s_FinalArgv[0]));
+    s_MameArgc = DefaultsBuildArgv(MameArgv, sizeof(MameArgv) / sizeof(MameArgv[0]),
+                                   s_FinalArgv,
+                                   sizeof(s_FinalArgv) / sizeof(s_FinalArgv[0]));
 
     m_Logger.Write(From, LogNotice, "starting MAME platform binary (%d args)",
-                   argc - 1);
+                   s_MameArgc - 1);
 
-    // Dev bench: hand the shim our serial so a console can type into the
-    // running machine (dismiss a warning box, pick a +3 Loader, LOAD a disk).
-    if (rapi_debug_uart)
-    {
-        SDL2Circle_SetInjectSerial(&m_Serial);
-        m_Logger.Write(From, LogNotice,
-                       "serial key injection armed (--rapi-debug-uart)");
-    }
-
-    // Bench instrumentation: the shim's per-core receipts print only if the
-    // host arms them (the library reads no boot config for it, by design).
-    if (rapi_perf_interval)
-        SDL2Circle_SetPerfInterval(rapi_perf_interval);
+    // Every --rapi- switch in the defaults block belongs to the library. It
+    // reads the block itself, at the same offset, and acts on its own
+    // switches — serial key injection, performance reports — with nothing
+    // wired here. This kernel only strips them from MAME's argv.
 
     // Geometry evidence belongs on serial (the HDMI capture dongle is not
     // pixel-faithful): what boot config handed us, read next to the shim's
@@ -249,27 +322,34 @@ TShutdownMode CKernel::Run(void)
                    CMachineInfo::Get()->GetClockRate(CLOCK_ID_CORE) / 1000000,
                    CKernelOptions::Get()->GetSoCMaxTemp());
 
+    m_Logger.Write(From, LogNotice,
+                   "core split: hardware core 0, MAME core 1, presentation "
+                   "core 2, core 3 parked");
+
     // Arm the split BEFORE MAME's first instruction: the shim's servo and
-    // watchdog tasks (core 0), and the threading library's creator task, so
-    // MAME can create its service threads from core 1 and every device call
-    // it makes is already being marshaled back to the core that owns the
-    // hardware.
+    // watchdog tasks on core 0, and the mailboxes every marshalled call
+    // rides. Then open the gate and core 1 calls MAME.
     SDL2Circle_SplitInit();
-    xthread_init();
+    s_MameGate.store(1, std::memory_order_release);
+    PublishToOtherCores();
 
-    // MAME, alone, on core 1: a pinned thread on the xthreading dispatcher —
-    // no pump work, no interrupt jitter, no audio mixing sharing its core.
-    xthread_pin_next(1);
-    static int s_mame_result = -1;
-    std::thread mame([argc]
+    // Core 0's idle loop for the whole run. Yielding is not politeness: the
+    // servo task is what answers core 1, feeds the sound device and pumps
+    // USB, and it only runs when this loop gives up the core.
+    //
+    // The disk cache's report rides here and nowhere else. Printing it from
+    // inside a read would put serial output in the middle of a call MAME's
+    // core is blocked on; Poll() costs one clock read until its interval is
+    // up.
+    while (!s_MameDone.load(std::memory_order_acquire))
     {
-        s_mame_result = mame_circle_main(argc, const_cast<char **>(s_FinalArgv));
-    });
+        m_DiskCache.Poll();
+        m_Scheduler.Yield();
+    }
+    int res = s_MameResult;
 
-    // Core 0 belongs to its tasks now; this join spins through scheduler
-    // yields, which IS this world's idle loop.
-    mame.join();
-    int res = s_mame_result;
+    // One last report, so a run that ends quickly still says what it did.
+    m_DiskCache.Report();
 
     m_Logger.Write(From, LogNotice, "SoC: %uC, arm %u MHz, core %u MHz",
                    SDL2Circle_SoCTemperature(),

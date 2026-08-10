@@ -6,10 +6,10 @@
 
 int main(void)
 {
-    // Core 0's runtime is armed before anything that can throw — the same
-    // rule CSplitCores::Run applies to the secondary cores.
-    SDL2Circle_ArmCoreRuntime();
-
+    // Core 0's runtime is armed inside CKernel::Initialize, once the card is
+    // mounted and stdio is wired: the call runs deferred constructors and
+    // creates a scheduler where the host has none, so it cannot come before
+    // the world those need.
     CKernel Kernel;
     if (!Kernel.Initialize())
     {
