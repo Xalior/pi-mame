@@ -15,7 +15,7 @@ Ground truth (read fresh every run, nothing cached or hand-maintained):
                            `make -f host/machines.mk print-<VAR>`, the same
                            mechanism scripts/gen-bootmenu.sh uses, so this
                            generator sees exactly what the build sees.
-  host/machines/<m>.conf  each machine's `--virtual-resolution` directive, if
+  host/machines/<m>.conf  each machine's `--rapi-vfb` directive, if
                            any — the TV standard a card must present it on
                            (see derive_tv_standard below).
   scripts/assets.manifest each asset's tier (free/public) and destination
@@ -529,7 +529,7 @@ def uses_shared_bios(name, rom_starts, defines):
 # --- TV standard: derived from each machine's own boot conf, not the driver ---
 
 def tv_standard_for_machine(machine):
-    """host/machines/<machine>.conf carries at most one --virtual-resolution=WxH
+    """host/machines/<machine>.conf carries at most one --rapi-vfb=WxH
     directive. Absent means the machine fills the default 720x576 PAL
     canvas. 720x480 is the NTSC canvas the region sweep introduced. Any
     other value is a machine's own native raster (an arcade board's video
@@ -539,7 +539,7 @@ def tv_standard_for_machine(machine):
     conf = MACHINE_CONF_DIR / f"{machine}.conf"
     if not conf.is_file():
         return "PAL"
-    m = re.search(r"--virtual-resolution=(\S+)", conf.read_text())
+    m = re.search(r"--rapi-vfb=(\S+)", conf.read_text())
     if not m:
         return "PAL"
     return "NTSC" if m.group(1) == "720x480" else None
