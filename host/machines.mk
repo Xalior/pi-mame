@@ -58,6 +58,44 @@
 
 PLATFORMS = sinclair amstrad commodore amiga atari acorn eaca samcoupe camputers tatung memotech enterprise sord vtech trs sega
 
+# ---------------------------------------------------------------------------
+# Virtual platforms — whole-tree kernels, for measuring rather than shipping.
+# ---------------------------------------------------------------------------
+#
+# A vendor platform carries one directory's machines. These two carry MAME's
+# whole driver set, cut in half by what the drivers say they are: `computers`
+# takes the computers, consoles and systems, `arcade` takes the coin-operated
+# machines and the gambling cabinets with them.
+#
+# They exist because a kernel per vendor is a build per vendor, and the whole
+# set does not fit one image: everything together links at about 335MB, over
+# the ceiling that keeps a kernel pushable to the bench. Split this way both
+# halves fit, which is the useful fact — two builds instead of sixteen.
+#
+# DELIBERATELY NOT IN PLATFORMS. These ship nothing, own no machines and have
+# no roster, so `make kernels`, the per-machine images and CI never see them.
+# The PLATFORM check accepts them (Makefile) and nothing else does.
+#
+# Their SOURCES are a SCAN, never a list — see scripts/driver-class.sh. A
+# written-down list of three thousand driver files would not grow when MAME
+# does, and new machines would quietly appear in no kernel at all.
+#
+# The scan is a recursive grep over src/mame, so it is not free. These are
+# recursively assigned (`=`) so it runs only when a rule actually asks for a
+# virtual platform's sources, and never on an ordinary vendor build.
+VIRTUAL_PLATFORMS = computers arcade
+
+PLATFORM_SUBTARGET_computers = mame
+PLATFORM_SUBTARGET_arcade    = mame
+
+# ROOT is the Makefile's, but this file is also read on its own (build-mame.sh
+# and the verify scripts ask it for a roster with `make -f machines.mk print-…`),
+# and there it is unset. Same value either way: this file sits in host/.
+ROOT ?= ..
+
+PLATFORM_SOURCES_computers = $(shell $(ROOT)/scripts/driver-class.sh computers)
+PLATFORM_SOURCES_arcade    = $(shell $(ROOT)/scripts/driver-class.sh arcade)
+
 PLATFORM_MACHINES_sinclair = spectrum spec128 specpls2 specpl2a specpls3 \
 	tbblue specnext_ks1 specnext_ks2 specnext_ks3 zx80 zx81 tc2048 ts2068 \
 	ts1000 ts1500 pentagon scorpio atmtb2 pentevo tsconf elwro800 byte sprinter

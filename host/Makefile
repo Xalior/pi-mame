@@ -102,7 +102,7 @@ OBJDIR = build/$(RAPI_BOARD)
 PLATFORM ?= sinclair
 SUBTARGET := $(PLATFORM_SUBTARGET_$(PLATFORM))
 ifeq ($(SUBTARGET),)
-$(error unknown PLATFORM '$(PLATFORM)' — not in machines.mk PLATFORMS ($(PLATFORMS)))
+$(error unknown PLATFORM '$(PLATFORM)' — not in machines.mk PLATFORMS ($(PLATFORMS)) or VIRTUAL_PLATFORMS ($(VIRTUAL_PLATFORMS)))
 endif
 
 # The one MAME source tree, and this board's mamedrivers engine build inside it.
