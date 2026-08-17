@@ -1,21 +1,11 @@
 //
 // defaults.cpp — the receiver side of the pi-mame patchable-defaults block.
 //
-// Three responsibilities, all against the shared ABI in
+// One responsibility, against the shared ABI in
 // rapi-bootloader/defaultsblock/defaultsblock.h (the single source of truth — the writer and
 // this receiver compile the same header):
 //
-//  1. CARRY the block: the image's one TDefaultsBlock instance lives in
-//     section .pimame.defaults, which mk/ld/circle-defaults.ld pins to
-//     image offset 0x800 (runtime 0x80800). It ships with the magic, the
-//     capacity, and an empty string — an unpatched image boots straight to
-//     MAME's system-selection list through the identical code path.
-//
-//  2. OPEN the image: the four-byte trampoline in .pimame.entry is the
-//     first instruction of the image, branching over the reserved boot
-//     furniture and the block to Circle's own _start.
-//
-//  3. CONSUME the text: DefaultsBuildArgv() verifies magic-at-offset FIRST
+//     CONSUME the text: DefaultsBuildArgv() verifies magic-at-offset FIRST
 //     (the seatbelt: absent or wrong => the block is ignored and MAME boots
 //     its system list), tokenises the length-bounded text, takes out this
 //     kernel's own switches and every --rapi-* one, and appends the rest
@@ -39,33 +29,16 @@
 static const char From[] = "defaults";
 
 // ---------------------------------------------------------------------------
-// 2. The trampoline: the image's first four bytes. `b _start` is
-// PC-relative (±128MB reach; the furniture is 2KB), so the image entry
-// stays a single instruction whatever Circle's startup relocates to.
-// ---------------------------------------------------------------------------
-__asm__ (
-	"\t.section .pimame.entry, \"ax\", %progbits\n"
-	"\t.globl	_pimame_entry\n"
-	"_pimame_entry:\n"
-	"\tb	_start\n"
-	"\t.previous\n"
-);
-
-// ---------------------------------------------------------------------------
-// 1. The block instance. 'used' + the linker script's KEEP() keep it alive;
-// the script's ASSERTs refuse any link that leaves it off 0x800.
+// The block itself, and the trampoline that opens the image, come from
+// circle-libsdl2: its sdl-app.ld reserves image offset 0x800 for both, and
+// src/bootargs.cpp supplies them. This kernel carried its own pair until the
+// library grew them, and two blocks in one image is one block too many — the
+// spare kept its magic, so anything searching for 'PM8D' rather than seeking
+// to 0x800 could find the wrong one. What is read below is the block at the
+// ABI offset, whoever placed it there.
 // ---------------------------------------------------------------------------
 extern "C"
 {
-
-__attribute__ ((section (".pimame.defaults"), used, aligned (8)))
-TDefaultsBlock _pimame_defaults =
-{
-	{DEFAULTS_MAGIC0, DEFAULTS_MAGIC1, DEFAULTS_MAGIC2, DEFAULTS_MAGIC3},
-	DEFAULTS_BUFFER_BYTES,
-	0,			// Length: empty string
-	{0}			// Text: NUL — appends nothing, MAME's system list
-};
 
 // Kernel flags settable by injected switches
 int rapi_show_fps = 0;

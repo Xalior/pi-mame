@@ -170,11 +170,20 @@ LIBS = $(MAME_OBJS) \
 	--whole-archive $(SHIM_LIB) --no-whole-archive \
 	$(CIRCLE_STDLIB_LIBS)
 
-# The platform image carries the patchable-defaults block, so it links with
-# the defaults linker script (trampoline + block pinned at 0x800) rather than
-# the library's own. Everything else about the script — including the TLS
-# adjacency binutils 2.44 and later require — is inherited from the library's.
-SDL_APP_LDSCRIPT = $(CURDIR)/../mk/ld/circle-defaults.ld
+# SDL_APP_LDSCRIPT is deliberately NOT set: the library's own sdl-app.ld is
+# the script this image links with. It reserves image offset 0x800 for the
+# defaults block and carries the entry trampoline over it, which is the whole
+# of what this kernel used to keep a private script for.
+#
+# The private script also had to be kept in step with the library's by hand,
+# and one thing it never picked up is why leaving it behind matters: the
+# library defers an application's static constructors until after CKernel
+# exists, and it finds them through __sdl2_deferred_init_{start,end}, which
+# sdl-app.ld defines and a private script did not. Those symbols are WEAK, so
+# a script that omits them produces no link error and no warning — they
+# resolve to zero, the deferred range is empty, and every constructor runs
+# early, before CTimer/CLogger/CScheduler exist. A constructor that reaches
+# any of them then stops the board with nothing on the wire.
 
 # Two things want a link rule for $(TARGET).img: Circle's Rules.mk and the
 # library's sdl-app.mk, which is the one this build uses. Make warns about the
