@@ -41,9 +41,7 @@ extern "C"
 {
 
 // Kernel flags settable by injected switches
-int rapi_show_fps = 0;
-int rapi_vdisplay_w = 0;      // the machine's declared virtual display —
-int rapi_vdisplay_h = 0;      // 0x0 means the region canvas (kernel default)
+int mame_fps = 0;
 
 }
 
@@ -53,36 +51,11 @@ int rapi_vdisplay_h = 0;      // 0x0 means the region canvas (kernel default)
 // ones are logged and dropped.
 static void DispatchKernelSwitch (const char *pSwitch)
 {
-	if (strncmp (pSwitch, "--virtual-resolution=", 21) == 0)
+	if (strcmp (pSwitch, "--mame-fps") == 0)
 	{
-		// The machine's virtual display, WxH — the resolution MAME is
-		// given, a fact about the machine that rides the defaults block
-		// exactly as the machine name does. The shim's presentation
-		// core scales it to the glass, aspect preserved. Malformed
-		// values are dropped (logged), leaving the region-canvas
-		// default standing.
-		const char *p = pSwitch + 21;
-		int w = atoi (p);
-		const char *x = strchr (p, 'x');
-		int h = x ? atoi (x + 1) : 0;
-		if (w > 0 && h > 0)
-		{
-			rapi_vdisplay_w = w;
-			rapi_vdisplay_h = h;
-			CLogger::Get ()->Write (From, LogNotice,
-						"--virtual-resolution consumed: virtual display %dx%d",
-						w, h);
-		}
-		else
-			CLogger::Get ()->Write (From, LogWarning,
-						"--virtual-resolution \"%s\" malformed (want WxH), ignored",
-						p);
-	}
-	else if (strcmp (pSwitch, "--rapi-fps") == 0)
-	{
-		rapi_show_fps = 1;
+		mame_fps = 1;
 		CLogger::Get ()->Write (From, LogNotice,
-					"--rapi-fps consumed: MAME FPS/speed readout on");
+					"--mame-fps consumed: MAME FPS/speed readout on");
 	}
 	else
 	{
@@ -95,10 +68,14 @@ static void DispatchKernelSwitch (const char *pSwitch)
 // this same block for itself. Take them out of MAME's argv and say nothing:
 // two complaints about one token would be worse than none, and the library
 // reports on the ones it recognises.
+//
+// The whole prefix, with nothing carved out of it. This kernel's own
+// switches are named for what they belong to instead — --mame-fps turns on a
+// readout MAME itself draws — so no token has to be claimed back from the
+// namespace it appears to be in.
 static boolean IsLibrarySwitch (const char *pSwitch)
 {
-	return strncmp (pSwitch, "--rapi-", 7) == 0
-	       && strcmp (pSwitch, "--rapi-fps") != 0;
+	return strncmp (pSwitch, "--rapi-", 7) == 0;
 }
 
 // ---------------------------------------------------------------------------
@@ -214,8 +191,7 @@ int DefaultsBuildArgv (const char **pBaked, unsigned nBaked,
 		{
 			nConsumed++;
 		}
-		else if (   strncmp (pToken, "--rapi-", 7) == 0
-			 || strncmp (pToken, "--virtual-resolution", 20) == 0)
+		else if (strncmp (pToken, "--rapi-", 7) == 0)
 		{
 			DispatchKernelSwitch (pToken);
 			nConsumed++;

@@ -32,8 +32,10 @@ int DefaultsBuildArgv (const char **pBaked, unsigned nBaked,
 // linkage: the OSD glue (mamemain.cpp, compiled in the MAME environment)
 // reads them without seeing any Circle header.
 //
-// --rapi-fps: turn on MAME's built-in FPS/speed readout (the public
-// mame_ui_manager::set_show_fps setter, called from the OSD glue).
-extern "C" int rapi_show_fps;
+// --mame-fps: turn on MAME's built-in FPS/speed readout (the public
+// mame_ui_manager::set_show_fps setter, called from the OSD glue). Named for
+// MAME because the readout is MAME's own; --rapi- is the library's prefix and
+// carries only switches the library acts on.
+extern "C" int mame_fps;
 
 #endif

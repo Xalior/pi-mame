@@ -110,10 +110,10 @@ public:
         if (m.phase() != machine_phase::RUNNING)
             return;
 
-        // --rapi-fps (bench switch, defaults.cpp): light MAME's own
+        // --mame-fps (bench switch, defaults.cpp): light MAME's own
         // FPS/speed readout once the machine runs, via the public
         // mame_ui_manager::set_show_fps setter.
-        if (rapi_show_fps && !m_fps_applied)
+        if (mame_fps && !m_fps_applied)
         {
             mame_machine_manager::instance()->ui().set_show_fps(true);
             m_fps_applied = true;

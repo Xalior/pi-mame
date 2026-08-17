@@ -38,11 +38,9 @@
 extern "C" int mame_circle_main(int argc, char **argv);
 void CGlueStdioInit(CConsole &rConsole);
 
-extern "C" int rapi_vdisplay_w;
-extern "C" int rapi_vdisplay_h;
-
 // The region canvas: the virtual display every machine gets unless its
-// defaults block names its own with --virtual-resolution=WxH. PAL,
+// defaults block names its own with --rapi-vfb=WxH, which the library reads
+// and applies for itself. PAL,
 // CRT-shaped — the frame every PAL machine historically filled. (PoC3 rules
 // the regional canvas PAL-only; an NTSC canvas arrives with an NTSC card.)
 static const int CanvasWidth  = 720;
@@ -295,22 +293,24 @@ TShutdownMode CKernel::Run(void)
     m_Logger.Write(From, LogNotice, "boot config geometry: %ux%u",
                    m_Options.GetWidth(), m_Options.GetHeight());
 
-    // Declare the virtual display — the resolution MAME is given, whatever
-    // the glass is doing; the shim's presentation core scales it out,
-    // aspect preserved. Mandatory before SDL_Init (the shim refuses to
-    // start undeclared): the machine's own raster where the defaults block
-    // stamped one, the region canvas otherwise.
-    {
-        int w = rapi_vdisplay_w > 0 ? rapi_vdisplay_w : CanvasWidth;
-        int h = rapi_vdisplay_h > 0 ? rapi_vdisplay_h : CanvasHeight;
-        if (SDL2Circle_DeclareVirtualDevice(32, w, h) == 0)
-            m_Logger.Write(From, LogNotice, "virtual display declared: %dx%d%s",
-                           w, h, rapi_vdisplay_w > 0 ? " (machine)" : " (region canvas)");
-        else
-            m_Logger.Write(From, LogError,
-                           "virtual display %dx%d REFUSED — SDL_Init will fail",
-                           w, h);
-    }
+    // Declare the region canvas — the resolution MAME is given when the
+    // machine does not name one, whatever the glass is doing; the shim's
+    // presentation core scales it out, aspect preserved.
+    //
+    // A machine that has its own raster carries it as --rapi-vfb=WxH in the
+    // defaults block, and that switch beats this declaration inside the
+    // library: it reads the block itself, before SDL_Init, and holds the
+    // value against everything below it. So this is the floor rather than
+    // the decision, and the kernel neither reads that switch nor forwards
+    // it.
+    if (SDL2Circle_DeclareVirtualDevice(32, CanvasWidth, CanvasHeight) == 0)
+        m_Logger.Write(From, LogNotice,
+                       "region canvas declared: %dx%d (a machine's own raster overrides it)",
+                       CanvasWidth, CanvasHeight);
+    else
+        m_Logger.Write(From, LogError,
+                       "region canvas %dx%d REFUSED — SDL_Init will fail",
+                       CanvasWidth, CanvasHeight);
 
     // SoC state around the run: render throughput lives and dies by the
     // ARM/core clocks, and the shim's hardware management (it owns Circle's

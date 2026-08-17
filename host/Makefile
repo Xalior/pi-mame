@@ -76,6 +76,12 @@ SHIM ?= $(ROOT)/circle-libsdl2
 CIRCLE_WORLDS ?= $(SHIM)
 WORLD = $(CIRCLE_WORLDS)/circle-stdlib-$(RAPI_BOARD)
 
+# Exported because mk/cross reads it too. The MAME-environment compiles go
+# through those wrappers rather than through the include chain below, so a
+# wrapper left to guess would compile against a different world from the one
+# this makefile links — and say nothing until a header went missing.
+export CIRCLE_WORLDS
+
 include $(WORLD)/Config.mk
 include machines.mk
 

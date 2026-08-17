@@ -42,7 +42,11 @@ case "$RAPI_BOARD" in
     rpi5) RAPI_RASPPI=5; RAPI_MCPU=cortex-a76 ;;
     *) echo "aarch64-circle-gcc: unknown RAPI_BOARD='$RAPI_BOARD' (rpi3|rpi4|rpi5)" >&2; exit 1 ;;
 esac
-STDLIB=$ROOT/circle-libsdl2/circle-stdlib-$RAPI_BOARD
+# Which set of built worlds to compile against — see the note in
+# aarch64-circle-g++. host/Makefile decides it and exports it; the fallback is
+# this repository's own, which is what a clone gets.
+CIRCLE_WORLDS="${CIRCLE_WORLDS:-$ROOT/circle-libsdl2}"
+STDLIB=$CIRCLE_WORLDS/circle-stdlib-$RAPI_BOARD
 INSTALL=$STDLIB/install/aarch64-none-circle
 TCINC="$(echo "$TC"/lib/gcc/aarch64-none-elf/*/include)"
 

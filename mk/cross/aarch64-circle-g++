@@ -43,7 +43,19 @@ case "$RAPI_BOARD" in
     rpi5) RAPI_RASPPI=5; RAPI_MCPU=cortex-a76 ;;
     *) echo "aarch64-circle-g++: unknown RAPI_BOARD='$RAPI_BOARD' (rpi3|rpi4|rpi5)" >&2; exit 1 ;;
 esac
-STDLIB=$ROOT/circle-libsdl2/circle-stdlib-$RAPI_BOARD
+# Which set of built worlds to compile against. host/Makefile decides this
+# with CIRCLE_WORLDS and exports it, so a parent proving one checkout across
+# several projects points both the makefile and this wrapper at the same
+# place. The fallback is this repository's own, which is what a clone gets.
+#
+# It has to be read here rather than assumed: everything else in the build
+# already honoured the variable, this did not, and the two disagreed silently.
+# A tree whose own circle-libsdl2 is not checked out then failed only in the
+# MAME-environment compiles -- "cstdint: No such file or directory" -- while
+# the Circle-environment ones, which take their include chain from the
+# makefile, carried on building.
+CIRCLE_WORLDS="${CIRCLE_WORLDS:-$ROOT/circle-libsdl2}"
+STDLIB=$CIRCLE_WORLDS/circle-stdlib-$RAPI_BOARD
 INSTALL=$STDLIB/install/aarch64-none-circle
 TCINC="$(echo "$TC"/lib/gcc/aarch64-none-elf/*/include)"
 

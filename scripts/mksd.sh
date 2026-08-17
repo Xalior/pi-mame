@@ -69,7 +69,7 @@ cp "$IMG" "$SD/kernel-$BOARD.img"
 
 # There are NO region cards: every board boots the panel's native mode
 # (cmdline.txt asks for none) and the shim scales onto it. Region is a
-# virtual resolution — the kernel declares MAME's display (--virtual-resolution
+# virtual resolution — the kernel declares MAME's display (--rapi-vfb
 # per machine, the 720x576 PAL canvas otherwise).
 cp "$ROOT/host/cmdline-native.txt" "$SD/cmdline.txt"
 

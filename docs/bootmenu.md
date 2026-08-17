@@ -132,7 +132,7 @@ author writes it like a shell command line, with a few fixed rules:
   `-iec8 ""` tells MAME to leave IEC device 8 unpopulated.
 - Tokens starting with `--rapi-` are consumed by the kernel itself and
   never reach MAME's argv. A recognised one sets a kernel flag (for
-  example `--rapi-fps` turns on MAME's built-in FPS/speed readout); an
+  example `--mame-fps` turns on MAME's built-in FPS/speed readout); an
   unrecognised one is logged and dropped.
 - An empty defaults string boots MAME's own system-selection list instead
   of a specific machine.
