@@ -127,7 +127,14 @@ cp "$BINARY" "$SD/kernel-$BOARD.img"
 # Every asset's manifest stanza names the card path (dest); copy exactly
 # those files. A file absent from the bundle is the public tier's "boots
 # but wants its ROMs added" case — warn, never fail the card.
+# EVERY FILE MAME OWNS SITS UNDER ONE DIRECTORY, and the manifest's own dest
+# paths (roms/…, media/…) are relative to it. The kernel works from inside it
+# — see the chdir in host/kernel.cpp — so it never names a path that leaves,
+# and a card can carry another project's boot files beside ours untouched.
+MAMEDIR="$SD/mame"
+
 if [ -n "$ASSETS" ]; then
+    mkdir -p "$MAMEDIR"
     TRIAL_LABELS="$ROOT/scripts/trial-games.manifest"
     {
         for m in $(awk -F'|' '!/^#/ && NF {print $1}' "$SD/bootmenu.cfg"); do
@@ -150,8 +157,8 @@ if [ -n "$ASSETS" ]; then
         if [ -z "$dest" ]; then
             echo "mkcard.sh: warning: no manifest stanza for asset '$a'" >&2
         elif [ -f "$ASSETS/$dest" ]; then
-            mkdir -p "$SD/$(dirname "$dest")"
-            cp "$ASSETS/$dest" "$SD/$dest"
+            mkdir -p "$MAMEDIR/$(dirname "$dest")"
+            cp "$ASSETS/$dest" "$MAMEDIR/$dest"
         else
             echo "mkcard.sh: warning: $dest not in $ASSETS — add it to boot its machines" >&2
         fi

@@ -73,8 +73,15 @@ cp "$IMG" "$SD/kernel-$BOARD.img"
 # per machine, the 720x576 PAL canvas otherwise).
 cp "$ROOT/host/cmdline-native.txt" "$SD/cmdline.txt"
 
+# EVERY FILE MAME OWNS SITS UNDER ONE DIRECTORY, and the manifest's own dest
+# paths (roms/…, media/…) are relative to it. The kernel works from inside it
+# — see the chdir in host/kernel.cpp — so it never names a path that leaves,
+# and a card can carry another project's boot files beside ours untouched.
+MAMEDIR="$SD/mame"
+
 if [ -n "$ASSETS" ]; then
-    [ -d "$ASSETS/roms" ] && cp -R "$ASSETS/roms" "$SD/roms" \
+    mkdir -p "$MAMEDIR"
+    [ -d "$ASSETS/roms" ] && cp -R "$ASSETS/roms" "$MAMEDIR/roms" \
         || echo "mksd.sh: warning: no roms/ in $ASSETS" >&2
     # This machine's own loose media (MACHINE_ASSETS_<machine> in
     # host/machines.mk), each asset's manifest stanza naming the card path
@@ -88,8 +95,8 @@ if [ -n "$ASSETS" ]; then
         [ -n "$dest" ] || continue
         case "$dest" in roms/*) continue ;; esac  # already copied above
         if [ -f "$ASSETS/$dest" ]; then
-            mkdir -p "$SD/$(dirname "$dest")"
-            cp "$ASSETS/$dest" "$SD/$dest"
+            mkdir -p "$MAMEDIR/$(dirname "$dest")"
+            cp "$ASSETS/$dest" "$MAMEDIR/$dest"
         else
             echo "mksd.sh: warning: $dest not in $ASSETS — add it to boot $MACHINE" >&2
         fi

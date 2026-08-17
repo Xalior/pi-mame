@@ -34,9 +34,9 @@
 #include <SDL2/SDL_circle.h>
 #include <atomic>
 #include <cstdio>
+#include <unistd.h>     // chdir — MAME's paths are relative to /mame
 
 extern "C" int mame_circle_main(int argc, char **argv);
-void CGlueStdioInit(CConsole &rConsole);
 
 // The region canvas: the virtual display every machine gets unless its
 // defaults block names its own with --rapi-vfb=WxH, which the library reads
@@ -64,9 +64,14 @@ static const char *MameArgv[] = {
     // preserved, off the emulation core entirely.
     "-nokeepaspect",
     "-numprocessors", "1",
-    "-rompath", "/roms",
-    "-cfg_directory", "/mame/cfg",
-    "-nvram_directory", "/mame/nvram",
+    // RELATIVE, resolved against /mame — see the chdir in Initialize(). Every
+    // file this appliance owns lives under that one directory, so a card can
+    // carry other things beside it without this kernel writing anywhere near
+    // them, and a machine's media path in the defaults block is relative for
+    // the same reason.
+    "-rompath", "roms",
+    "-cfg_directory", "cfg",
+    "-nvram_directory", "nvram",
     "-skip_gameinfo",
 };
 
@@ -151,7 +156,6 @@ CKernel::CKernel(void)
       m_Timer(&m_Interrupt),
       m_Logger(m_Options.GetLogLevel(), &m_Timer),
       m_EMMC(&m_Interrupt, &m_Timer, &m_ActLED),
-      m_Console(&m_Serial, &m_Serial),   // stdio over the UART
       m_USB(&m_Interrupt, &m_Timer, TRUE /* plug-and-play */)
 {
     m_ActLED.Blink(3);
@@ -208,9 +212,21 @@ boolean CKernel::Initialize(void)
     // sector. FatFs finds its device by name and holds no pointer to the
     // card, so taking the name over is the whole of the interposition: MAME's
     // ROM loading, the C library and FatFs itself all arrive here without
-    // knowing. Configure() is what gives it memory; the library's own
-    // defaults are the sizes, there being nothing on this appliance to tune
-    // them from.
+    // knowing. Configure() is what gives it memory.
+    //
+    // The pool is the library's own default, which the card figures say is
+    // already far larger than this program's working set. The READ-AHEAD is
+    // ours, and deeper than the library's, because of who owns which core
+    // here. The library errs shallow to protect whatever the reading core owes
+    // an answer to; under the core split this core owes the sound device its
+    // ring, and nothing is drawn on it at all. That deadline is the audio
+    // device's hardware queue rather than a frame, which is long enough to
+    // absorb a bigger single transaction — while the total time inside the
+    // card driver, which is what actually keeps this core away from the ring,
+    // keeps falling as the window grows.
+    //
+    // MAME reads the card in single sectors and the large majority of them
+    // run on from the last, which is exactly the shape read-ahead exists for.
     //
     // Not fatal. A refusal leaves the name resolving to the card itself, and
     // the machine runs uncached.
@@ -218,8 +234,7 @@ boolean CKernel::Initialize(void)
         m_Logger.Write(From, LogWarning,
                        "disk cache did not install — the card is unwrapped "
                        "and no disk figures will be reported");
-    if (bOK && !m_DiskCache.Configure(DISKCACHE_DEFAULT_KB,
-                                      DISKCACHE_DEFAULT_READAHEAD_KB))
+    if (bOK && !m_DiskCache.Configure(DISKCACHE_DEFAULT_KB, 64))
         m_Logger.Write(From, LogWarning,
                        "disk cache refused its memory — running without it");
 
@@ -236,8 +251,34 @@ boolean CKernel::Initialize(void)
         f_mkdir("SD:/mame/cfg");
         f_mkdir("SD:/mame/nvram");
     }
-    if (bOK) bOK = m_Console.Initialize();
-    if (bOK) CGlueStdioInit(m_Console);
+
+    // EVERYTHING MAME TOUCHES IS UNDER /mame, and it gets there by working
+    // from inside it rather than by every path saying so. MAME's own
+    // directory options are relative (see MameArgv), a machine's media path in
+    // the defaults block is relative, and both resolve from here.
+    //
+    // The point is what it keeps OUT. A card can carry another project's boot
+    // files, its own loader, anything — and this kernel cannot write outside
+    // the one directory it was pointed at, because it never names a path that
+    // leaves it.
+    //
+    // chdir() directly rather than through the shim's I/O service: this runs
+    // on core 0, which is the core the service would have marshalled it to,
+    // and it must be settled before MAME opens anything. Both reach the same
+    // C library, so a relative open from MAME's core resolves against it.
+    if (bOK && chdir("/mame") != 0)
+    {
+        m_Logger.Write(From, LogError,
+                       "could not enter /mame — every ROM and config path is "
+                       "relative to it, so the machine has nothing to read");
+        bOK = FALSE;
+    }
+    // Nothing binds stdio here. SDL2Circle_ArmCoreRuntime below builds the
+    // shim's own console — a keyboard on it, and its output following
+    // whatever the logging destination is — and binds descriptors 0, 1 and 2
+    // to it. The C library binds those three together and asserts inside
+    // CGlueInitConsole if they are bound twice, which stops the board with
+    // "assertion !stdin->IsOpen() failed" before MAME starts.
 
     // USB, here and not inside MAME's SDL_Init. Enumeration is slow and
     // interrupt-driven, and right here it has core 0 to itself with nothing

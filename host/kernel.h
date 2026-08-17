@@ -74,7 +74,10 @@ private:
     // interposition and no caller above it changes.
     CDiskCacheDevice    m_DiskCache;
     FATFS               m_FileSystem;
-    CConsole            m_Console;
+    // No CConsole here. The shim builds one and binds the three standard
+    // descriptors to it inside SDL2Circle_ArmCoreRuntime, and the C library
+    // binds those three together and asserts if anything binds them twice —
+    // which halts the board before the application starts.
     // USB belongs to the host kernel: the shim reads whatever controller it
     // finds and never builds one. Plug-and-play, so a keyboard or pad
     // arriving after boot is still picked up.
