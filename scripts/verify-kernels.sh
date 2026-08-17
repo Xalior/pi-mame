@@ -1,8 +1,11 @@
 #!/bin/sh
 # verify-kernels.sh — assert every expected kernel image for a board exists and
-# is under the 256MB ceiling: every per-machine image (roster from machines.mk),
-# every platform binary (kernel8-<platform>.img, the no-options kernels), and
-# the board's boot picker at its real per-board path.
+# is under that board's kernel ceiling: every per-machine image (roster from
+# machines.mk), every platform binary (kernel8-<platform>.img, the no-options
+# kernels), and the board's boot picker at its real per-board path.
+#
+# The ceiling is read from the world the images were built against, never
+# written down here — see where CEIL is set.
 #
 # All artifacts are board-scoped under host/build/<board>/ (and the picker under
 # rapi-bootloader/menu-loader/build/<board>/), so verifying one board never
@@ -35,7 +38,28 @@ case "$SCOPE" in
 esac
 MK="$ROOT/host/machines.mk"
 HOSTDIR="$ROOT/host/build/$BOARD"
-CEIL=268435456   # 256 MiB
+
+# The ceiling is the world's, read from the world.
+#
+# It is decided when circle-libsdl2 configures a board's circle-stdlib
+# (--kernel-max-size) and baked into that world's Config.mk as
+# -DKERNEL_MAX_SIZE=0x... Everything downstream derives it from there, and a
+# second copy written down here would be a copy that goes stale: it did, and
+# the gate then passed images the world's own linker would have refused.
+#
+# Read, never guessed. A world that cannot be found, or a Config.mk with no
+# such define, stops this script — a size gate that quietly invented its own
+# limit would be worse than no gate, because it would report OK.
+WORLD="${CIRCLE_WORLDS:-$ROOT/circle-libsdl2}/circle-stdlib-$BOARD"
+[ -f "$WORLD/Config.mk" ] || {
+    echo "verify-kernels.sh: no $WORLD/Config.mk — build the world first" >&2
+    echo "  (or point CIRCLE_WORLDS at the set of worlds this build used)" >&2
+    exit 2; }
+CEIL_HEX=$(sed -n 's/.*-DKERNEL_MAX_SIZE=\(0[xX][0-9a-fA-F]*\).*/\1/p' "$WORLD/Config.mk" | head -1)
+[ -n "$CEIL_HEX" ] || {
+    echo "verify-kernels.sh: no KERNEL_MAX_SIZE in $WORLD/Config.mk" >&2; exit 2; }
+CEIL=$(printf '%d' "$CEIL_HEX")
+echo "ceiling: $CEIL bytes ($((CEIL / 1024 / 1024)) MiB, $CEIL_HEX) from $WORLD/Config.mk"
 fail=0
 
 check() {   # <path>
@@ -67,4 +91,4 @@ esac
 check "$ROOT/rapi-bootloader/menu-loader/build/$BOARD/$PICKER_IMG"
 
 [ "$fail" = 0 ] || { echo "kernel image verification failed"; exit 1; }
-echo "all $BOARD kernel images present and under the 256MB ceiling — OK."
+echo "all $BOARD kernel images present and under the ceiling — OK."

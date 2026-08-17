@@ -29,7 +29,7 @@
 #                                archives exist (genie's host link fails by design)
 #   make verify-kernels [RAPI_BOARD=<b>] [VERIFY_SCOPE=all|platform]
 #                                truth-gate: every kernel image exists, each
-#                                under the 256MB ceiling. Scope `platform`
+#                                under the 255MB ceiling. Scope `platform`
 #                                gates only what a release ships (platform
 #                                binaries + picker); per-machine images are a
 #                                local `make kernel MACHINE=<m>` byte-patch
@@ -215,7 +215,7 @@ ci-board-%:
 
 # Truth-gates, runnable locally and in CI (CI just calls these). verify-mame
 # checks the board's mamedrivers archives survived genie's by-design host-link
-# failure; verify-kernels checks every image exists and fits the 256MB ceiling.
+# failure; verify-kernels checks every image exists and fits the 255MB ceiling.
 verify-mame:
 	scripts/verify-mame.sh $(RAPI_BOARD)
 

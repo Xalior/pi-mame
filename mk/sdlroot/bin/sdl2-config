@@ -2,7 +2,18 @@
 # sdl2-config for circle-libsdl2 — answers MAME's build-time SDL discovery.
 # Lives outside the mame tree; genie finds it via SDL_INSTALL_ROOT.
 
-PREFIX="$(cd "$(dirname "$0")/../../.." && pwd)/circle-libsdl2"
+# Which checkout of the shim to answer with. host/Makefile decides that with
+# SHIM and exports it, so a parent proving one checkout across several projects
+# gets the headers it is proving rather than this repository's pinned copy. The
+# fallback is that pinned copy, which is what a clone gets.
+#
+# Read, not assumed: this used to derive the path from its own location alone,
+# so it always answered with public/circle-libsdl2 whatever the rest of the
+# build was using. With that submodule not checked out it answered with a
+# directory that did not exist, and every OSD source including SDL failed on
+# "SDL2/SDL.h: No such file or directory" — a missing-header error whose cause
+# was a stale path, not a missing header.
+PREFIX="${SHIM:-$(cd "$(dirname "$0")/../../.." && pwd)/circle-libsdl2}"
 
 case "$1" in
   --version) echo 2.32.4 ;;
