@@ -160,6 +160,42 @@ deps:
 mame:
 	scripts/build-mame.sh $(RAPI_BOARD)
 
+# ---------------------------------------------------------------------------
+# The two halves of MAME, as two kernels.
+# ---------------------------------------------------------------------------
+#
+# `computers` and `arcade` divide MAME's whole driver set in two by what the
+# drivers say they are, using MAME's own macros (scripts/driver-class.sh; the
+# two are declared in host/machines.mk as VIRTUAL_PLATFORMS). Between them they
+# carry every machine MAME supports, so a pull that adds drivers adds machines
+# here with nothing to edit.
+#
+# THEY NEED THE WHOLE-TREE ENGINE. An ordinary `make mame` compiles only the
+# drivers the roster names, and a kernel may link no driver its engine does not
+# carry, so these link against the `mame-all` engine instead. It lives in its
+# own build directory, so both engines can exist at once.
+#
+# WHY TWO KERNELS AND NOT ONE. On a Pi 5 the halves measure 219 MB and 242 MB;
+# together as a single kernel they are 335 MB, past the 255 MB ceiling a kernel
+# has to stay under. Split, each half fits.
+ALL_ENGINE = $(CURDIR)/mame/build/$(RAPI_BOARD)-all/rapi-circle
+
+mame-all:
+	scripts/build-mame.sh $(RAPI_BOARD) --all
+
+# MAMEBUILD and MAMEDRIVERS_SUBTARGET are the whole of what points host's
+# Makefile at the other engine. It needs no change to build these.
+.PHONY: mame-all computers arcade halves
+computers arcade:
+	@[ -d "$(ALL_ENGINE)/bin/mame_mame" ] || { \
+		echo "$@: no whole-tree engine for $(RAPI_BOARD) — run 'make mame-all' first" >&2; \
+		exit 1; }
+	$(MAKE) -C host RAPI_BOARD=$(RAPI_BOARD) PLATFORM=$@ \
+		MAMEBUILD=$(ALL_ENGINE) MAMEDRIVERS_SUBTARGET=mame
+	@echo "  SIZE  $@: $$(wc -c < host/build/$(RAPI_BOARD)/kernel8-$@.img) bytes"
+
+halves: computers arcade
+
 # One platform binary per vendor-class: each its own link against its own
 # isolated MAME tree, no machine baked. Unpatched, each is that platform's
 # no-options kernel (MAME's own system list).
