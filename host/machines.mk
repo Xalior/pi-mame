@@ -820,7 +820,7 @@ MACHINE_ASSETS_lynx128k     = lynx128k
 # The TC-01 is PAL (TMS9129, 50Hz) — undeclared, PAL canvas default. The
 # 256's line standard is a dipswitch (S:1, 525/60 vs 625/50) whose MAME
 # default is "525 lines 60Hz" on its V9938 — RULED: config follows the
-# driver's DIP defaults (the general porting rule, docs/new-platform.html),
+# driver's DIP defaults (the general porting rule),
 # so machines/einst256.conf declares the 720x480 NTSC canvas.
 
 # --- Tatung Einstein asset dependencies (manifest asset names) ---
