@@ -83,10 +83,14 @@ PLATFORMS = sinclair amstrad commodore amiga atari acorn eaca samcoupe camputers
 # The scan is a recursive grep over src/mame, so it is not free. These are
 # recursively assigned (`=`) so it runs only when a rule actually asks for a
 # virtual platform's sources, and never on an ordinary vendor build.
-VIRTUAL_PLATFORMS = computers arcade
+VIRTUAL_PLATFORMS = computers arcade whole
 
 PLATFORM_SUBTARGET_computers = mame
 PLATFORM_SUBTARGET_arcade    = mame
+# Every driver MAME has, in one kernel. It names no sources: the whole-tree
+# engine already generated a driver list with no filter, and the build links
+# that rather than making one.
+PLATFORM_SUBTARGET_whole     = mame
 
 # ROOT is the Makefile's, but this file is also read on its own (build-mame.sh
 # and the verify scripts ask it for a roster with `make -f machines.mk print-…`),
@@ -95,6 +99,9 @@ ROOT ?= ..
 
 PLATFORM_SOURCES_computers = $(shell $(ROOT)/scripts/driver-class.sh computers)
 PLATFORM_SOURCES_arcade    = $(shell $(ROOT)/scripts/driver-class.sh arcade)
+# Both halves together is every file that declares a driver at all, which is
+# every machine MAME has.
+PLATFORM_SOURCES_whole     = $(PLATFORM_SOURCES_computers) $(PLATFORM_SOURCES_arcade)
 
 PLATFORM_MACHINES_sinclair = spectrum spec128 specpls2 specpl2a specpls3 \
 	tbblue specnext_ks1 specnext_ks2 specnext_ks3 zx80 zx81 tc2048 ts2068 \
