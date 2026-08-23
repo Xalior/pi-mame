@@ -323,17 +323,9 @@ TShutdownMode CKernel::Run(void)
     m_Logger.Write(From, LogNotice, "boot config geometry: %ux%u",
                    m_Options.GetWidth(), m_Options.GetHeight());
 
-    // THE KERNEL NAMES NO RESOLUTION. The machine decides what it renders,
-    // and MAME states that size when it creates its window; the library takes
-    // the window's own size as the canvas and scales it onto whatever the
-    // panel is doing. A machine that wants a particular raster carries it as
-    // --rapi-vfb=WxH in the defaults block, which the library reads for
-    // itself before SDL_Init.
-    //
-    // There is nothing to declare here, and declaring anything would be
-    // worse than nothing: a size named in this kernel wins over the size the
-    // machine asked for, so every machine would be given one resolution and
-    // letterboxed inside it.
+    // The kernel names no resolution. MAME asks for the machine's own size
+    // (its pick_best_mode, under SDLMAME_CIRCLE) and the library takes any
+    // size up to the panel, so nothing here has to choose one.
 
     // SoC state around the run: render throughput lives and dies by the
     // ARM/core clocks, and the shim's hardware management (it owns Circle's
