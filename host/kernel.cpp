@@ -45,16 +45,13 @@ static const char From[] = "mame-host";
 static const char *MameArgv[] = {
     "mame",
     "-video", "soft",
-    // keepaspect is desktop application surface; the appliance bakes it
-    // off ON EVERY BOARD. The canvas IS the machine's raster (boot-config
-    // width=/height=), so the soft renderer blits 1:1 — MAME's
-    // assumed-4:3 CRT fit (a scale, glyph-destroying when it shrinks)
-    // never engages. What lifts the canvas to the glass is per-board and
-    // none of MAME's business: Pi 3/4 firmware outputs it as the video
-    // signal (the panel stretches); Pi 5 firmware cannot, so the shim's
-    // presentation core scales it onto the native scanout, aspect
-    // preserved, off the emulation core entirely.
-    "-nokeepaspect",
+    // Resolution follows the machine. Without this MAME takes the monitor's
+    // size for every window it makes, so a machine renders at panel
+    // resolution and MAME enlarges it on the emulation core. With it, MAME
+    // picks the nearest mode the library offers that is not smaller than the
+    // machine, at core start and again whenever the machine changes its own
+    // video mode (src/osd/sdl/window.cpp, complete_create and update).
+    "-switchres",
     "-numprocessors", "1",
     // RELATIVE, resolved against /mame — see the chdir in Initialize(). Every
     // file this appliance owns lives under that one directory, so a card can
