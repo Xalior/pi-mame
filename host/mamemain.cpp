@@ -151,9 +151,12 @@ public:
         m_partial.append(text, start, std::string::npos);
     }
 
-    // Print the kept lines on stdout, oldest first, each labelled with its
-    // channel and coloured for serial: red for an error, yellow for a
-    // warning. The screen log draws in white and discards the colour codes.
+    // Print the kept lines, oldest first, each labelled with its channel and
+    // coloured for serial: red for an error, yellow for a warning. The screen
+    // log draws in white and discards the colour codes. The lines go through
+    // the shim's raw channel rather than stdout, which this kernel sends to
+    // the log with a timestamp and a source (circle_syscalls.cpp), so each
+    // line arrives as the label and MAME's text and nothing else.
     void show_kept()
     {
         if (!m_partial.empty())
@@ -167,10 +170,10 @@ public:
         for (size_t i = 0; i < m_count; i++)
         {
             const kept_line &line = m_kept[(first + i) % size];
-            if (line.channel == OSD_OUTPUT_CHANNEL_ERROR)
-                std::printf("\x1b[31merror: %s\x1b[0m\n", line.text.c_str());
-            else
-                std::printf("\x1b[33mwarn: %s\x1b[0m\n", line.text.c_str());
+            const std::string out = line.channel == OSD_OUTPUT_CHANNEL_ERROR
+                ? "\x1b[31merror: " + line.text + "\x1b[0m\n"
+                : "\x1b[33mwarn: " + line.text + "\x1b[0m\n";
+            SDL2Circle_WriteBytes(out.data(), unsigned(out.size()));
         }
     }
 
