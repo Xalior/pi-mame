@@ -16,8 +16,10 @@
 # That guard does not apply to `ci` branch pushes, which build regardless
 # of ancestry.
 #
-# Scope: one Ubuntu x86_64 job per board (rpi3/rpi4/rpi5) plus a release
-# job that gathers the matrix on tags. macOS host builds are out of scope.
+# Scope: two Ubuntu x86_64 jobs per board (rpi3/rpi4/rpi5) - `build`, the
+# roster's platform binaries and cards, and `bundles`, the whole-tree kernels -
+# plus a release job that gathers both matrices on tags. macOS host builds are
+# out of scope.
 # Supply-chain restraint: first-party actions only (checkout / cache /
 # upload-artifact / download-artifact), the one exception being the release
 # action on tags.
@@ -245,16 +247,119 @@ jobs:
           path: dist/pi-mame-*
           if-no-files-found: error
 
+  # The three bundles: `computers` and `arcade`, MAME's whole driver set split
+  # in two by what each driver says it is, and `whole`, all of it in one kernel
+  # that only boots from a card. They link against the whole-tree engine
+  # (`make mame-all`), a second and much larger MAME build than the roster's,
+  # so they get their own job per board and their own time budget, running
+  # beside the roster build rather than after it. The setup steps repeat the
+  # build job's; see the comments there.
+  bundles:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      matrix:
+        board: [rpi3, rpi4, rpi5]
+
+    steps:
+      - name: Checkout (recursive, shallow submodules)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 1
+
+      - name: Reclaim disk (unused runner toolchains)
+        run: |
+          echo "before:"; df -h / | tail -1
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc \
+            /opt/hostedtoolcache/CodeQL /usr/local/share/boost || true
+          sudo docker image prune --all --force >/dev/null 2>&1 || true
+          echo "after:";  df -h / | tail -1
+
+      - name: Require the tagged commit to be on main
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          git fetch --unshallow origin +refs/heads/main:refs/remotes/origin/main \
+            || git fetch origin +refs/heads/main:refs/remotes/origin/main
+          if git merge-base --is-ancestor "$GITHUB_SHA" refs/remotes/origin/main; then
+            echo "tag $GITHUB_REF_NAME points at a commit on main — building"
+          else
+            echo "tag $GITHUB_REF_NAME is NOT on main — side-branch tags build nothing"
+            exit 1
+          fi
+
+      - name: Resolve cache keys
+        id: keys
+        run: |
+          echo "sdl2=$(git -C circle-libsdl2 rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "bootloader=$(git -C rapi-bootloader rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "deps=$(grep -A9 '^deps:' Makefile | sha256sum | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Arm toolchain
+        id: cache-toolchain
+        uses: actions/cache@v4
+        with:
+          path: toolchain
+          key: ${{ env.ARM_RELEASE }}
+
+      - name: Fetch Arm toolchain
+        if: steps.cache-toolchain.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p toolchain
+          wget -q -O arm.tar.xz "$ARM_URL"
+          tar -xf arm.tar.xz -C toolchain --strip-components=1
+          rm -f arm.tar.xz
+
+      - name: Put toolchain on PATH
+        run: echo "$GITHUB_WORKSPACE/toolchain/bin" >> "$GITHUB_PATH"
+
+      - name: Install prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential make wget python3 zip unzip
+
+      - name: Cache deps (both Circle worlds + SDL2 shim)
+        id: cache-deps
+        uses: actions/cache@v4
+        with:
+          path: |
+            circle-libsdl2
+            rapi-bootloader
+          key: deps-${{ steps.keys.outputs.deps }}-${{ steps.keys.outputs.sdl2 }}-${{ steps.keys.outputs.bootloader }}
+
+      - name: Build deps
+        run: make deps
+
+      # Every driver MAME has, in its own build directory
+      # (mame/build/<board>-all), so it never touches the roster's engine.
+      - name: Build the whole-tree engine (this board)
+        run: make mame-all RAPI_BOARD=${{ matrix.board }}
+
+      - name: Build the bundles (this board)
+        run: make bundles RAPI_BOARD=${{ matrix.board }}
+
+      - name: Name the bundles for release (this board)
+        run: make dist-bundles TAG="${GITHUB_REF_NAME}" RAPI_BOARD=${{ matrix.board }}
+
+      - name: Upload this board's bundles
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundles-${{ matrix.board }}
+          path: dist/pi-mame-*
+          if-no-files-found: error
+
   # Cut ONE GitHub Release carrying every board's platform binaries and card
-  # zips, gathered from the three build jobs, so users can skip the toolchain
-  # entirely. A separate job because the deliverable is the board MATRIX —
+  # zips and bundles, gathered from every board's build and bundles jobs, so
+  # users can skip the toolchain entirely. A separate job because the deliverable is the board MATRIX —
   # release assets must wait for all three boards to go green. The body is
   # deliberately honest about what CI does and does not prove.
   # download-artifact/upload-artifact are first-party; the release action is
   # the workflow's one standing third-party exception.
   release:
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: build
+    needs: [build, bundles]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -274,7 +379,7 @@ jobs:
       - name: Attach built assets to the release
         uses: softprops/action-gh-release@v2
         with:
-          files: artifacts/dist-*/pi-mame-*
+          files: artifacts/*/pi-mame-*
           fail_on_unmatched_files: true
           generate_release_notes: false
           # Leave it staged. Publishing is a person's decision, taken after
