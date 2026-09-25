@@ -20,3 +20,8 @@ host/drivlist-*.flt
 host/drivlist-*.cpp
 assets/
 .DS_Store
+# make dist output: the card zips and platform images, and the asset trees
+# it stages them from (all-assets carries ROMs, which never enter this repo).
+/dist/
+/all-assets/
+/free-assets/
