@@ -370,7 +370,26 @@ TShutdownMode CKernel::Run(void)
                    SDL2Circle_SoCTemperature(),
                    SDL2Circle_CPUClockRate() / 1000000,
                    CMachineInfo::Get()->GetClockRate(CLOCK_ID_CORE) / 1000000);
+    if (res != 0)
+    {
+        m_Logger.Write(From, LogNotice, "MAME exited with %d, holding", res);
+
+        // Everything MAME's core printed, and the line above, out of the
+        // rings and off the UART before core 0 stops.
+        SDL2Circle_LogFlush();
+
+        // A failed run stays on the glass, MAME's reason with it, until
+        // power-off. Nothing on core 0 runs after this: no task is scheduled
+        // again, which is also why the watchdog does not print over the
+        // screen.
+        for (;;)
+            asm volatile("" ::: "memory");
+    }
+
     m_Logger.Write(From, LogNotice, "MAME exited with %d, rebooting", res);
+
+    // Everything still in flight, out before the reset cuts it off.
+    SDL2Circle_LogFlush();
 
     // Reboot to whatever the card boots — the dev bench's chainloader, a
     // product card's picker: quitting the emulator hands the machine back.

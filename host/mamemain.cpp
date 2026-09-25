@@ -27,6 +27,7 @@
 #include <sstream>
 
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_circle.h>
 
 #include <cstdio>
 #include <string>
@@ -97,10 +98,81 @@ static void rapi_nvram_save(running_machine &m)
 // change WHEN they fire. Zero MAME edits: we observe the public menu-active
 // state from update(). The menu is the appliance's settling point; NVRAM that
 // changes purely in-game is captured the next time the user visits the menu.
+//
+// A run that fails leaves its reason on the glass. MAME's window is open while
+// it loads ROMs, and while a window is open the shim writes stdout to serial
+// only, so MAME's own report of a failed start (a missing romset, say) never
+// reaches the screen. output_callback keeps every line of MAME's error and
+// warning channels, exactly as MAME wrote it, in a ring of a fixed number of
+// lines, and passes every call on to the base class unchanged, so serial
+// output is what it always was. When the frontend returns a failure the
+// window has closed and the screen log is live again, and show_kept() prints
+// the ring there.
 class rapi_osd_interface : public sdl_osd_interface
 {
 public:
     using sdl_osd_interface::sdl_osd_interface;
+
+    // Size the ring, once, before MAME starts. It never grows: when it is
+    // full the oldest line goes. Zero keeps nothing.
+    void keep_lines(size_t lines)
+    {
+        m_kept.assign(lines, kept_line{});
+        m_head = 0;
+        m_count = 0;
+    }
+
+    virtual void output_callback(osd_output_channel channel,
+                                 const util::format_argument_pack<char> &args) override
+    {
+        sdl_osd_interface::output_callback(channel, args);
+
+        if (m_kept.empty())
+            return;
+        if (channel != OSD_OUTPUT_CHANNEL_ERROR && channel != OSD_OUTPUT_CHANNEL_WARNING)
+            return;
+
+        // One call can carry many lines (romload.cpp's missing-ROM list is
+        // one), and a line can arrive in pieces over several calls. Text
+        // after the last newline waits for the rest of its line, unless the
+        // other channel speaks first.
+        if (!m_partial.empty() && channel != m_partial_channel)
+            keep(m_partial_channel, std::move(m_partial));
+        m_partial_channel = channel;
+
+        const std::string text = util::string_format(args);
+        std::string::size_type start = 0, end;
+        while ((end = text.find('\n', start)) != std::string::npos)
+        {
+            m_partial.append(text, start, end - start);
+            keep(channel, std::move(m_partial));
+            start = end + 1;
+        }
+        m_partial.append(text, start, std::string::npos);
+    }
+
+    // Print the kept lines on stdout, oldest first, each labelled with its
+    // channel and coloured for serial: red for an error, yellow for a
+    // warning. The screen log draws in white and discards the colour codes.
+    void show_kept()
+    {
+        if (!m_partial.empty())
+            keep(m_partial_channel, std::move(m_partial));
+
+        if (m_count == 0)
+            return;
+
+        const size_t size = m_kept.size();
+        const size_t first = (m_head + size - m_count) % size;
+        for (size_t i = 0; i < m_count; i++)
+        {
+            const kept_line &line = m_kept[(first + i) % size];
+            if (line.channel == OSD_OUTPUT_CHANNEL_ERROR)
+                std::printf("\x1b[31merror: %s\x1b[0m\n", line.text.c_str());
+            else
+                std::printf("\x1b[33mwarn: %s\x1b[0m\n", line.text.c_str());
+        }
+    }
 
     virtual void update(bool skip_redraw) override
     {
@@ -129,8 +201,31 @@ public:
     }
 
 private:
+    struct kept_line
+    {
+        osd_output_channel channel = OSD_OUTPUT_CHANNEL_ERROR;
+        std::string text;
+    };
+
+    void keep(osd_output_channel channel, std::string &&text)
+    {
+        kept_line &slot = m_kept[m_head];
+        slot.channel = channel;
+        slot.text = std::move(text);
+        m_head = (m_head + 1) % m_kept.size();
+        if (m_count < m_kept.size())
+            m_count++;
+        m_partial.clear();
+    }
+
     bool m_prev_menu_active = false;
     bool m_fps_applied = false;
+
+    std::vector<kept_line> m_kept;      // the ring, sized by keep_lines()
+    size_t m_head = 0;                  // the slot the next line goes in
+    size_t m_count = 0;                 // lines held, up to m_kept.size()
+    std::string m_partial;              // a line still waiting for its newline
+    osd_output_channel m_partial_channel = OSD_OUTPUT_CHANNEL_ERROR;
 };
 
 extern "C" int mame_circle_main(int argc, char **argv)
@@ -145,7 +240,11 @@ extern "C" int mame_circle_main(int argc, char **argv)
         sdl_options options;
         rapi_osd_interface osd(options);
         osd.register_options();
+        // Twice the screen log's rows; none where there is no screen log.
+        osd.keep_lines(2 * size_t(SDL2Circle_ConsoleRows()));
         res = emulator_info::start_frontend(options, osd, args);
+        if (res != 0)
+            osd.show_kept();
     }
     return res;
 }
