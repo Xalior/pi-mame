@@ -209,6 +209,14 @@ dist-bundles:
 			dist/pi-mame-$(TAG)-$$v-$(RAPI_BOARD).img || exit 1; \
 	done
 	@ls -l dist/pi-mame-$(TAG)-*-$(RAPI_BOARD).img | grep -E -- '-(computers|arcade|whole)-'
+	@# `whole` is too big for the bootloader to chain-boot, so its card is a
+	@# single-kernel card the firmware boots directly. It carries every
+	@# free-tier ROM, the same set mkdist.sh gives the free platform cards.
+	$(MAKE) assets-free ASSETS=$(CURDIR)/free-assets
+	scripts/mksd.sh whole $(CURDIR)/free-assets
+	@rm -f dist/pi-mame-$(TAG)-whole-$(RAPI_BOARD).zip
+	cd build/sd-whole-$(RAPI_BOARD) && zip -qr ../../dist/pi-mame-$(TAG)-whole-$(RAPI_BOARD).zip .
+	@ls -l dist/pi-mame-$(TAG)-whole-$(RAPI_BOARD).zip
 
 # One platform binary per vendor-class: each its own link against its own
 # isolated MAME tree, no machine baked. Unpatched, each is that platform's

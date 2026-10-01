@@ -12,8 +12,8 @@ bare-metal framework through a purpose-built
 same emulator; what differs is what happens at power-on, and that is
 decided when the image is **built** — never by config files or a command
 line, because there are none. A machine image powers on as its one
-machine, instantly, every time. A platform card powers on into a picker
-instead: a menu of that platform's machines — pick one with the keyboard
+machine, instantly, every time. A platform card powers on into a bootloader
+instead, which shows a menu of that platform's machines — pick one with the keyboard
 and, if its ROMs are on the card, it starts. Nothing you pick is
 remembered — power off, and the next power-on asks again. 🔁
 
@@ -31,9 +31,9 @@ tells you which is which.
 
 - **`pi-mame-<tag>-<platform>-<free|public>-<board>.zip`** — a platform card,
   the ready-to-boot download: that board's Pi firmware, `config.txt`, the
-  regional `cmdline.txt`, the boot picker (as `pi-mame-boot-<board>.img`,
+  regional `cmdline.txt`, the bootloader (as `pi-mame-boot-<board>.img`,
   which the firmware boots), that platform's binary as the MAME core (as
-  `kernel-<board>.img`, which the picker chain-boots), a menu of the
+  `kernel-<board>.img`, which the bootloader chain-boots), a menu of the
   platform's machines, and their ROMs. The **free** card lists only machines
   whose ROMs are all free-tier and bundles just those free-blessed ROMs. The
   **public** card lists the full roster and bundles the full ROM set — the
@@ -48,14 +48,14 @@ tells you which is which.
   own, for one board. This is the same core already inside that board's card
   zips; it is here for anyone assembling a card by hand or replacing the core
   on one they built. Copy it onto the card as `kernel-<board>.img`, the name
-  the picker chain-boots. The board is in this filename for the same reason it
+  the bootloader chain-boots. The board is in this filename for the same reason it
   is in the zips': every board builds a file called
   `kernel8-<platform>.img`, so the release names them apart.
 
 A release does **not** carry a separate download per machine: that would mean
 near-identical files per board, each about 84 MB, differing only by a few
 bytes of baked-in defaults. If you want a card that
-powers straight on into one machine with no picker, build it from the
+powers straight on into one machine with no bootloader, build it from the
 published sources with `make kernel MACHINE=<name>` — see
 [Building from source](#-building-from-source-the-long-way).
 
@@ -119,7 +119,7 @@ What comes out of that one binary per platform:
 |---|---|
 | `kernel8-<platform>.img` | the platform's **no-options** kernel — unpatched, so MAME boots its own system list; machines with ROMs on the card run |
 | `kernel8-<machine>.img` | one machine — the same platform binary with that machine's defaults stamped in (`make kernel MACHINE=<name>`, built locally; not a release download) |
-| the **boot picker** (`make picker`) | a menu of the platform's machines read from `bootmenu.cfg`; a pick patches the platform binary and chain-boots it |
+| the **bootloader** (`make picker`) | a menu of the platform's machines read from `bootmenu.cfg`; choosing one patches the platform binary and chain-boots it |
 
 Those `kernel8-*.img` names are the build products. **On a card, fixed
 names matter instead**, both carrying the board token so a card is
@@ -127,8 +127,8 @@ self-describing:
 
 | On the card | What it is |
 |---|---|
-| `pi-mame-boot-<board>.img` | the boot picker — this is what the Pi firmware boots |
-| `kernel-<board>.img` | the MAME core the picker chain-boots: a platform binary, or a single machine's image on a `make sd` card |
+| `pi-mame-boot-<board>.img` | the bootloader — this is what the Pi firmware boots |
+| `kernel-<board>.img` | the MAME core the bootloader chain-boots: a platform binary, or a single machine's image on a `make sd` card |
 
 `make sd` and `make card` put them there for you; do the rename by hand only
 if you're dropping a bare kernel onto a card you already built.
@@ -163,7 +163,7 @@ mockup. 📸 The original platforms were captured on a Pi 4; the ones that
 followed were captured on a Pi 5.
 
 A platform card's menu and the mechanism behind it are documented
-separately: [docs/bootmenu.md](docs/bootmenu.md) covers the boot picker
+separately: [docs/bootmenu.md](docs/bootmenu.md) covers the bootloader
 and the `bootmenu.cfg` format for anyone building or editing a card, and
 [docs/defaults-abi.md](docs/defaults-abi.md) covers the patchable-defaults
 block itself for anyone writing their own tooling against a pi-mame
@@ -229,7 +229,7 @@ over which machines get baked in.
 git clone --recursive https://github.com/Xalior/pi-mame.git
 cd pi-mame
 
-make deps      # circle-stdlib worlds + SDL2 shim (multicore, per board) and the picker's single-core world
+make deps      # circle-stdlib worlds + SDL2 shim (multicore, per board) and the bootloader's single-core world
 make mame      # the board's ONE shared mamedrivers engine — the long one; logs:
                #   build/mame-build-<board>.log. Default RAPI_BOARD=rpi4; add
                #   RAPI_BOARD=rpi3|rpi5 to build another board (all three share
@@ -237,7 +237,7 @@ make mame      # the board's ONE shared mamedrivers engine — the long one; log
                #   (genie's final host-style link fails by design; the archives
                #   are the product and the kernel links itself)
 make kernels   # every platform binary + every machine's kernel8-<machine>.img
-               #   + the boot picker — each platform kernel links the shared
+               #   + the bootloader — each platform kernel links the shared
                #   mamedrivers engine with its own drivlist. Each platform's
                #   folder under docs/ lists its machines, or use
                #   `make kernel MACHINE=<name>` for just one
@@ -250,9 +250,9 @@ make card PLATFORM=sinclair TIER=free ASSETS=~/my-assets   # a platform card
 `build/sd/`: that board's Raspberry Pi firmware (fetched at the revision
 Circle pins), our `config.txt` boot configuration, the machine's regional
 canvas `cmdline.txt`, and the MAME core as `kernel-<board>.img` — which the
-firmware boots directly, no picker. `make card PLATFORM=<p> TIER=<free|public>`
-instead lays out a platform card in `build/card-<p>-<tier>-<board>/`: the boot
-picker as `pi-mame-boot-<board>.img` (the front door the firmware boots), the
+firmware boots directly, no bootloader. `make card PLATFORM=<p> TIER=<free|public>`
+instead lays out a platform card in `build/card-<p>-<tier>-<board>/`: the
+bootloader as `pi-mame-boot-<board>.img` (the front door the firmware boots), the
 MAME core as `kernel-<board>.img`, and a generated `bootmenu.cfg` (the
 **free** menu lists only machines whose ROMs are all free-tier; **public**
 lists the full roster). A card carries the media its own menu asks for and
