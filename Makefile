@@ -175,10 +175,11 @@ mame:
 # carry, so these link against the `mame-all` engine instead. It lives in its
 # own build directory, so both engines can exist at once.
 #
-# WHY TWO HALVES AND A WHOLE. The halves each stay under the 255 MB ceiling
-# the network loader stages a kernel into, so each can be pushed to a board.
-# `whole` is every driver in one kernel, about 350 MB: past that ceiling, so it
-# boots from a card and never over the network.
+# WHY TWO KERNELS AND NOT ONE. Every driver in one kernel runs to about 343 MB
+# of code and data. The Circle world places the kernel stacks, page tables and
+# heap directly after KERNEL_MAX_SIZE (255 MB) from the load address, so a kernel
+# that large overwrites them and never starts, from a card or over the network.
+# Split in two, each half fits.
 ALL_ENGINE = $(CURDIR)/mame/build/$(RAPI_BOARD)-all/rapi-circle
 
 mame-all:
@@ -186,8 +187,8 @@ mame-all:
 
 # MAMEBUILD and MAMEDRIVERS_SUBTARGET are the whole of what points host's
 # Makefile at the other engine. It needs no change to build these.
-.PHONY: mame-all computers arcade whole halves bundles dist-bundles
-computers arcade whole:
+.PHONY: mame-all computers arcade halves bundles dist-bundles
+computers arcade:
 	@[ -d "$(ALL_ENGINE)/bin/mame_mame" ] || { \
 		echo "$@: no whole-tree engine for $(RAPI_BOARD) — run 'make mame-all' first" >&2; \
 		exit 1; }
@@ -197,26 +198,18 @@ computers arcade whole:
 
 halves: computers arcade
 
-bundles: computers arcade whole
+bundles: computers arcade
 
-# The three bundles as release assets, named the way scripts/mkdist.sh names a
+# The two bundles as release assets, named the way scripts/mkdist.sh names a
 # platform binary: every board builds kernel8-<bundle>.img, and a release's
 # assets are one flat namespace, so the board goes into the name here.
 dist-bundles:
 	@mkdir -p dist
-	@for v in computers arcade whole; do \
+	@for v in computers arcade; do \
 		cp host/build/$(RAPI_BOARD)/kernel8-$$v.img \
 			dist/pi-mame-$(TAG)-$$v-$(RAPI_BOARD).img || exit 1; \
 	done
-	@ls -l dist/pi-mame-$(TAG)-*-$(RAPI_BOARD).img | grep -E -- '-(computers|arcade|whole)-'
-	@# `whole` is too big for the bootloader to chain-boot, so its card is a
-	@# single-kernel card the firmware boots directly. It carries every
-	@# free-tier ROM, the same set mkdist.sh gives the free platform cards.
-	$(MAKE) assets-free ASSETS=$(CURDIR)/free-assets
-	scripts/mksd.sh whole $(CURDIR)/free-assets
-	@rm -f dist/pi-mame-$(TAG)-whole-$(RAPI_BOARD).zip
-	cd build/sd-whole-$(RAPI_BOARD) && zip -qr ../../dist/pi-mame-$(TAG)-whole-$(RAPI_BOARD).zip .
-	@ls -l dist/pi-mame-$(TAG)-whole-$(RAPI_BOARD).zip
+	@ls -l dist/pi-mame-$(TAG)-*-$(RAPI_BOARD).img | grep -E -- '-(computers|arcade)-'
 
 # One platform binary per vendor-class: each its own link against its own
 # isolated MAME tree, no machine baked. Unpatched, each is that platform's

@@ -68,13 +68,14 @@ PLATFORMS = sinclair amstrad commodore amiga atari acorn eaca samcoupe camputers
 # machines and the gambling cabinets with them.
 #
 # They exist because a kernel per vendor is a build per vendor, and the whole
-# set does not fit one image: everything together links at about 335MB, over
-# the ceiling that keeps a kernel pushable to the bench. Split this way both
-# halves fit, which is the useful fact — two builds instead of sixteen.
+# set does not fit one image: everything together runs past KERNEL_MAX_SIZE,
+# where the Circle world places the kernel stacks, page tables and heap. Split
+# this way both halves fit, which is the useful fact — two builds instead of
+# sixteen.
 #
-# DELIBERATELY NOT IN PLATFORMS. These ship nothing, own no machines and have
-# no roster, so `make kernels`, the per-machine images and CI never see them.
-# The PLATFORM check accepts them (Makefile) and nothing else does.
+# DELIBERATELY NOT IN PLATFORMS. These own no machines and have no roster, so
+# `make kernels`, the per-machine images and the platform cards never see them.
+# The PLATFORM check accepts them (Makefile), and `make bundles` builds them.
 #
 # Their SOURCES are a SCAN, never a list — see scripts/driver-class.sh. A
 # written-down list of three thousand driver files would not grow when MAME
@@ -83,14 +84,10 @@ PLATFORMS = sinclair amstrad commodore amiga atari acorn eaca samcoupe camputers
 # The scan is a recursive grep over src/mame, so it is not free. These are
 # recursively assigned (`=`) so it runs only when a rule actually asks for a
 # virtual platform's sources, and never on an ordinary vendor build.
-VIRTUAL_PLATFORMS = computers arcade whole
+VIRTUAL_PLATFORMS = computers arcade
 
 PLATFORM_SUBTARGET_computers = mame
 PLATFORM_SUBTARGET_arcade    = mame
-# Every driver MAME has, in one kernel. It names no sources: the whole-tree
-# engine already generated a driver list with no filter, and the build links
-# that rather than making one.
-PLATFORM_SUBTARGET_whole     = mame
 
 # ROOT is the Makefile's, but this file is also read on its own (build-mame.sh
 # and the verify scripts ask it for a roster with `make -f machines.mk print-…`),
@@ -99,9 +96,6 @@ ROOT ?= ..
 
 PLATFORM_SOURCES_computers = $(shell $(ROOT)/scripts/driver-class.sh computers)
 PLATFORM_SOURCES_arcade    = $(shell $(ROOT)/scripts/driver-class.sh arcade)
-# Both halves together is every file that declares a driver at all, which is
-# every machine MAME has.
-PLATFORM_SOURCES_whole     = $(PLATFORM_SOURCES_computers) $(PLATFORM_SOURCES_arcade)
 
 PLATFORM_MACHINES_sinclair = spectrum spec128 specpls2 specpl2a specpls3 \
 	tbblue specnext_ks1 specnext_ks2 specnext_ks3 zx80 zx81 tc2048 ts2068 \

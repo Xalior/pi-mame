@@ -247,9 +247,8 @@ jobs:
           path: dist/pi-mame-*
           if-no-files-found: error
 
-  # The three bundles: `computers` and `arcade`, MAME's whole driver set split
-  # in two by what each driver says it is, and `whole`, all of it in one kernel
-  # that only boots from a card. They link against the whole-tree engine
+  # The two bundles: `computers` and `arcade`, MAME's whole driver set split
+  # in two by what each driver says it is. They link against the whole-tree engine
   # (`make mame-all`), a second and much larger MAME build than the roster's,
   # so they get their own job per board and their own time budget, running
   # beside the roster build rather than after it. The setup steps repeat the
